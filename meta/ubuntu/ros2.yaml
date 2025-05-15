@@ -1,0 +1,42 @@
+name: ubuntu-ros2-pi5
+
+mmdebstrap:
+  mode: unshare
+  suite: noble
+  target: rootfs
+  mirrors:
+    - http://ports.ubuntu.com/ubuntu-ports noble main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-updates main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-security main restricted universe multiverse
+  keyrings:
+    - /usr/share/keyrings/ubuntu-archive-keyring.gpg
+  architecture: arm64
+  variant: minbase
+
+  setup-hooks:
+    - rm -f "$1/etc/apt/sources.list.d/ros2-testing.list"
+    - mkdir -p "$1/usr/share/keyrings"
+    - curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o "$1/usr/share/keyrings/ros-archive-keyring.gpg"
+    - chmod 644 "$1/usr/share/keyrings/ros-archive-keyring.gpg"
+    - echo "deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > "$1/etc/apt/sources.list.d/ros2.list"
+
+  packages:
+    - ros-jazzy-ros-base
+    - python3-rosdep
+
+  customize-hooks:
+    # System setup
+    - chroot "$1" apt-get update
+    - chroot "$1" apt-get install -y software-properties-common
+    - chroot "$1" add-apt-repository universe
+    - chroot "$1" apt-get -y full-upgrade
+
+    # Create ubuntu user with home directory
+    - chroot "$1" useradd --create-home --shell /bin/bash ubuntu
+    - chroot "$1" passwd -d ubuntu  # Remove password for convenience
+
+    # ROS configuration
+    - chroot "$1" rosdep init
+    - chroot "$1" runuser -u ubuntu -- rosdep update --include-eol-distros
+    - echo "source /opt/ros/jazzy/setup.bash" >> "$1/home/ubuntu/.bashrc"
+

@@ -41,7 +41,7 @@ image boot.vfat {
       label = "BOOT"
       extraargs = "-s 4 -S <SECTOR_SIZE> -i <BOOT_UUID>"
    }
-   size = <FW_SIZE>
+   size = "512M"
    mountpoint = "/boot/firmware"
    exec-pre = "<SETUP> BOOT <BOOT_UUID> <ROOT_UUID>"
 }
@@ -53,7 +53,7 @@ image root.ext4 {
       mke2fs-conf = <MKE2FSCONF>
       extraargs = "-U <ROOT_UUID>"
    }
-   size = <ROOT_SIZE>
+   size = "4G"
    mountpoint = "/"
    exec-pre = "<SETUP> ROOT <BOOT_UUID> <ROOT_UUID>"
 }

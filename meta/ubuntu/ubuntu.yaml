@@ -1,0 +1,35 @@
+name: ubuntu-ros2-pi5
+mmdebstrap:
+  mode: unshare
+  suite: noble
+  target: rootfs
+  mirrors:
+    - deb http://archive.raspberrypi.com/debian bookworm main
+    - http://ports.ubuntu.com/ubuntu-ports noble main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-updates main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-security main restricted universe multiverse
+  keyrings:
+    - /usr/share/keyrings/ubuntu-archive-keyring.gpg
+  packages:
+    - raspberrypi-archive-keyring
+    - ubuntu-minimal
+    - systemd
+    - linux-raspi
+    - linux-firmware-raspi
+      #- u-boot-rpi5
+    - network-manager
+    - sudo
+    - curl
+    - locales
+  customize-hooks:
+    - test -f $1/usr/share/keyrings/raspberrypi-archive-keyring.gpg || false
+    - mkdir -p $1/etc/apt/sources.list.d
+    - |-
+      cat <<- EOF > $1/etc/apt/sources.list.d/raspberrypi.list
+      deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.com/debian bookworm main
+      EOF
+    - sed -i '/archive\.raspberrypi\.com/d' $1/etc/apt/sources.list
+  setup-hooks:
+    - mkdir -p "$1/usr/share/keyrings"
+    - echo "ubuntu-ros2" > "$1/etc/hostname"
+
