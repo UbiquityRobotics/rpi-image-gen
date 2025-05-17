@@ -23,6 +23,12 @@ mmdebstrap:
   packages:
     - ros-jazzy-ros-base
     - python3-rosdep
+    - python3-colcon-common-extensions
+    - ros-jazzy-controller-manager
+    - ros-jazzy-joint-state-publisher
+    - ros-jazzy-xacro
+    - ros-jazzy-ros2-control
+    - ros-jazzy-ros2-controllers
 
   customize-hooks:
     # System setup

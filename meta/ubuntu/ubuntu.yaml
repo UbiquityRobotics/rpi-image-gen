@@ -13,14 +13,41 @@ mmdebstrap:
   packages:
     - raspberrypi-archive-keyring
     - ubuntu-minimal
-    - systemd
+      #- systemd
     - linux-raspi
     - linux-firmware-raspi
-      #- u-boot-rpi5
+    - wpasupplicant
     - network-manager
-    - sudo
+      #- sudo
     - curl
     - locales
+    - python3-setuptools
+    - vim
+    - nano
+    - emacs
+    - htop
+    - screen
+    - tmux
+    - at
+    - cloud-init
+    - dosfstools
+    - e2fsprogs
+    - fdisk
+    - minicom
+    - git
+    - python3-pip
+    - ethtool
+      #- openssh-server
+    - libnss-mdns
+    - avahi-daemon
+    - gnupg
+    - patch
+    - pollinate
+    - software-properties-common
+    - i2c-tools
+    - net-tools
+    - fake-hwclock
+    - ssl-cert
   customize-hooks:
     - test -f $1/usr/share/keyrings/raspberrypi-archive-keyring.gpg || false
     - mkdir -p $1/etc/apt/sources.list.d
@@ -29,6 +56,24 @@ mmdebstrap:
       deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.com/debian bookworm main
       EOF
     - sed -i '/archive\.raspberrypi\.com/d' $1/etc/apt/sources.list
+    - |
+      mkdir -p $1/etc/cloud/cloud.cfg.d
+      cat <<EOF > $1/etc/cloud/cloud.cfg.d/99-growpart.cfg
+      growpart:
+        mode: auto
+      EOF
+
+      cat <<EOF > $1/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+      network: {config: disabled}
+      EOF
+
+      # Disable cloud-init user management
+      cat <<EOF > $1/etc/cloud/cloud.cfg.d/99-disable-users.cfg
+      #cloud-config
+      users: []
+      disable_root: false
+      EOF
+    - chroot "$1" systemctl mask systemd-networkd-wait-online.service
   setup-hooks:
     - mkdir -p "$1/usr/share/keyrings"
     - echo "ubuntu-ros2" > "$1/etc/hostname"
