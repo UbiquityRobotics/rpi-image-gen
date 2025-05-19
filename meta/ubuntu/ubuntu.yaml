@@ -1,3 +1,4 @@
+# ubuntu-ros2-pi5.yaml
 name: ubuntu-ros2-pi5
 mmdebstrap:
   mode: unshare
@@ -12,13 +13,26 @@ mmdebstrap:
     - /usr/share/keyrings/ubuntu-archive-keyring.gpg
   packages:
     - raspberrypi-archive-keyring
-    - ubuntu-minimal
-      #- systemd
+    - ubuntu-server
+    - systemd
     - linux-raspi
+    - linux-image-raspi
     - linux-firmware-raspi
+    - raspi-firmware
+    - firmware-brcm80211
+    - raspberrypi-bootloader
+    - linux-firmware
+    - rfkill
     - wpasupplicant
+    - modemmanager
+    - iw
+    - wireless-regdb
     - network-manager
-      #- sudo
+    - systemd-timesyncd
+    # --- your other packages below ---
+    - cage
+    - initramfs-tools
+    - sudo
     - curl
     - locales
     - python3-setuptools
@@ -37,7 +51,7 @@ mmdebstrap:
     - git
     - python3-pip
     - ethtool
-      #- openssh-server
+    - openssh-server
     - libnss-mdns
     - avahi-daemon
     - gnupg
@@ -48,33 +62,19 @@ mmdebstrap:
     - net-tools
     - fake-hwclock
     - ssl-cert
+    - console-setup
   customize-hooks:
-    - test -f $1/usr/share/keyrings/raspberrypi-archive-keyring.gpg || false
-    - mkdir -p $1/etc/apt/sources.list.d
-    - |-
-      cat <<- EOF > $1/etc/apt/sources.list.d/raspberrypi.list
-      deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.com/debian bookworm main
-      EOF
-    - sed -i '/archive\.raspberrypi\.com/d' $1/etc/apt/sources.list
+    - test -f "$1/usr/share/keyrings/raspberrypi-archive-keyring.gpg" || false
+    - mkdir -p "$1/etc/apt/sources.list.d"
+    - printf 'deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.com/debian bookworm main\n' > "$1/etc/apt/sources.list.d/raspberrypi.list"
+    - sed -i '/archive\.raspberrypi\.com/d' "$1/etc/apt/sources.list"
     - |
-      mkdir -p $1/etc/cloud/cloud.cfg.d
-      cat <<EOF > $1/etc/cloud/cloud.cfg.d/99-growpart.cfg
-      growpart:
-        mode: auto
-      EOF
-
-      cat <<EOF > $1/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
-      network: {config: disabled}
-      EOF
-
-      # Disable cloud-init user management
-      cat <<EOF > $1/etc/cloud/cloud.cfg.d/99-disable-users.cfg
-      #cloud-config
-      users: []
-      disable_root: false
-      EOF
+      mkdir -p "$1/etc/cloud/cloud.cfg.d"
+      printf 'growpart:\n  mode: auto\n' > "$1/etc/cloud/cloud.cfg.d/99-growpart.cfg"
+      printf 'network: {config: disabled}\n' > "$1/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"
+      printf '#cloud-config\nusers: []\ndisable_root: false\n' > "$1/etc/cloud/cloud.cfg.d/99-disable-users.cfg"
     - chroot "$1" systemctl mask systemd-networkd-wait-online.service
-  setup-hooks:
-    - mkdir -p "$1/usr/share/keyrings"
-    - echo "ubuntu-ros2" > "$1/etc/hostname"
+    - printf 'ACTIVE_CONSOLES="/dev/tty[1-6]"\nCHARMAP="UTF-8"\nCODESET="guess"\nFONTFACE="TerminusBold"\nFONTSIZE="32x16"\n' > "$1/etc/default/console-setup"
 
+    # Remove systemd-networkd config for wlan0 to avoid conflict
+    # - $META_HOOKS/systemd/netgen wlan0 > $1/etc/systemd/network/25-wireless.network

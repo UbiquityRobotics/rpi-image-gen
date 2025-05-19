@@ -1,0 +1,113 @@
+mmdebstrap:
+  mode: unshare
+  suite: noble
+  target: rootfs
+  architecture: arm64
+  mirrors:
+    - http://ports.ubuntu.com/ubuntu-ports noble main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-updates main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-security main restricted universe multiverse
+  keyrings:
+    - /usr/share/keyrings/ubuntu-archive-keyring.gpg
+  packages:
+    # Core and Pi 5 support
+    - ubuntu-minimal
+    - systemd
+    - linux-raspi              # Meta-package for Pi kernels
+    - linux-firmware-raspi     # Includes Pi 5 WiFi/BT firmware
+    - rfkill
+    - wpasupplicant
+    - network-manager
+    - iw
+    - wireless-regdb
+    - network-manager-config-connectivity-ubuntu
+    - modemmanager
+    - sudo
+    - curl
+    - locales
+    - python3-setuptools
+    - vim
+    - nano
+    - emacs
+    - htop
+    - screen
+    - tmux
+    - at
+    - cloud-init
+    - dosfstools
+    - e2fsprogs
+    - fdisk
+    - minicom
+    - git
+    - python3-pip
+    - ethtool
+    - openssh-server
+    - libnss-mdns
+    - avahi-daemon
+    - gnupg
+    - patch
+    - pollinate
+    - software-properties-common
+    - i2c-tools
+    - net-tools
+    - fake-hwclock
+    - ssl-cert
+    - initramfs-tools
+    - watchdog
+  customize-hooks:
+    # Pi 5 boot configuration
+    - |
+      mkdir -p "$1/boot/firmware"
+      # Copy device-tree and overlays
+      for dtb in $(find "$1/usr/lib/linux-image-"*"-raspi-2712" -name "bcm2712-rpi-5-b.dtb"); do
+        cp "$dtb" "$1/boot/firmware/"
+      done
+      # Copy overlays if present (optional, but recommended)
+      if [ -d "$1/usr/lib/linux-image-"*"-raspi-2712/overlays" ]; then
+        cp -r "$1/usr/lib/linux-image-"*"-raspi-2712/overlays" "$1/boot/firmware/"
+      fi
+      cat <<EOF > "$1/boot/firmware/config.txt"
+      # Pi 5 specific configuration
+      dtoverlay=disable-bt-pi5
+      dtparam=ant2
+      dtparam=pciex1
+      dtoverlay=vc4-kms-v3d,cma-128
+      EOF
+
+      cat <<EOF > "$1/boot/firmware/cmdline.txt"
+      console=serial0,115200 console=tty1 root=PARTUUID=ROOTUUID rootfstype=ext4 fsck.repair=yes rootwait quiet splash
+      EOF
+
+    # NetworkManager regulatory domain
+    - |
+      mkdir -p "$1/etc/NetworkManager/conf.d"
+      cat <<EOF > "$1/etc/NetworkManager/conf.d/regdom.conf"
+      [device]
+      wifi.scan-rand-mac-address=no
+      wifi.cloned-mac-address=preserve
+      regulatory-domain=US
+      EOF
+
+    # Unblock WiFi at boot
+    - |
+      echo "#!/bin/sh -e" > "$1/etc/rc.local"
+      echo "rfkill unblock wifi" >> "$1/etc/rc.local"
+      echo "exit 0" >> "$1/etc/rc.local"
+      chmod +x "$1/etc/rc.local"
+
+    # Enable NetworkManager and watchdog
+    - chroot "$1" systemctl enable NetworkManager
+    - chroot "$1" systemctl enable watchdog
+
+    # Update initramfs (critical for WiFi firmware)
+    - chroot "$1" update-initramfs -u -k all
+
+    # Make /tmp and /var/log tmpfs for SD card longevity
+    - |
+      echo "tmpfs /tmp tmpfs defaults,nosuid 0 0" >> "$1/etc/fstab"
+      echo "tmpfs /var/log tmpfs defaults,noatime 0 0" >> "$1/etc/fstab"
+
+  setup-hooks:
+    - mkdir -p "$1/usr/share/keyrings"
+    - echo "ubuntu-ros2-pi5" > "$1/etc/hostname"
+

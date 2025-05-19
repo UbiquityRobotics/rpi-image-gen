@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+# Write out our systemd service to unblock wifi
+rsync ../wifi-setup/unblock-wifi.service $1/etc/systemd/system/unblock-wifi.service
+
+$BDEBSTRAP_HOOKS/enable-units "$1" unblock-wifi
+
+mkdir -p $1/etc/wpa_supplicant
+
+# Write out our systemd service to connect wifi
+rsync ../wifi-setup/connect-wifi.service $1/etc/systemd/system/connect-wifi.service
+
+$BDEBSTRAP_HOOKS/enable-units "$1" connect-wifi
