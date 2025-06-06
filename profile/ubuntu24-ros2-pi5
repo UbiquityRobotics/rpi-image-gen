@@ -2,8 +2,8 @@ ubuntu/ubuntu
 ubuntu/ros2
 rpi/misc-utils
 rpi/base/essential
-rpi/boot-firmware
-rpi/arm64/linux-image-v8
+ubuntu/firmware
+ubuntu/kernel
 rpi/user-credentials
 rpi/misc-skel
-ubuntu/wifi
+ubuntu/dns

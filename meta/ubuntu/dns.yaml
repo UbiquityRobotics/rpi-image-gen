@@ -1,0 +1,32 @@
+name: network-fixes
+mmdebstrap:
+  architectures:
+    - arm64
+  packages:
+    - dnsutils
+    - resolvconf
+    - ca-certificates
+    - iptables  # For firewall checks
+  customize-hooks:
+    # Disable conflicting services
+    - chroot $1 systemctl disable systemd-resolved.service 2>/dev/null || true
+    - chroot $1 systemctl stop systemd-resolved.service 2>/dev/null || true
+    - rm -f $1/etc/resolv.conf
+
+    # Configure static DNS for all interfaces
+    - |-
+      echo "interface eth0
+      static domain_name_servers=1.1.1.1 8.8.8.8" >> $1/etc/dhcpcd.conf
+    - |-
+      echo "interface wlan0
+      static domain_name_servers=1.1.1.1 8.8.8.8" >> $1/etc/dhcpcd.conf
+
+    # Force resolvconf to use our DNS
+    - mkdir -p $1/etc/resolvconf/conf.d
+    - echo "name_servers=1.1.1.1 8.8.8.8" > $1/etc/resolvconf/conf.d/head
+    - chroot $1 resolvconf -u
+
+    # Final verification file
+    - echo "nameserver 1.1.1.1" > $1/etc/resolv.conf
+    - echo "nameserver 8.8.8.8" >> $1/etc/resolv.conf
+
