@@ -16,12 +16,6 @@ mmdebstrap:
     - ubuntu-server
     - systemd
     - linux-raspi
-    - linux-image-raspi
-    - linux-firmware-raspi
-    - raspi-firmware
-    - firmware-brcm80211
-    - raspberrypi-bootloader
-    - linux-firmware
     - rfkill
     - wpasupplicant
     - modemmanager
@@ -31,7 +25,6 @@ mmdebstrap:
     - systemd-timesyncd
     # --- your other packages below ---
     - cage
-    - initramfs-tools
     - sudo
     - curl
     - locales

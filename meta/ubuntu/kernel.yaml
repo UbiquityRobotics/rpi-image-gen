@@ -1,0 +1,26 @@
+name: pi5-kernel
+mmdebstrap:
+  architectures:
+    - arm64
+  packages:
+    - linux-image-rpi-2712
+    - initramfs-tools
+  customize-hooks:
+    # --- Install Pi 5 WiFi firmware files from local directory ---
+    - install -Dm644 firmware/brcm/cyfmac43455-sdio.bin $1/lib/firmware/brcm/cyfmac43455-sdio.bin
+    - install -Dm644 firmware/brcm/cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/cyfmac43455-sdio.clm_blob
+    - install -Dm644 firmware/brcm/brcmfmac43455-sdio.txt $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+
+    # --- Create Pi 5-specific symlinks as required by the kernel ---
+    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin
+    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.clm_blob
+    - ln -sf brcmfmac43455-sdio.txt $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.txt
+
+    # --- Ensure firmware is in the initramfs ---
+    - chroot $1 update-initramfs -u
+
+  dpkgopts:
+    - path-exclude=/usr/lib/linux-image-*-2712/broadcom/bcm2710*
+    - path-exclude=/usr/lib/linux-image-*-2712/broadcom/bcm2711*
+    - path-exclude=/usr/lib/linux-image-*-2712/broadcom/bcm2837*
+

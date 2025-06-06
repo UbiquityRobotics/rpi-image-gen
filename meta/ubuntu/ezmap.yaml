@@ -1,0 +1,9 @@
+name: github-repo-clone
+mmdebstrap:
+  customize-hooks:
+    - |
+      # Clone repository during image customization
+      chroot "$1" /bin/bash -c ' \
+        git clone https://github.com/yourusername/your-repo.git /opt/your-repo \
+        && chown -R root:root /opt/your-repo \
+        && echo "Repository cloned to /opt/your-repo"'
