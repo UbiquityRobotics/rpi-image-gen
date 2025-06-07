@@ -1,0 +1,23 @@
+name: firstboot-wifi-setup
+mmdebstrap:
+  architectures:
+    - arm64
+  packages:
+    - whiptail
+  customize-hooks:
+    - |
+      # Create interactive WiFi setup script
+      cat > "$1/usr/local/bin/setup-wifi" <<'EOF'
+      #!/bin/bash
+      SSID=$(whiptail --inputbox "Enter WiFi SSID:" 8 40 3>&1 1>&2 2>&3)
+      PASS=$(whiptail --passwordbox "Enter WiFi Password:" 8 40 3>&1 1>&2 2>&3)
+      sudo sed -i "s/SSID_PLACEHOLDER/$SSID/; s/PASSWORD_PLACEHOLDER/$PASS/" /etc/netplan/90-dns-fix.yaml
+      sudo netplan apply
+      sudo rm -f /usr/local/bin/setup-wifi
+      EOF
+      chmod +x "$1/usr/local/bin/setup-wifi"
+
+      # Add to profile.d for first login
+      echo "[ -x /usr/local/bin/setup-wifi ] && /usr/local/bin/setup-wifi" > "$1/etc/profile.d/wifi-prompt.sh"
+      chmod +x "$1/etc/profile.d/wifi-prompt.sh"
+

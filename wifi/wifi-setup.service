@@ -1,0 +1,14 @@
+[Unit]
+Description=WiFi Setup Wizard
+After=network.target
+Wants=network.target
+Requires=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wifi-setup.sh
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+

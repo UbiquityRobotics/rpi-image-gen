@@ -7,3 +7,4 @@ ubuntu/kernel
 rpi/user-credentials
 rpi/misc-skel
 ubuntu/dns
+ubuntu/wifi-start

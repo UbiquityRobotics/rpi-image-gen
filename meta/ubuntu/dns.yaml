@@ -3,30 +3,31 @@ mmdebstrap:
   architectures:
     - arm64
   packages:
-    - dnsutils
-    - resolvconf
-    - ca-certificates
-    - iptables  # For firewall checks
+    - systemd-resolved
+    - netplan.io
+    - network-manager
   customize-hooks:
-    # Disable conflicting services
-    - chroot $1 systemctl disable systemd-resolved.service 2>/dev/null || true
-    - chroot $1 systemctl stop systemd-resolved.service 2>/dev/null || true
-    - rm -f $1/etc/resolv.conf
-
-    # Configure static DNS for all interfaces
-    - |-
-      echo "interface eth0
-      static domain_name_servers=1.1.1.1 8.8.8.8" >> $1/etc/dhcpcd.conf
-    - |-
-      echo "interface wlan0
-      static domain_name_servers=1.1.1.1 8.8.8.8" >> $1/etc/dhcpcd.conf
-
-    # Force resolvconf to use our DNS
-    - mkdir -p $1/etc/resolvconf/conf.d
-    - echo "name_servers=1.1.1.1 8.8.8.8" > $1/etc/resolvconf/conf.d/head
-    - chroot $1 resolvconf -u
-
-    # Final verification file
-    - echo "nameserver 1.1.1.1" > $1/etc/resolv.conf
-    - echo "nameserver 8.8.8.8" >> $1/etc/resolv.conf
-
+    - |
+      mkdir -p "$1/etc/netplan"
+      cat > "$1/etc/netplan/90-dns-fix.yaml" <<EOF
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          eth0:
+            dhcp4: true
+            nameservers:
+              addresses: [1.1.1.1, 8.8.8.8]
+        wifis:
+          wlan0:
+            dhcp4: true
+            nameservers:
+              addresses: [1.1.1.1, 8.8.8.8]
+            access-points:
+              "SSID_PLACEHOLDER":
+                password: "PASSWORD_PLACEHOLDER"
+      EOF
+    - ln -sf /run/systemd/resolve/stub-resolv.conf "$1/etc/resolv.conf"
+    - chroot "$1" systemctl enable systemd-resolved
+    - chmod 600 "$1/etc/netplan/90-dns-fix.yaml"
+    - chown root:root "$1/etc/netplan/90-dns-fix.yaml"
