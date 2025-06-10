@@ -21,9 +21,7 @@ mmdebstrap:
     - modemmanager
     - iw
     - wireless-regdb
-    - network-manager
     - systemd-timesyncd
-    # --- your other packages below ---
     - cage
     - sudo
     - curl
@@ -68,6 +66,3 @@ mmdebstrap:
       printf '#cloud-config\nusers: []\ndisable_root: false\n' > "$1/etc/cloud/cloud.cfg.d/99-disable-users.cfg"
     - chroot "$1" systemctl mask systemd-networkd-wait-online.service
     - printf 'ACTIVE_CONSOLES="/dev/tty[1-6]"\nCHARMAP="UTF-8"\nCODESET="guess"\nFONTFACE="TerminusBold"\nFONTSIZE="32x16"\n' > "$1/etc/default/console-setup"
-
-    # Remove systemd-networkd config for wlan0 to avoid conflict
-    # - $META_HOOKS/systemd/netgen wlan0 > $1/etc/systemd/network/25-wireless.network

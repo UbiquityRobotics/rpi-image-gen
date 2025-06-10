@@ -1,26 +1,43 @@
-name: pi5-kernel
+name: pi-universal-wifi
 mmdebstrap:
-  architectures:
-    - arm64
+  architectures: arm64
   packages:
-    - linux-image-rpi-2712
+    - linux-image-rpi-v8
+    - firmware-brcm80211
+    - raspi-firmware
     - initramfs-tools
   customize-hooks:
-    # --- Install Pi 5 WiFi firmware files from local directory ---
-    - install -Dm644 firmware/brcm/cyfmac43455-sdio.bin $1/lib/firmware/brcm/cyfmac43455-sdio.bin
-    - install -Dm644 firmware/brcm/cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/cyfmac43455-sdio.clm_blob
-    - install -Dm644 firmware/brcm/brcmfmac43455-sdio.txt $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+    # ===== Firmware Installation =====
+    - mkdir -p $1/lib/firmware/brcm
+    # Install base firmware files
+    - install -Dm644 firmware/brcm/cyfmac43455-sdio.* $1/lib/firmware/brcm/
+    - install -Dm644 firmware/brcm/brcmfmac43455-sdio.txt $1/lib/firmware/brcm/
 
-    # --- Create Pi 5-specific symlinks as required by the kernel ---
+    # ===== Device-Specific Symlinks =====
+    # Pi5 symlinks (required for BCM2712 detection)
     - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin
     - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.clm_blob
-    - ln -sf brcmfmac43455-sdio.txt $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.txt
+    
+    # Pi4 symlinks (generic fallback)
+    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.bin
+    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob
 
-    # --- Ensure firmware is in the initramfs ---
-    - chroot $1 update-initramfs -u
+    # ===== NVRAM Configuration =====
+    - |
+      echo "boardflags3=0x44200100" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+      echo "sromrev=11" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+      echo "xtalfreq=40000" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+
+    # ===== Initramfs Handling =====
+    - echo "brcm/brcmfmac43455-sdio.*" >> $1/etc/initramfs-tools/modules
+    - chroot $1 update-initramfs -u -k all
+
+    # ===== Kernel Parameters =====
+    - sed -i 's/$/ brcmfmac.run_oob=0 brcmfmac.htavail_timeout=1000000/' $1/boot/firmware/cmdline.txt
+
+    # ===== Power Management Fix =====
+    - echo "options brcmfmac roamoff=1" > $1/etc/modprobe.d/brcmfmac.conf
 
   dpkgopts:
-    - path-exclude=/usr/lib/linux-image-*-2712/broadcom/bcm2710*
-    - path-exclude=/usr/lib/linux-image-*-2712/broadcom/bcm2711*
-    - path-exclude=/usr/lib/linux-image-*-2712/broadcom/bcm2837*
+    - path-include=/usr/lib/raspi-firmware/brcm/*
 
