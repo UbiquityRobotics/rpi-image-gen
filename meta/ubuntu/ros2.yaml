@@ -34,7 +34,7 @@ mmdebstrap:
     # System setup
     - chroot "$1" apt-get update
     - chroot "$1" apt-get install -y software-properties-common
-    - chroot "$1" add-apt-repository universe
+    - chroot "$1" add-apt-repository -y universe
     - chroot "$1" apt-get -y full-upgrade
 
     # Create ubuntu user with home directory

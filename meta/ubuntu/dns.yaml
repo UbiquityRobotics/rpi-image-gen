@@ -6,23 +6,20 @@ mmdebstrap:
     - systemd-resolved
     - netplan.io
     - network-manager
+    - wireless-regdb  # Added for regulatory database
   customize-hooks:
     - |
       mkdir -p "$1/etc/netplan"
       cat > "$1/etc/netplan/90-dns-fix.yaml" <<EOF
       network:
         version: 2
-        renderer: networkd
+        renderer: NetworkManager  # Changed from networkd
         ethernets:
           eth0:
             dhcp4: true
-            nameservers:
-              addresses: [1.1.1.1, 8.8.8.8]
         wifis:
           wlan0:
             dhcp4: true
-            nameservers:
-              addresses: [1.1.1.1, 8.8.8.8]
             access-points:
               "SSID_PLACEHOLDER":
                 password: "PASSWORD_PLACEHOLDER"
@@ -31,3 +28,9 @@ mmdebstrap:
     - chroot "$1" systemctl enable systemd-resolved
     - chmod 600 "$1/etc/netplan/90-dns-fix.yaml"
     - chown root:root "$1/etc/netplan/90-dns-fix.yaml"
+    
+    # ===== NetworkManager Configuration =====
+    - |
+      echo "[device]
+      wifi.scan-rand-mac-address=no
+      wifi.powersave=2" > $1/etc/NetworkManager/conf.d/wifi.conf

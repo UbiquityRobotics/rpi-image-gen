@@ -1,42 +1,40 @@
 name: pi-universal-wifi
 mmdebstrap:
-  architectures: arm64
+  architectures:
+    - arm64
   packages:
     - linux-image-rpi-v8
     - firmware-brcm80211
     - raspi-firmware
     - initramfs-tools
+    - iw  # Added for power management control
   customize-hooks:
     # ===== Firmware Installation =====
     - mkdir -p $1/lib/firmware/brcm
-    # Install base firmware files
     - install -Dm644 firmware/brcm/cyfmac43455-sdio.* $1/lib/firmware/brcm/
     - install -Dm644 firmware/brcm/brcmfmac43455-sdio.txt $1/lib/firmware/brcm/
 
-    # ===== Device-Specific Symlinks =====
-    # Pi5 symlinks (required for BCM2712 detection)
-    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin
-    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.clm_blob
-    
-    # Pi4 symlinks (generic fallback)
+    # ===== Corrected Device Symlinks =====
+    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
+    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
     - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.bin
     - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob
 
-    # ===== NVRAM Configuration =====
+    # ===== Enhanced NVRAM Configuration =====
     - |
       echo "boardflags3=0x44200100" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
       echo "sromrev=11" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
       echo "xtalfreq=40000" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+      echo "boardtype=0x0e00" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+      echo "boardrev=0x1100" >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
 
-    # ===== Initramfs Handling =====
-    - echo "brcm/brcmfmac43455-sdio.*" >> $1/etc/initramfs-tools/modules
-    - chroot $1 update-initramfs -u -k all
+    # ===== Regulatory Domain Setup =====
+    - mkdir -p $1/etc/regulatory
+    - echo "country=US" > $1/etc/regulatory/regulatory.db
+    - chmod 644 $1/etc/regulatory/regulatory.db
 
-    # ===== Kernel Parameters =====
-    - sed -i 's/$/ brcmfmac.run_oob=0 brcmfmac.htavail_timeout=1000000/' $1/boot/firmware/cmdline.txt
-
-    # ===== Power Management Fix =====
-    - echo "options brcmfmac roamoff=1" > $1/etc/modprobe.d/brcmfmac.conf
+    # ===== Kernel Parameters Update =====
+    - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
 
   dpkgopts:
     - path-include=/usr/lib/raspi-firmware/brcm/*
