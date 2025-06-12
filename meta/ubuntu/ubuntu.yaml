@@ -1,4 +1,3 @@
-# ubuntu-ros2-pi5.yaml
 name: ubuntu-ros2-pi5
 mmdebstrap:
   mode: unshare
@@ -34,7 +33,6 @@ mmdebstrap:
     - screen
     - tmux
     - at
-    - cloud-init
     - dosfstools
     - e2fsprogs
     - fdisk
@@ -54,15 +52,80 @@ mmdebstrap:
     - fake-hwclock
     - ssl-cert
     - console-setup
+    - cloud-guest-utils  # Required for growpart
+    - parted            # Partition management
   customize-hooks:
-    - test -f "$1/usr/share/keyrings/raspberrypi-archive-keyring.gpg" || false
-    - mkdir -p "$1/etc/apt/sources.list.d"
-    - printf 'deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] http://archive.raspberrypi.com/debian bookworm main\n' > "$1/etc/apt/sources.list.d/raspberrypi.list"
-    - sed -i '/archive\.raspberrypi\.com/d' "$1/etc/apt/sources.list"
+      # Remove default repository entries
+    - sed -i '/^deb.*ubuntu.com/d' "$1/etc/apt/sources.list"
+    - rm -f "$1/etc/apt/sources.list.d/"*.list  # Remove any default list files
+
+  # Now add your custom repositories
     - |
-      mkdir -p "$1/etc/cloud/cloud.cfg.d"
-      printf 'growpart:\n  mode: auto\n' > "$1/etc/cloud/cloud.cfg.d/99-growpart.cfg"
-      printf 'network: {config: disabled}\n' > "$1/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"
-      printf '#cloud-config\nusers: []\ndisable_root: false\n' > "$1/etc/cloud/cloud.cfg.d/99-disable-users.cfg"
-    - chroot "$1" systemctl mask systemd-networkd-wait-online.service
+      cat > "$1/etc/apt/sources.list" <<EOF
+      deb http://ports.ubuntu.com/ubuntu-ports noble main restricted universe multiverse
+      deb http://ports.ubuntu.com/ubuntu-ports noble-updates main restricted universe multiverse
+      deb http://ports.ubuntu.com/ubuntu-ports noble-security main restricted universe multiverse
+      EOF
     - printf 'ACTIVE_CONSOLES="/dev/tty[1-6]"\nCHARMAP="UTF-8"\nCODESET="guess"\nFONTFACE="TerminusBold"\nFONTSIZE="32x16"\n' > "$1/etc/default/console-setup"
+    # ===== Custom Partition Resizing =====
+    - |
+      mkdir -p "$1/usr/local/sbin"
+      cat > "$1/usr/local/sbin/resize-rootfs.sh" <<'EOF'
+      #!/bin/bash
+      set -e
+      
+      # Log function
+      log() {
+          echo "$(date): $1" | tee -a /var/log/resize-rootfs.log
+      }
+      
+      log "Starting partition resize on first boot"
+      
+      # Detect root device and partition
+      ROOT_DEV=$(findmnt -n -o SOURCE /)
+      ROOT_DISK=${ROOT_DEV%p*}
+      ROOT_PART_NUM=${ROOT_DEV##*p}
+      
+      log "Root device: $ROOT_DEV, Disk: $ROOT_DISK, Partition: $ROOT_PART_NUM"
+      
+      # Resize partition
+      if ! growpart "$ROOT_DISK" "$ROOT_PART_NUM" 2>/dev/null; then
+          log "Partition resize failed or not needed"
+      else
+          log "Partition resized successfully"
+      fi
+      
+      # Resize filesystem
+      if resize2fs "$ROOT_DEV" 2>/dev/null; then
+          log "Filesystem resized successfully"
+      else
+          log "Filesystem resize failed"
+      fi
+      
+      # Disable service after completion
+      systemctl disable resize-rootfs.service
+      log "Resize service disabled"
+      EOF
+      chmod +x "$1/usr/local/sbin/resize-rootfs.sh"
+
+    - |
+      cat > "$1/etc/systemd/system/resize-rootfs.service" <<'EOF'
+      [Unit]
+      Description=Resize root partition on first boot
+      After=local-fs.target
+      Before=multi-user.target
+      ConditionPathExists=!/var/lib/resize-rootfs-done
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/sbin/resize-rootfs.sh
+      ExecStartPost=/bin/touch /var/lib/resize-rootfs-done
+      RemainAfterExit=true
+      StandardOutput=journal+console
+      StandardError=journal+console
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+    - chroot "$1" systemctl enable resize-rootfs.service
