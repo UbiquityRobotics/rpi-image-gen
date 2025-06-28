@@ -7,7 +7,9 @@ mmdebstrap:
     - firmware-brcm80211
     - raspi-firmware
     - initramfs-tools
-    - iw  # Added for power management control
+    - iw
+    - network-manager  # For AP functionality
+    - dnsmasq-base     # Required for DHCP in shared mode
   customize-hooks:
     # ===== Firmware Installation =====
     - mkdir -p $1/lib/firmware/brcm
@@ -35,6 +37,64 @@ mmdebstrap:
 
     # ===== Kernel Parameters Update =====
     - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
+
+    # ===== Access Point Setup Script (First Boot Only) =====
+    - |
+      cat <<EOF > $1/usr/local/bin/setup-ap.sh
+      #!/bin/bash
+      # Exit if already configured
+      if [ -f /etc/accesspoint-configured ]; then
+          exit 0
+      fi
+
+      # Set regulatory domain
+      iw reg set US
+
+      # Configure access point
+      nmcli con add type wifi ifname wlan0 con-name ap autoconnect yes \
+          ssid "RPi-AccessPoint" \
+          802-11-wireless.mode ap \
+          ipv4.method shared \
+          ipv4.addresses 192.168.4.1/24 \
+          wifi-sec.key-mgmt wpa-psk \
+          wifi-sec.psk "securepassword"
+
+      # Enable connection
+      nmcli con up ap
+
+      # Create marker file
+      touch /etc/accesspoint-configured
+      EOF
+      chmod +x $1/usr/local/bin/setup-ap.sh
+
+    # ===== First-Boot Systemd Service =====
+    - |
+      cat <<EOF > $1/etc/systemd/system/firstboot-ap.service
+      [Unit]
+      Description=First-boot Access Point Setup
+      After=network.target
+      ConditionPathExists=!/etc/accesspoint-configured
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/setup-ap.sh
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+    # Enable the first-boot service
+    - chroot $1 systemctl enable firstboot-ap.service
+
+    # ===== DHCP Configuration for NetworkManager =====
+    - |
+      cat <<EOF > $1/etc/NetworkManager/conf.d/ap-dhcp.conf
+      [connection]
+      match-device=interface-name:wlan0
+      ipv4.dhcp-timeout=10
+      ipv4.may-fail=no
+      EOF
 
   dpkgopts:
     - path-include=/usr/lib/raspi-firmware/brcm/*

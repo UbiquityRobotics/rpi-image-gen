@@ -4,6 +4,7 @@ rpi/misc-utils
 rpi/base/essential
 ubuntu/firmware
 ubuntu/kernel
+ubuntu/ezmap
 rpi/user-credentials
 rpi/misc-skel
 ubuntu/dns

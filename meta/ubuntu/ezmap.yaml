@@ -1,9 +1,59 @@
 name: github-repo-clone
 mmdebstrap:
+  packages:
+    - make
+    - g++
+    - python3-vcstool  # Added to provide vcs command
   customize-hooks:
+    # Initialize rosdep without privileged operations
     - |
-      # Clone repository during image customization
-      chroot "$1" /bin/bash -c ' \
-        git clone https://github.com/yourusername/your-repo.git /opt/your-repo \
-        && chown -R root:root /opt/your-repo \
-        && echo "Repository cloned to /opt/your-repo"'
+      chroot "$1" bash -c '
+        mkdir -p /home/ubuntu/.ros/rosdep/sources.list.d
+        echo "yaml https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/base.yaml" > /home/ubuntu/.ros/rosdep/sources.list.d/20-default.list
+        echo "yaml https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/python.yaml" >> /home/ubuntu/.ros/rosdep/sources.list.d/20-default.list
+        echo "yaml https://raw.githubusercontent.com/ros/rosdistro/master/rosdep/ruby.yaml" >> /home/ubuntu/.ros/rosdep/sources.list.d/20-default.list
+        export ROS_ETC_DIR=/home/ubuntu/.ros
+        rosdep update'
+
+    # Clone rmw_zenoh repository
+    - |
+      chroot "$1" bash -c '
+        mkdir -p /home/ubuntu/zenoh_ws/src
+        cd /home/ubuntu/zenoh_ws/src
+        git clone -b jazzy https://github.com/ros2/rmw_zenoh.git'
+
+    # Build ament_cmake_vendor_package from source
+    - |
+      chroot "$1" bash -c '
+        mkdir -p /home/ubuntu/ament_ws/src
+        git clone -b jazzy https://github.com/ament/ament_cmake /home/ubuntu/ament_ws/src/ament_cmake
+        source /opt/ros/jazzy/setup.bash
+        cd /home/ubuntu/ament_ws
+        colcon build --packages-up-to ament_cmake_vendor_package
+        source install/setup.bash'
+
+    # Build rmw_zenoh with serial transport
+    - |
+      chroot "$1" bash -c '
+        source /opt/ros/jazzy/setup.bash
+        source /home/ubuntu/ament_ws/install/setup.bash
+        cd /home/ubuntu/zenoh_ws
+        rosdep install --from-paths src --ignore-src --rosdistro jazzy -y
+        sed -i "s|zenoh/transport_tls|zenoh/transport_tls zenoh/transport_serial|" src/rmw_zenoh/zenoh_cpp_vendor/CMakeLists.txt
+        colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release'
+
+    # Download and configure router
+    - |
+      chroot "$1" bash -c '
+        wget -O /home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5 \
+          https://raw.githubusercontent.com/ros2/rmw_zenoh/jazzy/rmw_zenoh_cpp/config/DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5
+        sed -i "s|\"endpoints\": \[|\"endpoints\": \[ \"serial//dev/ttyAMA0#baudrate=1000000\", |" \
+          /home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5'
+
+    # Configure environment
+    - |
+      chroot "$1" bash -c '
+        echo "export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5" >> /home/ubuntu/.profile
+        echo "source /home/ubuntu/zenoh_ws/install/setup.bash" >> /home/ubuntu/.profile
+        echo "export RMW_IMPLEMENTATION=rmw_zenoh_cpp" >> /home/ubuntu/.profile'
+
