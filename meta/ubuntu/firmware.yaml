@@ -8,7 +8,7 @@ mmdebstrap:
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
-    # ===== Corrected Device Tree Configuration =====
+    # ===== Device Tree Configuration =====
     - |
       # Pi4 Configuration
       printf "\n[pi4]\n" >> "$1/boot/firmware/config.txt"
@@ -23,10 +23,18 @@ mmdebstrap:
       printf "dtoverlay=uart4\n" >> "$1/boot/firmware/config.txt"
       printf "dtoverlay=uart5\n" >> "$1/boot/firmware/config.txt"
 
-      # Common UART Configuration (applies to all models)
+      # Common UART Configuration
       printf "\n[all]\n" >> "$1/boot/firmware/config.txt"
       printf "enable_uart=1\n" >> "$1/boot/firmware/config.txt"
-    # ===== Updated Firmware Symlinks =====
+
+      # Camera Configuration (applies to all models)
+      printf "\n# Camera settings\n" >> "$1/boot/firmware/config.txt"
+      printf "camera_auto_detect=0\n" >> "$1/boot/firmware/config.txt"
+      printf "start_x=1\n" >> "$1/boot/firmware/config.txt"
+      printf "display_auto_detect=1\n" >> "$1/boot/firmware/config.txt"
+      printf "dtoverlay=imx219\n" >> "$1/boot/firmware/config.txt"
+
+    # ===== Firmware Symlinks =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
     - ln -sf brcmfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
 

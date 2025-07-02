@@ -1,0 +1,53 @@
+mmdebstrap:
+  mode: unshare
+  suite: noble
+  target: rootfs
+
+  packages:
+    - plocate
+    - g++
+    - make
+    - software-properties-common
+    - curl
+    - gnupg
+    - dirmngr
+    - ca-certificates
+    - git
+    - python3-pip
+
+  customize-hooks:
+    # --- Add Marco Sonic PPA with trusted=yes (insecure, use only if you trust the source) ---
+    - |
+      echo "deb [trusted=yes] http://ppa.launchpad.net/marco-sonic/rasppios/ubuntu noble main" > "$1/etc/apt/sources.list.d/marco-sonic-rasppios-noble.list"
+
+    - echo "installing picam"
+
+    # --- Add ROS 2 Jazzy repository and key ---
+    - |
+      curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o "$1/usr/share/keyrings/ros-archive-keyring.gpg"
+    - |
+      echo "deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > "$1/etc/apt/sources.list.d/ros2.list"
+    - chroot "$1" apt update
+
+    # --- System updates and installations ---
+    - chroot "$1" apt upgrade -y
+    - chroot "$1" apt install -y libcamera-tools gstreamer1.0-libcamera libcamera-dev libcamera-doc libcamera-ipa libcamera-v4l2 python3-libcamera
+    - chroot "$1" apt install -y ros-dev-tools
+
+    # --- Workspace setup ---
+    - |
+      chroot "$1" mkdir -p /home/ubuntu/ros2_ws/src
+    - |
+      chroot "$1" git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
+
+    # --- Initialize rosdep ---
+    - chroot "$1" rosdep update
+
+    # --- Install dependencies with rosdep ---
+    - |
+      chroot "$1" rosdep install -y --from-paths /home/ubuntu/ros2_ws/src --ignore-src --rosdistro jazzy --skip-keys=libcamera
+
+    # --- Final updates ---
+    - chroot "$1" add-apt-repository -y universe
+    - chroot "$1" apt update
+
