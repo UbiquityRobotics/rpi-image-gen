@@ -24,15 +24,12 @@ mmdebstrap:
 
     # --- Add ROS 2 Jazzy repository and key ---
     - |
-      curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o "$1/usr/share/keyrings/ros-archive-keyring.gpg"
-    - |
-      echo "deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > "$1/etc/apt/sources.list.d/ros2.list"
-    - chroot "$1" apt update
-
+      export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+      curl -L -o "$1/tmp/ros2-apt-source.deb" "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.noble_all.deb"
+      chroot "$1" dpkg -i /tmp/ros2-apt-source.deb || true
     # --- System updates and installations ---
     - chroot "$1" apt upgrade -y
     - chroot "$1" apt install -y libcamera-tools gstreamer1.0-libcamera libcamera-dev libcamera-doc libcamera-ipa libcamera-v4l2 python3-libcamera
-    - chroot "$1" apt install -y ros-dev-tools
 
     # --- Workspace setup ---
     - |
@@ -44,10 +41,47 @@ mmdebstrap:
     - chroot "$1" rosdep update
 
     # --- Install dependencies with rosdep ---
-    - |
-      chroot "$1" rosdep install -y --from-paths /home/ubuntu/ros2_ws/src --ignore-src --rosdistro jazzy --skip-keys=libcamera
 
     # --- Final updates ---
     - chroot "$1" add-apt-repository -y universe
     - chroot "$1" apt update
+
+    # --- ADDED: Create udev rule for dma_heap access for picam ---
+    - |
+      echo 'SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"' > "$1/etc/udev/rules.d/picam.rules"
+    - chroot "$1" udevadm control --reload-rules
+    - chroot "$1" udevadm trigger
+
+
+    # --- ADDED: Locale setup for en_US.UTF-8 ---
+    - chroot "$1" apt update
+    - chroot "$1" apt install -y locales
+    - chroot "$1" locale-gen en_US en_US.UTF-8
+    - chroot "$1" update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+    - |
+      echo 'export LANG=en_US.UTF-8' >> "$1/etc/profile.d/locale.sh"
+
+
+    # --- ADDED: ROS tools and camera info manager ---
+    - chroot "$1" apt update
+    - chroot "$1" apt install -y ros-dev-tools ros-jazzy-camera-info-manager
+
+    # --- ADDED: rosdep initialization and update ---
+    - chroot "$1" rosdep init || true
+    - chroot "$1" rosdep update
+
+    # --- ADDED: rosdep install for workspace, skipping libcamera as before ---
+    - |
+      chroot "$1" rosdep install -y --from-paths /home/ubuntu/ros2_ws/src --ignore-src --rosdistro jazzy --skip-keys=libcamera
+
+    # --- ADDED: Build the workspace with colcon ---
+    - chroot "$1" apt install -y ros-jazzy-ament-cmake  # Ensure ament_cmake is present
+    - chroot "$1" bash -c "source /opt/ros/jazzy/setup.bash && cd /home/ubuntu/ros2_ws && colcon build"
+    # --- ADDED: Source ROS2 workspace on login ---
+    - |
+      echo 'source /home/ubuntu/ros2_ws/install/setup.bash' >> "$1/home/ubuntu/.bashrc"
+
+    # --- NOTE: The actual camera node run command is not included here as it should be run interactively after boot ---
+    # Example for user after boot:
+    # ros2 run camera_ros camera_node --ros-args -p width:=640 -p height:=480 -p format:=YUYV
 
