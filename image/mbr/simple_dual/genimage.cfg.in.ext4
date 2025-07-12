@@ -27,7 +27,7 @@ image boot.vfat {
    }
    size = "512M"  # Size ONLY in image blocks
    mountpoint = "/boot/firmware"
-   exec-pre = "/home/admin/rpi-image-gen/image/mbr/simple_dual/setup-clear.sh BOOT eea4db02 fd3a839a-24af-4e52-8993-74ed74aa824b"
+   exec-pre = "image/mbr/simple_dual/setup-clear.sh BOOT eea4db02 fd3a839a-24af-4e52-8993-74ed74aa824b"
 }
 
 image root.ext4 {
@@ -39,6 +39,6 @@ image root.ext4 {
    }
    size = "12G"  # Size ONLY in image blocks
    mountpoint = "/"
-   exec-pre = "/home/admin/rpi-image-gen/image/mbr/simple_dual/setup-clear.sh ROOT eea4db02 fd3a839a-24af-4e52-8993-74ed74aa824b"
+   exec-pre = "image/mbr/simple_dual/setup-clear.sh ROOT eea4db02 fd3a839a-24af-4e52-8993-74ed74aa824b"
 }
 
