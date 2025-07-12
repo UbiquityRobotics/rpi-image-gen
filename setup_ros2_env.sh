@@ -21,4 +21,4 @@ echo 'deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] htt
 
 # Update package lists again to include ROS 2 repository
 sudo apt update
-
+sudo export PATH=$PATH:/usr/sbin
