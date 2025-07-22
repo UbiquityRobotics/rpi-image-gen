@@ -1,0 +1,212 @@
+[0.462s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--packages-select', 'ubiquity_motor_ros2']
+[0.462s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=4, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=['ubiquity_motor_ros2'], packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, mixin_files=None, mixin=None, verb_parser=<colcon_mixin.mixin.mixin_argument.MixinArgumentDecorator object at 0xffffb02f4aa0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0xffffb0499f70>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0xffffb0499f70>>, mixin_verb=('build',))
+[0.755s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.756s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.756s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.756s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.756s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.757s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.757s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/drbot/ros2_ws/src'
+[0.757s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.758s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.758s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.758s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.758s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.759s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.759s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.759s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.759s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.916s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.916s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.916s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.916s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.916s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.919s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extensions ['ignore', 'ignore_ament_install']
+[0.920s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extension 'ignore'
+[0.920s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extension 'ignore_ament_install'
+[0.920s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extensions ['colcon_pkg']
+[0.920s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extension 'colcon_pkg'
+[0.921s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extensions ['colcon_meta']
+[0.921s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extension 'colcon_meta'
+[0.921s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extensions ['ros']
+[0.921s] Level 1:colcon.colcon_core.package_identification:_identify(ROS2Pi_sonar) by extension 'ros'
+[0.932s] DEBUG:colcon.colcon_core.package_identification:Package 'ROS2Pi_sonar' with type 'ros.ament_cmake' and name 'pi_sonar'
+[0.933s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.933s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.933s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.935s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extensions ['ignore', 'ignore_ament_install']
+[0.935s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extension 'ignore'
+[0.936s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extension 'ignore_ament_install'
+[0.936s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extensions ['colcon_pkg']
+[0.936s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extension 'colcon_pkg'
+[0.936s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extensions ['colcon_meta']
+[0.936s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extension 'colcon_meta'
+[0.936s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extensions ['ros']
+[0.937s] Level 1:colcon.colcon_core.package_identification:_identify(camera_ros) by extension 'ros'
+[0.952s] DEBUG:colcon.colcon_core.package_identification:Package 'camera_ros' with type 'ros.ament_cmake' and name 'camera_ros'
+[0.953s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.953s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.953s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.956s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extensions ['ignore', 'ignore_ament_install']
+[0.956s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extension 'ignore'
+[0.957s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extension 'ignore_ament_install'
+[0.957s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extensions ['colcon_pkg']
+[0.957s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extension 'colcon_pkg'
+[0.957s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extensions ['colcon_meta']
+[0.957s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extension 'colcon_meta'
+[0.957s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extensions ['ros']
+[0.958s] Level 1:colcon.colcon_core.package_identification:_identify(ldlidar_stl_ros2) by extension 'ros'
+[0.961s] DEBUG:colcon.colcon_core.package_identification:Package 'ldlidar_stl_ros2' with type 'ros.ament_cmake' and name 'ldlidar_stl_ros2'
+[0.961s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.962s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.962s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.963s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extensions ['ignore', 'ignore_ament_install']
+[0.964s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extension 'ignore'
+[0.965s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extension 'ignore_ament_install'
+[0.965s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extensions ['colcon_pkg']
+[0.965s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extension 'colcon_pkg'
+[0.965s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extensions ['colcon_meta']
+[0.965s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extension 'colcon_meta'
+[0.966s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extensions ['ros']
+[0.966s] Level 1:colcon.colcon_core.package_identification:_identify(magni_bringup) by extension 'ros'
+[0.969s] DEBUG:colcon.colcon_core.package_identification:Package 'magni_bringup' with type 'ros.ament_cmake' and name 'magni_bringup'
+[0.970s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extensions ['ignore', 'ignore_ament_install']
+[0.970s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extension 'ignore'
+[0.971s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extension 'ignore_ament_install'
+[0.971s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extensions ['colcon_pkg']
+[0.971s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extension 'colcon_pkg'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extensions ['colcon_meta']
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extension 'colcon_meta'
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extensions ['ros']
+[0.972s] Level 1:colcon.colcon_core.package_identification:_identify(magni_description) by extension 'ros'
+[0.975s] DEBUG:colcon.colcon_core.package_identification:Package 'magni_description' with type 'ros.ament_cmake' and name 'magni_description'
+[0.976s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extensions ['ignore', 'ignore_ament_install']
+[0.976s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extension 'ignore'
+[0.976s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extension 'ignore_ament_install'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extensions ['colcon_pkg']
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extension 'colcon_pkg'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extensions ['colcon_meta']
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extension 'colcon_meta'
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extensions ['ros']
+[0.977s] Level 1:colcon.colcon_core.package_identification:_identify(ros2_pigpio) by extension 'ros'
+[0.980s] DEBUG:colcon.colcon_core.package_identification:Package 'ros2_pigpio' with type 'ros.ament_cmake' and name 'ros2_pigpio'
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extensions ['ignore', 'ignore_ament_install']
+[0.981s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extension 'ignore'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extension 'ignore_ament_install'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extensions ['colcon_pkg']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extension 'colcon_pkg'
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extensions ['colcon_meta']
+[0.982s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extension 'colcon_meta'
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extensions ['ros']
+[0.983s] Level 1:colcon.colcon_core.package_identification:_identify(ubiquity_motor_ros2) by extension 'ros'
+[0.986s] DEBUG:colcon.colcon_core.package_identification:Package 'ubiquity_motor_ros2' with type 'ros.ament_cmake' and name 'ubiquity_motor_ros2'
+[0.987s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.987s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.987s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.987s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.987s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[1.100s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'camera_ros' in 'camera_ros'
+[1.100s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'ldlidar_stl_ros2' in 'ldlidar_stl_ros2'
+[1.101s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'magni_description' in 'magni_description'
+[1.101s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'pi_sonar' in 'ROS2Pi_sonar'
+[1.101s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'ros2_pigpio' in 'ros2_pigpio'
+[1.101s] INFO:colcon.colcon_core.package_selection:Skipping not selected package 'magni_bringup' in 'magni_bringup'
+[1.105s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[1.106s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[1.124s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 8 installed packages in /home/drbot/ros2_ws/install
+[1.137s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 329 installed packages in /opt/ros/jazzy
+[1.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[1.394s] WARNING:colcon.colcon_core.package_selection:Some selected packages are already built in one or more underlay workspaces:
+	'ubiquity_motor_ros2' is in: /home/drbot/ros2_ws/install/ubiquity_motor_ros2
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding ubiquity_motor_ros2
+
+This may be promoted to an error in a future release of colcon-override-check.
+[1.397s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'cmake_args' from command line to 'None'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'cmake_target' from command line to 'None'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'cmake_clean_cache' from command line to 'False'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'cmake_clean_first' from command line to 'False'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'cmake_force_configure' from command line to 'False'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'ament_cmake_args' from command line to 'None'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'catkin_cmake_args' from command line to 'None'
+[1.398s] Level 5:colcon.colcon_core.verb:set package 'ubiquity_motor_ros2' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.399s] DEBUG:colcon.colcon_core.verb:Building package 'ubiquity_motor_ros2' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2', 'merge_install': False, 'path': '/home/drbot/ros2_ws/src/ubiquity_motor_ros2', 'symlink_install': False, 'test_result_base': None}
+[1.399s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.402s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.403s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/drbot/ros2_ws/src/ubiquity_motor_ros2' with build type 'ament_cmake'
+[1.404s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/drbot/ros2_ws/src/ubiquity_motor_ros2'
+[1.425s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.426s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.426s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.478s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2': CMAKE_PREFIX_PATH=/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/drbot/ros2_ws/src/ubiquity_motor_ros2 -DCMAKE_INSTALL_PREFIX=/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2
+[13.530s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2' returned '0': CMAKE_PREFIX_PATH=/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/drbot/ros2_ws/src/ubiquity_motor_ros2 -DCMAKE_INSTALL_PREFIX=/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2
+[13.536s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2': CMAKE_PREFIX_PATH=/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/drbot/ros2_ws/src/build/ubiquity_motor_ros2 -- -j4 -l4
+[96.923s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2' returned '0': CMAKE_PREFIX_PATH=/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/drbot/ros2_ws/src/build/ubiquity_motor_ros2 -- -j4 -l4
+[96.975s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2': CMAKE_PREFIX_PATH=/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/drbot/ros2_ws/src/build/ubiquity_motor_ros2
+[97.139s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ubiquity_motor_ros2)
+[97.141s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2' returned '0': CMAKE_PREFIX_PATH=/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/drbot/ros2_ws/src/build/ubiquity_motor_ros2
+[97.166s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2' for CMake module files
+[97.170s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2' for CMake config files
+[97.173s] Level 1:colcon.colcon_core.shell:create_environment_hook('ubiquity_motor_ros2', 'cmake_prefix_path')
+[97.174s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/cmake_prefix_path.ps1'
+[97.180s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/cmake_prefix_path.dsv'
+[97.182s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/cmake_prefix_path.sh'
+[97.186s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib'
+[97.187s] Level 1:colcon.colcon_core.shell:create_environment_hook('ubiquity_motor_ros2', 'ld_library_path_lib')
+[97.188s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/ld_library_path_lib.ps1'
+[97.189s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/ld_library_path_lib.dsv'
+[97.191s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/ld_library_path_lib.sh'
+[97.193s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/bin'
+[97.193s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/pkgconfig/ubiquity_motor_ros2.pc'
+[97.194s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/python3.12/site-packages'
+[97.195s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/bin'
+[97.196s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.ps1'
+[97.201s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.dsv'
+[97.204s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.sh'
+[97.208s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.bash'
+[97.211s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.zsh'
+[97.215s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/colcon-core/packages/ubiquity_motor_ros2)
+[97.218s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ubiquity_motor_ros2)
+[97.218s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2' for CMake module files
+[97.222s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2' for CMake config files
+[97.224s] Level 1:colcon.colcon_core.shell:create_environment_hook('ubiquity_motor_ros2', 'cmake_prefix_path')
+[97.225s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/cmake_prefix_path.ps1'
+[97.227s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/cmake_prefix_path.dsv'
+[97.230s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/cmake_prefix_path.sh'
+[97.232s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib'
+[97.233s] Level 1:colcon.colcon_core.shell:create_environment_hook('ubiquity_motor_ros2', 'ld_library_path_lib')
+[97.233s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/ld_library_path_lib.ps1'
+[97.235s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/ld_library_path_lib.dsv'
+[97.237s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/hook/ld_library_path_lib.sh'
+[97.240s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/bin'
+[97.240s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/pkgconfig/ubiquity_motor_ros2.pc'
+[97.241s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/python3.12/site-packages'
+[97.242s] Level 1:colcon.colcon_core.environment:checking '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/bin'
+[97.243s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.ps1'
+[97.246s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.dsv'
+[97.249s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.sh'
+[97.251s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.bash'
+[97.252s] INFO:colcon.colcon_core.shell:Creating package script '/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.zsh'
+[97.254s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/colcon-core/packages/ubiquity_motor_ros2)
+[97.255s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[97.257s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[97.258s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[97.258s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[97.286s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[97.286s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[97.286s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[97.336s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[97.337s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/drbot/ros2_ws/src/install/local_setup.ps1'
+[97.342s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/drbot/ros2_ws/src/install/_local_setup_util_ps1.py'
+[97.347s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/drbot/ros2_ws/src/install/setup.ps1'
+[97.354s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/drbot/ros2_ws/src/install/local_setup.sh'
+[97.357s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/drbot/ros2_ws/src/install/_local_setup_util_sh.py'
+[97.360s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/drbot/ros2_ws/src/install/setup.sh'
+[97.368s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/drbot/ros2_ws/src/install/local_setup.bash'
+[97.370s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/drbot/ros2_ws/src/install/setup.bash'
+[97.377s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/drbot/ros2_ws/src/install/local_setup.zsh'
+[97.380s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/drbot/ros2_ws/src/install/setup.zsh'

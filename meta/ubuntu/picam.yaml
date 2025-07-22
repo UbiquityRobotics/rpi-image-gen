@@ -80,6 +80,7 @@ mmdebstrap:
     # --- ADDED: Source ROS2 workspace on login ---
     - |
       echo 'source /home/ubuntu/ros2_ws/install/setup.bash' >> "$1/home/ubuntu/.bashrc"
+      cp -a ros2_ws/src/. "$1/home/ubuntu/ros2_ws/src/"
 
     # --- NOTE: The actual camera node run command is not included here as it should be run interactively after boot ---
     # Example for user after boot:

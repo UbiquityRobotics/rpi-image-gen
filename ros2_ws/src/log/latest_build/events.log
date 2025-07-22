@@ -1,0 +1,1096 @@
+[0.000000] (-) TimerEvent: {}
+[0.001480] (-) JobUnselected: {'identifier': 'camera_ros'}
+[0.001611] (-) JobUnselected: {'identifier': 'ldlidar_stl_ros2'}
+[0.001682] (-) JobUnselected: {'identifier': 'magni_bringup'}
+[0.001744] (-) JobUnselected: {'identifier': 'magni_description'}
+[0.001826] (-) JobUnselected: {'identifier': 'pi_sonar'}
+[0.001896] (-) JobUnselected: {'identifier': 'ros2_pigpio'}
+[0.001961] (ubiquity_motor_ros2) JobQueued: {'identifier': 'ubiquity_motor_ros2', 'dependencies': OrderedDict()}
+[0.002033] (ubiquity_motor_ros2) JobStarted: {'identifier': 'ubiquity_motor_ros2'}
+[0.064308] (ubiquity_motor_ros2) JobProgress: {'identifier': 'ubiquity_motor_ros2', 'progress': 'cmake'}
+[0.066877] (ubiquity_motor_ros2) Command: {'cmd': ['/usr/bin/cmake', '/home/drbot/ros2_ws/src/ubiquity_motor_ros2', '-DCMAKE_INSTALL_PREFIX=/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2'], 'cwd': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'drbot', 'SSH_CLIENT': '10.0.0.24 49600 22', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/sdformat_vendor/share/gz', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/drbot/ros2_ws/install/ubiquity_motor_ros2/lib:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/lib:/home/drbot/ros2_ws/install/camera_ros/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/drbot', 'OLDPWD': '/home/drbot/ros2_ws/src/ubiquity_motor_ros2', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1002/bus', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'COLCON_PREFIX_PATH': '/home/drbot/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'drbot', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '3', 'PATH': '/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1002', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '10.0.0.24 49600 10.0.0.139 22', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor'}), 'shell': False}
+[0.099268] (-) TimerEvent: {}
+[0.200255] (-) TimerEvent: {}
+[0.301537] (-) TimerEvent: {}
+[0.402469] (-) TimerEvent: {}
+[0.503433] (-) TimerEvent: {}
+[0.604210] (-) TimerEvent: {}
+[0.705150] (-) TimerEvent: {}
+[0.805925] (-) TimerEvent: {}
+[0.906858] (-) TimerEvent: {}
+[1.007603] (-) TimerEvent: {}
+[1.108591] (-) TimerEvent: {}
+[1.209558] (-) TimerEvent: {}
+[1.310516] (-) TimerEvent: {}
+[1.320145] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- The C compiler identification is GNU 13.3.0\n'}
+[1.410710] (-) TimerEvent: {}
+[1.511469] (-) TimerEvent: {}
+[1.612549] (-) TimerEvent: {}
+[1.713390] (-) TimerEvent: {}
+[1.814397] (-) TimerEvent: {}
+[1.915520] (-) TimerEvent: {}
+[2.016473] (-) TimerEvent: {}
+[2.117233] (-) TimerEvent: {}
+[2.152256] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 13.3.0\n'}
+[2.217449] (-) TimerEvent: {}
+[2.268042] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[2.317692] (-) TimerEvent: {}
+[2.418378] (-) TimerEvent: {}
+[2.519195] (-) TimerEvent: {}
+[2.619933] (-) TimerEvent: {}
+[2.720604] (-) TimerEvent: {}
+[2.821393] (-) TimerEvent: {}
+[2.832311] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[2.868033] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[2.871635] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[2.873887] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[2.921661] (-) TimerEvent: {}
+[2.926586] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[3.021890] (-) TimerEvent: {}
+[3.122572] (-) TimerEvent: {}
+[3.223420] (-) TimerEvent: {}
+[3.324240] (-) TimerEvent: {}
+[3.424987] (-) TimerEvent: {}
+[3.451650] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[3.487394] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[3.488425] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[3.490201] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[3.525142] (-) TimerEvent: {}
+[3.528319] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found ament_cmake: 2.5.4 (/opt/ros/jazzy/share/ament_cmake/cmake)\n'}
+[3.625333] (-) TimerEvent: {}
+[3.725945] (-) TimerEvent: {}
+[3.826572] (-) TimerEvent: {}
+[3.927372] (-) TimerEvent: {}
+[4.028073] (-) TimerEvent: {}
+[4.128869] (-) TimerEvent: {}
+[4.229610] (-) TimerEvent: {}
+[4.330692] (-) TimerEvent: {}
+[4.352134] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter \n'}
+[4.430851] (-) TimerEvent: {}
+[4.531431] (-) TimerEvent: {}
+[4.632049] (-) TimerEvent: {}
+[4.732648] (-) TimerEvent: {}
+[4.833296] (-) TimerEvent: {}
+[4.933906] (-) TimerEvent: {}
+[5.034533] (-) TimerEvent: {}
+[5.135194] (-) TimerEvent: {}
+[5.156670] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found rclcpp: 28.1.9 (/opt/ros/jazzy/share/rclcpp/cmake)\n'}
+[5.235378] (-) TimerEvent: {}
+[5.336033] (-) TimerEvent: {}
+[5.436652] (-) TimerEvent: {}
+[5.537453] (-) TimerEvent: {}
+[5.586538] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found rosidl_generator_c: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)\n'}
+[5.637627] (-) TimerEvent: {}
+[5.718321] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)\n'}
+[5.737803] (-) TimerEvent: {}
+[5.838377] (-) TimerEvent: {}
+[5.871606] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[5.938544] (-) TimerEvent: {}
+[6.034496] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[6.038683] (-) TimerEvent: {}
+[6.139274] (-) TimerEvent: {}
+[6.239921] (-) TimerEvent: {}
+[6.340562] (-) TimerEvent: {}
+[6.441227] (-) TimerEvent: {}
+[6.541902] (-) TimerEvent: {}
+[6.605931] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 7.3.2 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)\n'}
+[6.642071] (-) TimerEvent: {}
+[6.642603] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 8.4.2 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)\n'}
+[6.742309] (-) TimerEvent: {}
+[6.842912] (-) TimerEvent: {}
+[6.943576] (-) TimerEvent: {}
+[7.044555] (-) TimerEvent: {}
+[7.145303] (-) TimerEvent: {}
+[7.246123] (-) TimerEvent: {}
+[7.266050] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.13")  \n'}
+[7.346331] (-) TimerEvent: {}
+[7.375932] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") \n'}
+[7.446544] (-) TimerEvent: {}
+[7.475001] (ubiquity_motor_ros2) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[7.546741] (-) TimerEvent: {}
+[7.647431] (-) TimerEvent: {}
+[7.748056] (-) TimerEvent: {}
+[7.848681] (-) TimerEvent: {}
+[7.949337] (-) TimerEvent: {}
+[7.957734] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found sensor_msgs: 5.3.6 (/opt/ros/jazzy/share/sensor_msgs/cmake)\n'}
+[8.049516] (-) TimerEvent: {}
+[8.150192] (-) TimerEvent: {}
+[8.250947] (-) TimerEvent: {}
+[8.294973] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found diagnostic_msgs: 5.3.6 (/opt/ros/jazzy/share/diagnostic_msgs/cmake)\n'}
+[8.351107] (-) TimerEvent: {}
+[8.404480] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found hardware_interface: 4.28.1 (/opt/ros/jazzy/share/hardware_interface/cmake)\n'}
+[8.451294] (-) TimerEvent: {}
+[8.551974] (-) TimerEvent: {}
+[8.652619] (-) TimerEvent: {}
+[8.753294] (-) TimerEvent: {}
+[8.853927] (-) TimerEvent: {}
+[8.954589] (-) TimerEvent: {}
+[9.055285] (-) TimerEvent: {}
+[9.155910] (-) TimerEvent: {}
+[9.256622] (-) TimerEvent: {}
+[9.357253] (-) TimerEvent: {}
+[9.457892] (-) TimerEvent: {}
+[9.558544] (-) TimerEvent: {}
+[9.659384] (-) TimerEvent: {}
+[9.760153] (-) TimerEvent: {}
+[9.860819] (-) TimerEvent: {}
+[9.961523] (-) TimerEvent: {}
+[10.062211] (-) TimerEvent: {}
+[10.162918] (-) TimerEvent: {}
+[10.263537] (-) TimerEvent: {}
+[10.364163] (-) TimerEvent: {}
+[10.410027] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found ros2_control: 4.28.1 (/opt/ros/jazzy/share/ros2_control/cmake)\n'}
+[10.439728] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found diagnostic_updater: 4.2.3 (/opt/ros/jazzy/share/diagnostic_updater/cmake)\n'}
+[10.464341] (-) TimerEvent: {}
+[10.493895] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found controller_manager: 4.28.1 (/opt/ros/jazzy/share/controller_manager/cmake)\n'}
+[10.564504] (-) TimerEvent: {}
+[10.665111] (-) TimerEvent: {}
+[10.765707] (-) TimerEvent: {}
+[10.866392] (-) TimerEvent: {}
+[10.967041] (-) TimerEvent: {}
+[11.067658] (-) TimerEvent: {}
+[11.087935] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found ubiquity_motor_ros2_msgs: 1.0.0 (/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/share/ubiquity_motor_ros2_msgs/cmake)\n'}
+[11.167884] (-) TimerEvent: {}
+[11.268516] (-) TimerEvent: {}
+[11.369214] (-) TimerEvent: {}
+[11.369981] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found version "1.83.0") found components: thread \n'}
+[11.469360] (-) TimerEvent: {}
+[11.570430] (-) TimerEvent: {}
+[11.671117] (-) TimerEvent: {}
+[11.771877] (-) TimerEvent: {}
+[11.844980] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Configuring done (11.5s)\n'}
+[11.871999] (-) TimerEvent: {}
+[11.972574] (-) TimerEvent: {}
+[12.051958] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Generating done (0.1s)\n'}
+[12.072757] (-) TimerEvent: {}
+[12.075455] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Build files have been written to: /home/drbot/ros2_ws/src/build/ubiquity_motor_ros2\n'}
+[12.127940] (ubiquity_motor_ros2) CommandEnded: {'returncode': 0}
+[12.129736] (ubiquity_motor_ros2) JobProgress: {'identifier': 'ubiquity_motor_ros2', 'progress': 'build'}
+[12.131864] (ubiquity_motor_ros2) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', '--', '-j4', '-l4'], 'cwd': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'drbot', 'SSH_CLIENT': '10.0.0.24 49600 22', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/sdformat_vendor/share/gz', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/drbot/ros2_ws/install/ubiquity_motor_ros2/lib:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/lib:/home/drbot/ros2_ws/install/camera_ros/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/drbot', 'OLDPWD': '/home/drbot/ros2_ws/src/ubiquity_motor_ros2', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1002/bus', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'COLCON_PREFIX_PATH': '/home/drbot/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'drbot', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '3', 'PATH': '/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1002', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '10.0.0.24 49600 10.0.0.139 22', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor'}), 'shell': False}
+[12.172958] (-) TimerEvent: {}
+[12.273588] (-) TimerEvent: {}
+[12.374335] (-) TimerEvent: {}
+[12.428727] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/ur_serial.dir/serial/src/impl/unix.cc.o\x1b[0m\n'}
+[12.429877] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/ur_serial.dir/serial/src/serial.cc.o\x1b[0m\n'}
+[12.433274] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 37%] \x1b[32mBuilding CXX object CMakeFiles/ur_serial.dir/serial/src/impl/list_ports/list_ports_linux.cc.o\x1b[0m\n'}
+[12.474622] (-) TimerEvent: {}
+[12.575644] (-) TimerEvent: {}
+[12.676564] (-) TimerEvent: {}
+[12.777754] (-) TimerEvent: {}
+[12.878606] (-) TimerEvent: {}
+[12.979480] (-) TimerEvent: {}
+[13.080489] (-) TimerEvent: {}
+[13.181471] (-) TimerEvent: {}
+[13.282347] (-) TimerEvent: {}
+[13.384156] (-) TimerEvent: {}
+[13.485412] (-) TimerEvent: {}
+[13.587316] (-) TimerEvent: {}
+[13.688598] (-) TimerEvent: {}
+[13.789846] (-) TimerEvent: {}
+[13.890750] (-) TimerEvent: {}
+[13.991738] (-) TimerEvent: {}
+[14.093768] (-) TimerEvent: {}
+[14.110424] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kstd::vector<std::__cxx11::basic_string<char> >\x1b[01;32m\x1b[K glob\x1b[m\x1b[K(const std::vector<std::__cxx11::basic_string<char> >&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[14.111737] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:66:40:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 and \xe2\x80\x98\x1b[01m\x1b[Ksize_t\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare\x07-Wsign-compare\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[14.112727] (ubiquity_motor_ros2) StderrLine: {'line': b'   66 |     for(int path_index = 0; \x1b[01;35m\x1b[Kpath_index < glob_results.gl_pathc\x1b[m\x1b[K; path_index++)\n'}
+[14.113597] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                             \x1b[01;35m\x1b[K~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[14.115017] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:57:9:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kvariable \xe2\x80\x98\x1b[01m\x1b[Kglob_retval\x1b[m\x1b[K\xe2\x80\x99 set but not used [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-but-set-variable\x07-Wunused-but-set-variable\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[14.116021] (ubiquity_motor_ros2) StderrLine: {'line': b'   57 |     int \x1b[01;35m\x1b[Kglob_retval\x1b[m\x1b[K = glob(patterns[0].c_str(), 0, NULL, &glob_results);\n'}
+[14.116911] (ubiquity_motor_ros2) StderrLine: {'line': b'      |         \x1b[01;35m\x1b[K^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[14.124867] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[Kstd::string\x1b[01;32m\x1b[K format\x1b[m\x1b[K(const char*, ...)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[14.125988] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:246:31:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 and \xe2\x80\x98\x1b[01m\x1b[Ksize_t\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare\x07-Wsign-compare\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[14.126986] (ubiquity_motor_ros2) StderrLine: {'line': b'  246 |         else if( \x1b[01;35m\x1b[Kreturn_value >= buffer_size_bytes\x1b[m\x1b[K )\n'}
+[14.127915] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                  \x1b[01;35m\x1b[K~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[14.194006] (-) TimerEvent: {}
+[14.294997] (-) TimerEvent: {}
+[14.396320] (-) TimerEvent: {}
+[14.498195] (-) TimerEvent: {}
+[14.599285] (-) TimerEvent: {}
+[14.700717] (-) TimerEvent: {}
+[14.801922] (-) TimerEvent: {}
+[14.902863] (-) TimerEvent: {}
+[15.003727] (-) TimerEvent: {}
+[15.064723] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 50%] \x1b[32m\x1b[1mLinking CXX shared library libur_serial.so\x1b[0m\n'}
+[15.103937] (-) TimerEvent: {}
+[15.204604] (-) TimerEvent: {}
+[15.305362] (-) TimerEvent: {}
+[15.406131] (-) TimerEvent: {}
+[15.432772] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 50%] Built target ur_serial\n'}
+[15.506344] (-) TimerEvent: {}
+[15.559230] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 62%] \x1b[32mBuilding CXX object CMakeFiles/ubiquity_motor_ros2.dir/src/motor_message.cc.o\x1b[0m\n'}
+[15.560151] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 75%] \x1b[32mBuilding CXX object CMakeFiles/ubiquity_motor_ros2.dir/src/motor_serial.cc.o\x1b[0m\n'}
+[15.561851] (ubiquity_motor_ros2) StdoutLine: {'line': b'[ 87%] \x1b[32mBuilding CXX object CMakeFiles/ubiquity_motor_ros2.dir/src/motor_hardware.cc.o\x1b[0m\n'}
+[15.606646] (-) TimerEvent: {}
+[15.707601] (-) TimerEvent: {}
+[15.808276] (-) TimerEvent: {}
+[15.909321] (-) TimerEvent: {}
+[16.010039] (-) TimerEvent: {}
+[16.110638] (-) TimerEvent: {}
+[16.211626] (-) TimerEvent: {}
+[16.312256] (-) TimerEvent: {}
+[16.413331] (-) TimerEvent: {}
+[16.514075] (-) TimerEvent: {}
+[16.615938] (-) TimerEvent: {}
+[16.716663] (-) TimerEvent: {}
+[16.818214] (-) TimerEvent: {}
+[16.918917] (-) TimerEvent: {}
+[17.019503] (-) TimerEvent: {}
+[17.120137] (-) TimerEvent: {}
+[17.221201] (-) TimerEvent: {}
+[17.321832] (-) TimerEvent: {}
+[17.422489] (-) TimerEvent: {}
+[17.523583] (-) TimerEvent: {}
+[17.624403] (-) TimerEvent: {}
+[17.726298] (-) TimerEvent: {}
+[17.828744] (-) TimerEvent: {}
+[17.929939] (-) TimerEvent: {}
+[18.030763] (-) TimerEvent: {}
+[18.131418] (-) TimerEvent: {}
+[18.232140] (-) TimerEvent: {}
+[18.332865] (-) TimerEvent: {}
+[18.433560] (-) TimerEvent: {}
+[18.534419] (-) TimerEvent: {}
+[18.635211] (-) TimerEvent: {}
+[18.735957] (-) TimerEvent: {}
+[18.836915] (-) TimerEvent: {}
+[18.938182] (-) TimerEvent: {}
+[19.039077] (-) TimerEvent: {}
+[19.140004] (-) TimerEvent: {}
+[19.240919] (-) TimerEvent: {}
+[19.341910] (-) TimerEvent: {}
+[19.442820] (-) TimerEvent: {}
+[19.544087] (-) TimerEvent: {}
+[19.644869] (-) TimerEvent: {}
+[19.746235] (-) TimerEvent: {}
+[19.847121] (-) TimerEvent: {}
+[19.948699] (-) TimerEvent: {}
+[20.049531] (-) TimerEvent: {}
+[20.150223] (-) TimerEvent: {}
+[20.251346] (-) TimerEvent: {}
+[20.352323] (-) TimerEvent: {}
+[20.453017] (-) TimerEvent: {}
+[20.553663] (-) TimerEvent: {}
+[20.654442] (-) TimerEvent: {}
+[20.755703] (-) TimerEvent: {}
+[20.856603] (-) TimerEvent: {}
+[20.957964] (-) TimerEvent: {}
+[21.058738] (-) TimerEvent: {}
+[21.159456] (-) TimerEvent: {}
+[21.260634] (-) TimerEvent: {}
+[21.361898] (-) TimerEvent: {}
+[21.462755] (-) TimerEvent: {}
+[21.564273] (-) TimerEvent: {}
+[21.665606] (-) TimerEvent: {}
+[21.766998] (-) TimerEvent: {}
+[21.868591] (-) TimerEvent: {}
+[21.972281] (-) TimerEvent: {}
+[22.073157] (-) TimerEvent: {}
+[22.173882] (-) TimerEvent: {}
+[22.274661] (-) TimerEvent: {}
+[22.375976] (-) TimerEvent: {}
+[22.477051] (-) TimerEvent: {}
+[22.577744] (-) TimerEvent: {}
+[22.678558] (-) TimerEvent: {}
+[22.779598] (-) TimerEvent: {}
+[22.880854] (-) TimerEvent: {}
+[22.981934] (-) TimerEvent: {}
+[23.082698] (-) TimerEvent: {}
+[23.183907] (-) TimerEvent: {}
+[23.284724] (-) TimerEvent: {}
+[23.386317] (-) TimerEvent: {}
+[23.486975] (-) TimerEvent: {}
+[23.588280] (-) TimerEvent: {}
+[23.689565] (-) TimerEvent: {}
+[23.790325] (-) TimerEvent: {}
+[23.891099] (-) TimerEvent: {}
+[23.992038] (-) TimerEvent: {}
+[24.093501] (-) TimerEvent: {}
+[24.194190] (-) TimerEvent: {}
+[24.294924] (-) TimerEvent: {}
+[24.395710] (-) TimerEvent: {}
+[24.496962] (-) TimerEvent: {}
+[24.597916] (-) TimerEvent: {}
+[24.700975] (-) TimerEvent: {}
+[24.804645] (-) TimerEvent: {}
+[24.905572] (-) TimerEvent: {}
+[25.006455] (-) TimerEvent: {}
+[25.108131] (-) TimerEvent: {}
+[25.209696] (-) TimerEvent: {}
+[25.310848] (-) TimerEvent: {}
+[25.412573] (-) TimerEvent: {}
+[25.513574] (-) TimerEvent: {}
+[25.615279] (-) TimerEvent: {}
+[25.716459] (-) TimerEvent: {}
+[25.818116] (-) TimerEvent: {}
+[25.919216] (-) TimerEvent: {}
+[26.021138] (-) TimerEvent: {}
+[26.122478] (-) TimerEvent: {}
+[26.223609] (-) TimerEvent: {}
+[26.325095] (-) TimerEvent: {}
+[26.426378] (-) TimerEvent: {}
+[26.529410] (-) TimerEvent: {}
+[26.631831] (-) TimerEvent: {}
+[26.733571] (-) TimerEvent: {}
+[26.835302] (-) TimerEvent: {}
+[26.936622] (-) TimerEvent: {}
+[27.038522] (-) TimerEvent: {}
+[27.139555] (-) TimerEvent: {}
+[27.241176] (-) TimerEvent: {}
+[27.342234] (-) TimerEvent: {}
+[27.444162] (-) TimerEvent: {}
+[27.545164] (-) TimerEvent: {}
+[27.646282] (-) TimerEvent: {}
+[27.747918] (-) TimerEvent: {}
+[27.848906] (-) TimerEvent: {}
+[27.950629] (-) TimerEvent: {}
+[28.051681] (-) TimerEvent: {}
+[28.153494] (-) TimerEvent: {}
+[28.254734] (-) TimerEvent: {}
+[28.355921] (-) TimerEvent: {}
+[28.457500] (-) TimerEvent: {}
+[28.558704] (-) TimerEvent: {}
+[28.659609] (-) TimerEvent: {}
+[28.761115] (-) TimerEvent: {}
+[28.863033] (-) TimerEvent: {}
+[28.971025] (-) TimerEvent: {}
+[29.071986] (-) TimerEvent: {}
+[29.173993] (-) TimerEvent: {}
+[29.275295] (-) TimerEvent: {}
+[29.376333] (-) TimerEvent: {}
+[29.478130] (-) TimerEvent: {}
+[29.579234] (-) TimerEvent: {}
+[29.680323] (-) TimerEvent: {}
+[29.781497] (-) TimerEvent: {}
+[29.882496] (-) TimerEvent: {}
+[29.983977] (-) TimerEvent: {}
+[30.084966] (-) TimerEvent: {}
+[30.186984] (-) TimerEvent: {}
+[30.290026] (-) TimerEvent: {}
+[30.391589] (-) TimerEvent: {}
+[30.492892] (-) TimerEvent: {}
+[30.594493] (-) TimerEvent: {}
+[30.695546] (-) TimerEvent: {}
+[30.796896] (-) TimerEvent: {}
+[30.898674] (-) TimerEvent: {}
+[31.000399] (-) TimerEvent: {}
+[31.101512] (-) TimerEvent: {}
+[31.203229] (-) TimerEvent: {}
+[31.304454] (-) TimerEvent: {}
+[31.405609] (-) TimerEvent: {}
+[31.507241] (-) TimerEvent: {}
+[31.608393] (-) TimerEvent: {}
+[31.709393] (-) TimerEvent: {}
+[31.811241] (-) TimerEvent: {}
+[31.912866] (-) TimerEvent: {}
+[32.013959] (-) TimerEvent: {}
+[32.115505] (-) TimerEvent: {}
+[32.216750] (-) TimerEvent: {}
+[32.318218] (-) TimerEvent: {}
+[32.419266] (-) TimerEvent: {}
+[32.520553] (-) TimerEvent: {}
+[32.622142] (-) TimerEvent: {}
+[32.722953] (-) TimerEvent: {}
+[32.824338] (-) TimerEvent: {}
+[32.925164] (-) TimerEvent: {}
+[33.026571] (-) TimerEvent: {}
+[33.127490] (-) TimerEvent: {}
+[33.228926] (-) TimerEvent: {}
+[33.329944] (-) TimerEvent: {}
+[33.430853] (-) TimerEvent: {}
+[33.531605] (-) TimerEvent: {}
+[33.632929] (-) TimerEvent: {}
+[33.733700] (-) TimerEvent: {}
+[33.835030] (-) TimerEvent: {}
+[33.935968] (-) TimerEvent: {}
+[34.036720] (-) TimerEvent: {}
+[34.138008] (-) TimerEvent: {}
+[34.238828] (-) TimerEvent: {}
+[34.339646] (-) TimerEvent: {}
+[34.440486] (-) TimerEvent: {}
+[34.541869] (-) TimerEvent: {}
+[34.642623] (-) TimerEvent: {}
+[34.743935] (-) TimerEvent: {}
+[34.845323] (-) TimerEvent: {}
+[34.946157] (-) TimerEvent: {}
+[35.047549] (-) TimerEvent: {}
+[35.148546] (-) TimerEvent: {}
+[35.249347] (-) TimerEvent: {}
+[35.350153] (-) TimerEvent: {}
+[35.451410] (-) TimerEvent: {}
+[35.552208] (-) TimerEvent: {}
+[35.653512] (-) TimerEvent: {}
+[35.754327] (-) TimerEvent: {}
+[35.855672] (-) TimerEvent: {}
+[35.956650] (-) TimerEvent: {}
+[36.057984] (-) TimerEvent: {}
+[36.158926] (-) TimerEvent: {}
+[36.259737] (-) TimerEvent: {}
+[36.361054] (-) TimerEvent: {}
+[36.462347] (-) TimerEvent: {}
+[36.563168] (-) TimerEvent: {}
+[36.664435] (-) TimerEvent: {}
+[36.765302] (-) TimerEvent: {}
+[36.866549] (-) TimerEvent: {}
+[36.967897] (-) TimerEvent: {}
+[37.069847] (-) TimerEvent: {}
+[37.173479] (-) TimerEvent: {}
+[37.275386] (-) TimerEvent: {}
+[37.376943] (-) TimerEvent: {}
+[37.477865] (-) TimerEvent: {}
+[37.578700] (-) TimerEvent: {}
+[37.655893] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_serial.cc:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kbool MotorSerial::\x1b[01;32m\x1b[KopenPort\x1b[m\x1b[K()\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[37.656758] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_serial.cc:98:25:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcatching polymorphic type \xe2\x80\x98\x1b[01m\x1b[Kconst class std::invalid_argument\x1b[m\x1b[K\xe2\x80\x99 by value [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcatch-value=\x07-Wcatch-value=\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[37.657496] (ubiquity_motor_ros2) StderrLine: {'line': b'   98 |     } catch (const std::\x1b[01;35m\x1b[Kinvalid_argument\x1b[m\x1b[K) {\n'}
+[37.658178] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                         \x1b[01;35m\x1b[K^~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[37.678983] (-) TimerEvent: {}
+[37.779863] (-) TimerEvent: {}
+[37.880639] (-) TimerEvent: {}
+[37.981936] (-) TimerEvent: {}
+[38.083404] (-) TimerEvent: {}
+[38.184684] (-) TimerEvent: {}
+[38.285548] (-) TimerEvent: {}
+[38.386997] (-) TimerEvent: {}
+[38.488078] (-) TimerEvent: {}
+[38.589044] (-) TimerEvent: {}
+[38.690258] (-) TimerEvent: {}
+[38.791658] (-) TimerEvent: {}
+[38.893641] (-) TimerEvent: {}
+[38.994594] (-) TimerEvent: {}
+[39.095608] (-) TimerEvent: {}
+[39.196440] (-) TimerEvent: {}
+[39.297276] (-) TimerEvent: {}
+[39.398162] (-) TimerEvent: {}
+[39.498980] (-) TimerEvent: {}
+[39.599755] (-) TimerEvent: {}
+[39.700557] (-) TimerEvent: {}
+[39.801372] (-) TimerEvent: {}
+[39.902306] (-) TimerEvent: {}
+[40.003121] (-) TimerEvent: {}
+[40.103972] (-) TimerEvent: {}
+[40.204978] (-) TimerEvent: {}
+[40.305934] (-) TimerEvent: {}
+[40.406723] (-) TimerEvent: {}
+[40.507567] (-) TimerEvent: {}
+[40.608386] (-) TimerEvent: {}
+[40.709221] (-) TimerEvent: {}
+[40.810081] (-) TimerEvent: {}
+[40.910887] (-) TimerEvent: {}
+[41.011640] (-) TimerEvent: {}
+[41.112484] (-) TimerEvent: {}
+[41.213305] (-) TimerEvent: {}
+[41.314115] (-) TimerEvent: {}
+[41.414902] (-) TimerEvent: {}
+[41.515647] (-) TimerEvent: {}
+[41.616487] (-) TimerEvent: {}
+[41.717376] (-) TimerEvent: {}
+[41.818197] (-) TimerEvent: {}
+[41.918963] (-) TimerEvent: {}
+[42.019744] (-) TimerEvent: {}
+[42.120540] (-) TimerEvent: {}
+[42.221344] (-) TimerEvent: {}
+[42.322105] (-) TimerEvent: {}
+[42.423068] (-) TimerEvent: {}
+[42.524231] (-) TimerEvent: {}
+[42.623026] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvirtual hardware_interface::CallbackReturn ubiquity_motor_ros2::MotorHardware::\x1b[01;32m\x1b[Kon_configure\x1b[m\x1b[K(const rclcpp_lifecycle::State&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[42.624015] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:174:96:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused parameter \xe2\x80\x98\x1b[01m\x1b[Kprevious_state\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter\x07-Wunused-parameter\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[42.624689] (-) TimerEvent: {}
+[42.625168] (ubiquity_motor_ros2) StderrLine: {'line': b'  174 | hardware_interface::CallbackReturn MotorHardware::on_configure(\x1b[01;35m\x1b[Kconst rclcpp_lifecycle::State & previous_state\x1b[m\x1b[K)\n'}
+[42.626199] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                                                                \x1b[01;35m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[42.688025] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvirtual hardware_interface::CallbackReturn ubiquity_motor_ros2::MotorHardware::\x1b[01;32m\x1b[Kon_activate\x1b[m\x1b[K(const rclcpp_lifecycle::State&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[42.688847] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:370:94:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused parameter \xe2\x80\x98\x1b[01m\x1b[Kprevious_state\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter\x07-Wunused-parameter\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[42.689660] (ubiquity_motor_ros2) StderrLine: {'line': b'  370 | hardware_interface::CallbackReturn MotorHardware::on_activate(\x1b[01;35m\x1b[Kconst rclcpp_lifecycle::State& previous_state\x1b[m\x1b[K)\n'}
+[42.690359] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                                                               \x1b[01;35m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[42.697651] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvirtual hardware_interface::return_type ubiquity_motor_ros2::MotorHardware::\x1b[01;32m\x1b[Kread\x1b[m\x1b[K(const rclcpp::Time&, const rclcpp::Duration&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[42.698506] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:465:73:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused parameter \xe2\x80\x98\x1b[01m\x1b[Kcurrent_time\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter\x07-Wunused-parameter\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[42.699305] (ubiquity_motor_ros2) StderrLine: {'line': b'  465 | hardware_interface::return_type MotorHardware::read(\x1b[01;35m\x1b[Kconst rclcpp::Time& current_time\x1b[m\x1b[K, const rclcpp::Duration& elapsed_loop_time) {\n'}
+[42.699950] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                                                     \x1b[01;35m\x1b[K~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[42.700590] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:465:111:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused parameter \xe2\x80\x98\x1b[01m\x1b[Kelapsed_loop_time\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter\x07-Wunused-parameter\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[42.701192] (ubiquity_motor_ros2) StderrLine: {'line': b'  465 | hardware_interface::return_type MotorHardware::read(const rclcpp::Time& current_time, \x1b[01;35m\x1b[Kconst rclcpp::Duration& elapsed_loop_time\x1b[m\x1b[K) {\n'}
+[42.701752] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                                                                                       \x1b[01;35m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[42.711140] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid ubiquity_motor_ros2::MotorHardware::\x1b[01;32m\x1b[KsetWheelVelocities\x1b[m\x1b[K(const rclcpp::Time&, const rclcpp::Duration&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[42.711918] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:574:99:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused parameter \xe2\x80\x98\x1b[01m\x1b[Kelapsed_loop_time\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter\x07-Wunused-parameter\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[42.712616] (ubiquity_motor_ros2) StderrLine: {'line': b'  574 | void MotorHardware::setWheelVelocities(const rclcpp::Time& current_time, \x1b[01;35m\x1b[Kconst rclcpp::Duration & elapsed_loop_time\x1b[m\x1b[K) {\n'}
+[42.713279] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                                                                          \x1b[01;35m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[42.724943] (-) TimerEvent: {}
+[42.825691] (-) TimerEvent: {}
+[42.926489] (-) TimerEvent: {}
+[43.027300] (-) TimerEvent: {}
+[43.128104] (-) TimerEvent: {}
+[43.228964] (-) TimerEvent: {}
+[43.329828] (-) TimerEvent: {}
+[43.430952] (-) TimerEvent: {}
+[43.531860] (-) TimerEvent: {}
+[43.632984] (-) TimerEvent: {}
+[43.733741] (-) TimerEvent: {}
+[43.835008] (-) TimerEvent: {}
+[43.936872] (-) TimerEvent: {}
+[44.037608] (-) TimerEvent: {}
+[44.138702] (-) TimerEvent: {}
+[44.239521] (-) TimerEvent: {}
+[44.340280] (-) TimerEvent: {}
+[44.440963] (-) TimerEvent: {}
+[44.541625] (-) TimerEvent: {}
+[44.642339] (-) TimerEvent: {}
+[44.743040] (-) TimerEvent: {}
+[44.843725] (-) TimerEvent: {}
+[44.944431] (-) TimerEvent: {}
+[45.045131] (-) TimerEvent: {}
+[45.145842] (-) TimerEvent: {}
+[45.246591] (-) TimerEvent: {}
+[45.347321] (-) TimerEvent: {}
+[45.447969] (-) TimerEvent: {}
+[45.548958] (-) TimerEvent: {}
+[45.649749] (-) TimerEvent: {}
+[45.750552] (-) TimerEvent: {}
+[45.851329] (-) TimerEvent: {}
+[45.952054] (-) TimerEvent: {}
+[46.052724] (-) TimerEvent: {}
+[46.153430] (-) TimerEvent: {}
+[46.254150] (-) TimerEvent: {}
+[46.354850] (-) TimerEvent: {}
+[46.455522] (-) TimerEvent: {}
+[46.556258] (-) TimerEvent: {}
+[46.656931] (-) TimerEvent: {}
+[46.757590] (-) TimerEvent: {}
+[46.858330] (-) TimerEvent: {}
+[46.958993] (-) TimerEvent: {}
+[47.059639] (-) TimerEvent: {}
+[47.160354] (-) TimerEvent: {}
+[47.261241] (-) TimerEvent: {}
+[47.361928] (-) TimerEvent: {}
+[47.462582] (-) TimerEvent: {}
+[47.563288] (-) TimerEvent: {}
+[47.664053] (-) TimerEvent: {}
+[47.764715] (-) TimerEvent: {}
+[47.865431] (-) TimerEvent: {}
+[47.966161] (-) TimerEvent: {}
+[48.066881] (-) TimerEvent: {}
+[48.167543] (-) TimerEvent: {}
+[48.268240] (-) TimerEvent: {}
+[48.368923] (-) TimerEvent: {}
+[48.469628] (-) TimerEvent: {}
+[48.570411] (-) TimerEvent: {}
+[48.671131] (-) TimerEvent: {}
+[48.771769] (-) TimerEvent: {}
+[48.872461] (-) TimerEvent: {}
+[48.973159] (-) TimerEvent: {}
+[49.073858] (-) TimerEvent: {}
+[49.174495] (-) TimerEvent: {}
+[49.275190] (-) TimerEvent: {}
+[49.375887] (-) TimerEvent: {}
+[49.476526] (-) TimerEvent: {}
+[49.577229] (-) TimerEvent: {}
+[49.677923] (-) TimerEvent: {}
+[49.778599] (-) TimerEvent: {}
+[49.879324] (-) TimerEvent: {}
+[49.979995] (-) TimerEvent: {}
+[50.080650] (-) TimerEvent: {}
+[50.181355] (-) TimerEvent: {}
+[50.282064] (-) TimerEvent: {}
+[50.382871] (-) TimerEvent: {}
+[50.483530] (-) TimerEvent: {}
+[50.584240] (-) TimerEvent: {}
+[50.684939] (-) TimerEvent: {}
+[50.785602] (-) TimerEvent: {}
+[50.886314] (-) TimerEvent: {}
+[50.986959] (-) TimerEvent: {}
+[51.087613] (-) TimerEvent: {}
+[51.188324] (-) TimerEvent: {}
+[51.289018] (-) TimerEvent: {}
+[51.389877] (-) TimerEvent: {}
+[51.490859] (-) TimerEvent: {}
+[51.591500] (-) TimerEvent: {}
+[51.692218] (-) TimerEvent: {}
+[51.792930] (-) TimerEvent: {}
+[51.893611] (-) TimerEvent: {}
+[51.994343] (-) TimerEvent: {}
+[52.095047] (-) TimerEvent: {}
+[52.195716] (-) TimerEvent: {}
+[52.296439] (-) TimerEvent: {}
+[52.397190] (-) TimerEvent: {}
+[52.497892] (-) TimerEvent: {}
+[52.598562] (-) TimerEvent: {}
+[52.699368] (-) TimerEvent: {}
+[52.800089] (-) TimerEvent: {}
+[52.900902] (-) TimerEvent: {}
+[53.001636] (-) TimerEvent: {}
+[53.102510] (-) TimerEvent: {}
+[53.203456] (-) TimerEvent: {}
+[53.304200] (-) TimerEvent: {}
+[53.404928] (-) TimerEvent: {}
+[53.505611] (-) TimerEvent: {}
+[53.606366] (-) TimerEvent: {}
+[53.707080] (-) TimerEvent: {}
+[53.807730] (-) TimerEvent: {}
+[53.908428] (-) TimerEvent: {}
+[54.009131] (-) TimerEvent: {}
+[54.109868] (-) TimerEvent: {}
+[54.210531] (-) TimerEvent: {}
+[54.311264] (-) TimerEvent: {}
+[54.417080] (-) TimerEvent: {}
+[54.519116] (-) TimerEvent: {}
+[54.619934] (-) TimerEvent: {}
+[54.720603] (-) TimerEvent: {}
+[54.821362] (-) TimerEvent: {}
+[54.922113] (-) TimerEvent: {}
+[55.026967] (-) TimerEvent: {}
+[55.127687] (-) TimerEvent: {}
+[55.228422] (-) TimerEvent: {}
+[55.329142] (-) TimerEvent: {}
+[55.429884] (-) TimerEvent: {}
+[55.530608] (-) TimerEvent: {}
+[55.631341] (-) TimerEvent: {}
+[55.732070] (-) TimerEvent: {}
+[55.832750] (-) TimerEvent: {}
+[55.933496] (-) TimerEvent: {}
+[56.034242] (-) TimerEvent: {}
+[56.134924] (-) TimerEvent: {}
+[56.235569] (-) TimerEvent: {}
+[56.336296] (-) TimerEvent: {}
+[56.436948] (-) TimerEvent: {}
+[56.537613] (-) TimerEvent: {}
+[56.638333] (-) TimerEvent: {}
+[56.739001] (-) TimerEvent: {}
+[56.839672] (-) TimerEvent: {}
+[56.940411] (-) TimerEvent: {}
+[57.041250] (-) TimerEvent: {}
+[57.142274] (-) TimerEvent: {}
+[57.242923] (-) TimerEvent: {}
+[57.343534] (-) TimerEvent: {}
+[57.444220] (-) TimerEvent: {}
+[57.544899] (-) TimerEvent: {}
+[57.645596] (-) TimerEvent: {}
+[57.746338] (-) TimerEvent: {}
+[57.847048] (-) TimerEvent: {}
+[57.947726] (-) TimerEvent: {}
+[58.048440] (-) TimerEvent: {}
+[58.149165] (-) TimerEvent: {}
+[58.249885] (-) TimerEvent: {}
+[58.350568] (-) TimerEvent: {}
+[58.451312] (-) TimerEvent: {}
+[58.551993] (-) TimerEvent: {}
+[58.652712] (-) TimerEvent: {}
+[58.753445] (-) TimerEvent: {}
+[58.854173] (-) TimerEvent: {}
+[58.954907] (-) TimerEvent: {}
+[59.055605] (-) TimerEvent: {}
+[59.115668] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid ubiquity_motor_ros2::MotorHardware::\x1b[01;32m\x1b[KreadInputs\x1b[m\x1b[K(uint32_t)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[59.116635] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:1004:17:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kthis statement may fall through [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wimplicit-fallthrough=\x07-Wimplicit-fallthrough=\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[59.117411] (ubiquity_motor_ros2) StderrLine: {'line': b' 1004 |                 \x1b[01;35m\x1b[K}\x1b[m\x1b[K\n'}
+[59.117940] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                 \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[59.118346] (ubiquity_motor_ros2) StderrLine: {'line': b'\x1b[01m\x1b[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:1006:17:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Khere\n'}
+[59.118748] (ubiquity_motor_ros2) StderrLine: {'line': b' 1006 |                 \x1b[01;36m\x1b[Kcase\x1b[m\x1b[K MotorMessage::REG_TINT_BOTH_WHLS: {   // As of v41 show time between wheel enc edges\n'}
+[59.119305] (ubiquity_motor_ros2) StderrLine: {'line': b'      |                 \x1b[01;36m\x1b[K^~~~\x1b[m\x1b[K\n'}
+[59.155834] (-) TimerEvent: {}
+[59.256493] (-) TimerEvent: {}
+[59.357214] (-) TimerEvent: {}
+[59.457961] (-) TimerEvent: {}
+[59.558932] (-) TimerEvent: {}
+[59.660152] (-) TimerEvent: {}
+[59.760864] (-) TimerEvent: {}
+[59.861531] (-) TimerEvent: {}
+[59.962269] (-) TimerEvent: {}
+[60.062946] (-) TimerEvent: {}
+[60.163705] (-) TimerEvent: {}
+[60.264436] (-) TimerEvent: {}
+[60.365149] (-) TimerEvent: {}
+[60.465842] (-) TimerEvent: {}
+[60.566502] (-) TimerEvent: {}
+[60.667218] (-) TimerEvent: {}
+[60.767926] (-) TimerEvent: {}
+[60.868654] (-) TimerEvent: {}
+[60.969393] (-) TimerEvent: {}
+[61.070185] (-) TimerEvent: {}
+[61.170873] (-) TimerEvent: {}
+[61.271567] (-) TimerEvent: {}
+[61.372402] (-) TimerEvent: {}
+[61.473121] (-) TimerEvent: {}
+[61.575034] (-) TimerEvent: {}
+[61.675965] (-) TimerEvent: {}
+[61.776635] (-) TimerEvent: {}
+[61.877405] (-) TimerEvent: {}
+[61.978178] (-) TimerEvent: {}
+[62.078985] (-) TimerEvent: {}
+[62.179899] (-) TimerEvent: {}
+[62.282271] (-) TimerEvent: {}
+[62.383707] (-) TimerEvent: {}
+[62.484676] (-) TimerEvent: {}
+[62.585980] (-) TimerEvent: {}
+[62.687068] (-) TimerEvent: {}
+[62.788371] (-) TimerEvent: {}
+[62.889323] (-) TimerEvent: {}
+[62.990037] (-) TimerEvent: {}
+[63.090702] (-) TimerEvent: {}
+[63.191436] (-) TimerEvent: {}
+[63.292199] (-) TimerEvent: {}
+[63.392940] (-) TimerEvent: {}
+[63.493588] (-) TimerEvent: {}
+[63.594317] (-) TimerEvent: {}
+[63.694981] (-) TimerEvent: {}
+[63.795865] (-) TimerEvent: {}
+[63.896505] (-) TimerEvent: {}
+[63.997225] (-) TimerEvent: {}
+[64.098061] (-) TimerEvent: {}
+[64.198743] (-) TimerEvent: {}
+[64.299444] (-) TimerEvent: {}
+[64.400133] (-) TimerEvent: {}
+[64.500835] (-) TimerEvent: {}
+[64.601523] (-) TimerEvent: {}
+[64.702244] (-) TimerEvent: {}
+[64.803066] (-) TimerEvent: {}
+[64.904149] (-) TimerEvent: {}
+[65.004860] (-) TimerEvent: {}
+[65.105509] (-) TimerEvent: {}
+[65.206226] (-) TimerEvent: {}
+[65.306932] (-) TimerEvent: {}
+[65.407575] (-) TimerEvent: {}
+[65.508307] (-) TimerEvent: {}
+[65.608956] (-) TimerEvent: {}
+[65.709603] (-) TimerEvent: {}
+[65.810287] (-) TimerEvent: {}
+[65.910973] (-) TimerEvent: {}
+[66.011629] (-) TimerEvent: {}
+[66.112345] (-) TimerEvent: {}
+[66.213065] (-) TimerEvent: {}
+[66.313740] (-) TimerEvent: {}
+[66.414467] (-) TimerEvent: {}
+[66.515223] (-) TimerEvent: {}
+[66.615935] (-) TimerEvent: {}
+[66.716582] (-) TimerEvent: {}
+[66.817306] (-) TimerEvent: {}
+[66.918088] (-) TimerEvent: {}
+[67.018844] (-) TimerEvent: {}
+[67.119563] (-) TimerEvent: {}
+[67.220314] (-) TimerEvent: {}
+[67.321089] (-) TimerEvent: {}
+[67.421754] (-) TimerEvent: {}
+[67.522488] (-) TimerEvent: {}
+[67.623224] (-) TimerEvent: {}
+[67.723939] (-) TimerEvent: {}
+[67.824642] (-) TimerEvent: {}
+[67.925404] (-) TimerEvent: {}
+[68.026147] (-) TimerEvent: {}
+[68.126847] (-) TimerEvent: {}
+[68.227515] (-) TimerEvent: {}
+[68.328254] (-) TimerEvent: {}
+[68.428934] (-) TimerEvent: {}
+[68.529590] (-) TimerEvent: {}
+[68.630309] (-) TimerEvent: {}
+[68.730962] (-) TimerEvent: {}
+[68.831630] (-) TimerEvent: {}
+[68.932410] (-) TimerEvent: {}
+[69.033245] (-) TimerEvent: {}
+[69.133988] (-) TimerEvent: {}
+[69.234844] (-) TimerEvent: {}
+[69.335485] (-) TimerEvent: {}
+[69.436215] (-) TimerEvent: {}
+[69.536947] (-) TimerEvent: {}
+[69.637605] (-) TimerEvent: {}
+[69.738288] (-) TimerEvent: {}
+[69.838962] (-) TimerEvent: {}
+[69.939625] (-) TimerEvent: {}
+[70.040381] (-) TimerEvent: {}
+[70.141101] (-) TimerEvent: {}
+[70.241847] (-) TimerEvent: {}
+[70.342519] (-) TimerEvent: {}
+[70.443255] (-) TimerEvent: {}
+[70.543965] (-) TimerEvent: {}
+[70.644636] (-) TimerEvent: {}
+[70.745359] (-) TimerEvent: {}
+[70.846072] (-) TimerEvent: {}
+[70.946751] (-) TimerEvent: {}
+[71.047481] (-) TimerEvent: {}
+[71.148213] (-) TimerEvent: {}
+[71.248916] (-) TimerEvent: {}
+[71.349562] (-) TimerEvent: {}
+[71.450282] (-) TimerEvent: {}
+[71.550945] (-) TimerEvent: {}
+[71.651615] (-) TimerEvent: {}
+[71.752371] (-) TimerEvent: {}
+[71.853072] (-) TimerEvent: {}
+[71.953765] (-) TimerEvent: {}
+[72.054480] (-) TimerEvent: {}
+[72.155203] (-) TimerEvent: {}
+[72.255913] (-) TimerEvent: {}
+[72.356577] (-) TimerEvent: {}
+[72.457274] (-) TimerEvent: {}
+[72.557933] (-) TimerEvent: {}
+[72.658603] (-) TimerEvent: {}
+[72.759321] (-) TimerEvent: {}
+[72.859969] (-) TimerEvent: {}
+[72.960627] (-) TimerEvent: {}
+[73.061367] (-) TimerEvent: {}
+[73.162060] (-) TimerEvent: {}
+[73.262723] (-) TimerEvent: {}
+[73.363438] (-) TimerEvent: {}
+[73.464174] (-) TimerEvent: {}
+[73.564890] (-) TimerEvent: {}
+[73.665546] (-) TimerEvent: {}
+[73.766289] (-) TimerEvent: {}
+[73.866948] (-) TimerEvent: {}
+[73.967593] (-) TimerEvent: {}
+[74.068315] (-) TimerEvent: {}
+[74.169031] (-) TimerEvent: {}
+[74.269709] (-) TimerEvent: {}
+[74.370432] (-) TimerEvent: {}
+[74.471158] (-) TimerEvent: {}
+[74.571838] (-) TimerEvent: {}
+[74.672497] (-) TimerEvent: {}
+[74.773244] (-) TimerEvent: {}
+[74.873937] (-) TimerEvent: {}
+[74.974613] (-) TimerEvent: {}
+[75.075328] (-) TimerEvent: {}
+[75.175986] (-) TimerEvent: {}
+[75.276636] (-) TimerEvent: {}
+[75.377375] (-) TimerEvent: {}
+[75.478040] (-) TimerEvent: {}
+[75.578705] (-) TimerEvent: {}
+[75.679390] (-) TimerEvent: {}
+[75.780158] (-) TimerEvent: {}
+[75.880878] (-) TimerEvent: {}
+[75.981546] (-) TimerEvent: {}
+[76.082275] (-) TimerEvent: {}
+[76.182970] (-) TimerEvent: {}
+[76.283627] (-) TimerEvent: {}
+[76.384311] (-) TimerEvent: {}
+[76.484960] (-) TimerEvent: {}
+[76.585609] (-) TimerEvent: {}
+[76.686329] (-) TimerEvent: {}
+[76.786971] (-) TimerEvent: {}
+[76.887631] (-) TimerEvent: {}
+[76.988354] (-) TimerEvent: {}
+[77.089108] (-) TimerEvent: {}
+[77.189762] (-) TimerEvent: {}
+[77.290473] (-) TimerEvent: {}
+[77.391157] (-) TimerEvent: {}
+[77.491860] (-) TimerEvent: {}
+[77.592512] (-) TimerEvent: {}
+[77.693246] (-) TimerEvent: {}
+[77.793976] (-) TimerEvent: {}
+[77.894599] (-) TimerEvent: {}
+[77.995343] (-) TimerEvent: {}
+[78.096045] (-) TimerEvent: {}
+[78.196705] (-) TimerEvent: {}
+[78.297399] (-) TimerEvent: {}
+[78.398084] (-) TimerEvent: {}
+[78.498757] (-) TimerEvent: {}
+[78.599459] (-) TimerEvent: {}
+[78.700152] (-) TimerEvent: {}
+[78.800871] (-) TimerEvent: {}
+[78.901519] (-) TimerEvent: {}
+[79.002250] (-) TimerEvent: {}
+[79.102943] (-) TimerEvent: {}
+[79.203601] (-) TimerEvent: {}
+[79.304321] (-) TimerEvent: {}
+[79.404976] (-) TimerEvent: {}
+[79.505631] (-) TimerEvent: {}
+[79.606315] (-) TimerEvent: {}
+[79.706951] (-) TimerEvent: {}
+[79.807623] (-) TimerEvent: {}
+[79.908335] (-) TimerEvent: {}
+[80.008972] (-) TimerEvent: {}
+[80.109662] (-) TimerEvent: {}
+[80.210368] (-) TimerEvent: {}
+[80.311082] (-) TimerEvent: {}
+[80.411763] (-) TimerEvent: {}
+[80.512473] (-) TimerEvent: {}
+[80.613198] (-) TimerEvent: {}
+[80.713906] (-) TimerEvent: {}
+[80.814569] (-) TimerEvent: {}
+[80.915218] (-) TimerEvent: {}
+[81.015913] (-) TimerEvent: {}
+[81.116557] (-) TimerEvent: {}
+[81.217275] (-) TimerEvent: {}
+[81.317945] (-) TimerEvent: {}
+[81.418596] (-) TimerEvent: {}
+[81.519317] (-) TimerEvent: {}
+[81.619955] (-) TimerEvent: {}
+[81.720618] (-) TimerEvent: {}
+[81.821338] (-) TimerEvent: {}
+[81.921989] (-) TimerEvent: {}
+[82.022622] (-) TimerEvent: {}
+[82.123340] (-) TimerEvent: {}
+[82.224096] (-) TimerEvent: {}
+[82.324839] (-) TimerEvent: {}
+[82.425509] (-) TimerEvent: {}
+[82.526213] (-) TimerEvent: {}
+[82.626909] (-) TimerEvent: {}
+[82.727607] (-) TimerEvent: {}
+[82.828401] (-) TimerEvent: {}
+[82.929105] (-) TimerEvent: {}
+[83.029765] (-) TimerEvent: {}
+[83.130455] (-) TimerEvent: {}
+[83.231151] (-) TimerEvent: {}
+[83.331847] (-) TimerEvent: {}
+[83.432498] (-) TimerEvent: {}
+[83.533180] (-) TimerEvent: {}
+[83.633829] (-) TimerEvent: {}
+[83.734471] (-) TimerEvent: {}
+[83.835144] (-) TimerEvent: {}
+[83.935832] (-) TimerEvent: {}
+[84.036479] (-) TimerEvent: {}
+[84.137185] (-) TimerEvent: {}
+[84.237870] (-) TimerEvent: {}
+[84.338513] (-) TimerEvent: {}
+[84.439190] (-) TimerEvent: {}
+[84.539887] (-) TimerEvent: {}
+[84.640535] (-) TimerEvent: {}
+[84.741227] (-) TimerEvent: {}
+[84.841925] (-) TimerEvent: {}
+[84.942704] (-) TimerEvent: {}
+[85.043848] (-) TimerEvent: {}
+[85.144827] (-) TimerEvent: {}
+[85.245661] (-) TimerEvent: {}
+[85.346866] (-) TimerEvent: {}
+[85.447883] (-) TimerEvent: {}
+[85.548994] (-) TimerEvent: {}
+[85.649968] (-) TimerEvent: {}
+[85.751141] (-) TimerEvent: {}
+[85.852307] (-) TimerEvent: {}
+[85.953186] (-) TimerEvent: {}
+[86.053937] (-) TimerEvent: {}
+[86.154606] (-) TimerEvent: {}
+[86.255311] (-) TimerEvent: {}
+[86.356036] (-) TimerEvent: {}
+[86.456708] (-) TimerEvent: {}
+[86.557420] (-) TimerEvent: {}
+[86.658158] (-) TimerEvent: {}
+[86.758852] (-) TimerEvent: {}
+[86.859518] (-) TimerEvent: {}
+[86.960214] (-) TimerEvent: {}
+[87.060939] (-) TimerEvent: {}
+[87.161618] (-) TimerEvent: {}
+[87.262361] (-) TimerEvent: {}
+[87.363092] (-) TimerEvent: {}
+[87.463756] (-) TimerEvent: {}
+[87.564452] (-) TimerEvent: {}
+[87.665182] (-) TimerEvent: {}
+[87.765883] (-) TimerEvent: {}
+[87.866541] (-) TimerEvent: {}
+[87.967236] (-) TimerEvent: {}
+[88.067946] (-) TimerEvent: {}
+[88.168640] (-) TimerEvent: {}
+[88.269486] (-) TimerEvent: {}
+[88.370212] (-) TimerEvent: {}
+[88.470880] (-) TimerEvent: {}
+[88.571474] (-) TimerEvent: {}
+[88.672122] (-) TimerEvent: {}
+[88.772723] (-) TimerEvent: {}
+[88.873359] (-) TimerEvent: {}
+[88.973976] (-) TimerEvent: {}
+[89.074612] (-) TimerEvent: {}
+[89.175328] (-) TimerEvent: {}
+[89.276265] (-) TimerEvent: {}
+[89.377366] (-) TimerEvent: {}
+[89.478468] (-) TimerEvent: {}
+[89.579370] (-) TimerEvent: {}
+[89.680093] (-) TimerEvent: {}
+[89.780975] (-) TimerEvent: {}
+[89.881864] (-) TimerEvent: {}
+[89.982646] (-) TimerEvent: {}
+[90.083653] (-) TimerEvent: {}
+[90.184883] (-) TimerEvent: {}
+[90.285612] (-) TimerEvent: {}
+[90.386658] (-) TimerEvent: {}
+[90.487537] (-) TimerEvent: {}
+[90.562711] (ubiquity_motor_ros2) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX shared library libubiquity_motor_ros2.so\x1b[0m\n'}
+[90.587711] (-) TimerEvent: {}
+[90.688462] (-) TimerEvent: {}
+[90.789262] (-) TimerEvent: {}
+[90.890005] (-) TimerEvent: {}
+[90.990869] (-) TimerEvent: {}
+[91.091578] (-) TimerEvent: {}
+[91.192440] (-) TimerEvent: {}
+[91.293337] (-) TimerEvent: {}
+[91.394159] (-) TimerEvent: {}
+[91.495616] (-) TimerEvent: {}
+[91.596689] (-) TimerEvent: {}
+[91.697538] (-) TimerEvent: {}
+[91.798475] (-) TimerEvent: {}
+[91.899958] (-) TimerEvent: {}
+[92.001070] (-) TimerEvent: {}
+[92.102196] (-) TimerEvent: {}
+[92.203090] (-) TimerEvent: {}
+[92.304204] (-) TimerEvent: {}
+[92.405207] (-) TimerEvent: {}
+[92.506486] (-) TimerEvent: {}
+[92.607468] (-) TimerEvent: {}
+[92.708293] (-) TimerEvent: {}
+[92.809259] (-) TimerEvent: {}
+[92.910570] (-) TimerEvent: {}
+[93.011763] (-) TimerEvent: {}
+[93.112953] (-) TimerEvent: {}
+[93.214263] (-) TimerEvent: {}
+[93.315626] (-) TimerEvent: {}
+[93.416813] (-) TimerEvent: {}
+[93.517877] (-) TimerEvent: {}
+[93.619059] (-) TimerEvent: {}
+[93.720168] (-) TimerEvent: {}
+[93.821711] (-) TimerEvent: {}
+[93.922609] (-) TimerEvent: {}
+[94.023880] (-) TimerEvent: {}
+[94.124978] (-) TimerEvent: {}
+[94.225958] (-) TimerEvent: {}
+[94.326768] (-) TimerEvent: {}
+[94.427569] (-) TimerEvent: {}
+[94.528401] (-) TimerEvent: {}
+[94.629493] (-) TimerEvent: {}
+[94.730245] (-) TimerEvent: {}
+[94.830946] (-) TimerEvent: {}
+[94.931950] (-) TimerEvent: {}
+[95.033334] (-) TimerEvent: {}
+[95.133907] (-) TimerEvent: {}
+[95.234510] (-) TimerEvent: {}
+[95.335257] (-) TimerEvent: {}
+[95.435947] (-) TimerEvent: {}
+[95.462038] (ubiquity_motor_ros2) StdoutLine: {'line': b'[100%] Built target ubiquity_motor_ros2\n'}
+[95.520562] (ubiquity_motor_ros2) CommandEnded: {'returncode': 0}
+[95.522532] (ubiquity_motor_ros2) JobProgress: {'identifier': 'ubiquity_motor_ros2', 'progress': 'install'}
+[95.536132] (-) TimerEvent: {}
+[95.569647] (ubiquity_motor_ros2) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2'], 'cwd': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'drbot', 'SSH_CLIENT': '10.0.0.24 49600 22', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/sdformat_vendor/share/gz', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/drbot/ros2_ws/install/ubiquity_motor_ros2/lib:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/lib:/home/drbot/ros2_ws/install/camera_ros/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/drbot', 'OLDPWD': '/home/drbot/ros2_ws/src/ubiquity_motor_ros2', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1002/bus', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'COLCON_PREFIX_PATH': '/home/drbot/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'drbot', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '3', 'PATH': '/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1002', 'LANG': 'C.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'AMENT_PREFIX_PATH': '/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/drbot/ros2_ws/src/build/ubiquity_motor_ros2', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '10.0.0.24 49600 10.0.0.139 22', 'XDG_DATA_DIRS': '/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/drbot/ros2_ws/install/magni_bringup:/home/drbot/ros2_ws/install/ubiquity_motor_ros2:/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs:/home/drbot/ros2_ws/install/ros2_pigpio:/opt/ros/jazzy:/home/drbot/ros2_ws/install/pi_sonar:/home/drbot/ros2_ws/install/magni_description:/home/drbot/ros2_ws/install/ldlidar_stl_ros2:/home/drbot/ros2_ws/install/camera_ros:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor'}), 'shell': False}
+[95.615154] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[95.615862] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/libur_serial.so\n'}
+[95.618646] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include\n'}
+[95.619325] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial\n'}
+[95.619864] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/v8stdint.h\n'}
+[95.620471] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/impl\n'}
+[95.621033] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/impl/win.h\n'}
+[95.624160] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/impl/unix.h\n'}
+[95.624999] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/serial.h\n'}
+[95.626638] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/library_path.sh\n'}
+[95.627727] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/library_path.dsv\n'}
+[95.628816] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/plugin_description.xml\n'}
+[95.630662] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/libubiquity_motor_ros2.so\n'}
+[95.636286] (-) TimerEvent: {}
+[95.693721] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Set non-toolchain portion of runtime path of "/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/libubiquity_motor_ros2.so" to ""\n'}
+[95.694410] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/upgrade_firmware.py\n'}
+[95.697823] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/test_motor_board.py\n'}
+[95.700062] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/test_pi_gpio.py\n'}
+[95.701649] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/launch\n'}
+[95.702273] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/launch/new.launch.py\n'}
+[95.703202] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/launch/motors.launch.py\n'}
+[95.704598] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cfg\n'}
+[95.705745] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cfg/conf.yaml\n'}
+[95.708174] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/package_run_dependencies/ubiquity_motor_ros2\n'}
+[95.710078] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/parent_prefix_path/ubiquity_motor_ros2\n'}
+[95.711567] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/ament_prefix_path.sh\n'}
+[95.712951] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/ament_prefix_path.dsv\n'}
+[95.714282] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/path.sh\n'}
+[95.715622] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/path.dsv\n'}
+[95.716982] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.bash\n'}
+[95.718224] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.sh\n'}
+[95.719370] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.zsh\n'}
+[95.720451] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.dsv\n'}
+[95.721706] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.dsv\n'}
+[95.723223] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/packages/ubiquity_motor_ros2\n'}
+[95.724708] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/ubiquity_motor_ros2\n'}
+[95.726354] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[95.727606] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[95.728884] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ubiquity_motor_ros2Config.cmake\n'}
+[95.729850] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ubiquity_motor_ros2Config-version.cmake\n'}
+[95.730956] (ubiquity_motor_ros2) StdoutLine: {'line': b'-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.xml\n'}
+[95.736403] (-) TimerEvent: {}
+[95.737927] (ubiquity_motor_ros2) CommandEnded: {'returncode': 0}
+[95.836913] (-) TimerEvent: {}
+[95.854254] (ubiquity_motor_ros2) JobEnded: {'identifier': 'ubiquity_motor_ros2', 'rc': 0}
+[95.857319] (-) EventReactorShutdown: {}

@@ -1,0 +1,126 @@
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 2.5.4 (/opt/ros/jazzy/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+-- Found rclcpp: 28.1.9 (/opt/ros/jazzy/share/rclcpp/cmake)
+-- Found rosidl_generator_c: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+-- Found rosidl_generator_cpp: 4.6.5 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 7.3.2 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 8.4.2 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+-- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.13")  
+-- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") 
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found sensor_msgs: 5.3.6 (/opt/ros/jazzy/share/sensor_msgs/cmake)
+-- Found diagnostic_msgs: 5.3.6 (/opt/ros/jazzy/share/diagnostic_msgs/cmake)
+-- Found hardware_interface: 4.28.1 (/opt/ros/jazzy/share/hardware_interface/cmake)
+-- Found ros2_control: 4.28.1 (/opt/ros/jazzy/share/ros2_control/cmake)
+-- Found diagnostic_updater: 4.2.3 (/opt/ros/jazzy/share/diagnostic_updater/cmake)
+-- Found controller_manager: 4.28.1 (/opt/ros/jazzy/share/controller_manager/cmake)
+-- Found ubiquity_motor_ros2_msgs: 1.0.0 (/home/drbot/ros2_ws/install/ubiquity_motor_ros2_msgs/share/ubiquity_motor_ros2_msgs/cmake)
+-- Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake (found version "1.83.0") found components: thread 
+-- Configuring done (11.5s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/drbot/ros2_ws/src/build/ubiquity_motor_ros2
+[ 25%] [32mBuilding CXX object CMakeFiles/ur_serial.dir/serial/src/impl/unix.cc.o[0m
+[ 25%] [32mBuilding CXX object CMakeFiles/ur_serial.dir/serial/src/serial.cc.o[0m
+[ 37%] [32mBuilding CXX object CMakeFiles/ur_serial.dir/serial/src/impl/list_ports/list_ports_linux.cc.o[0m
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:[m[K In function ‘[01m[Kstd::vector<std::__cxx11::basic_string<char> >[01;32m[K glob[m[K(const std::vector<std::__cxx11::basic_string<char> >&)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:66:40:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Kint[m[K’ and ‘[01m[Ksize_t[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare-Wsign-compare]8;;[m[K]
+   66 |     for(int path_index = 0; [01;35m[Kpath_index < glob_results.gl_pathc[m[K; path_index++)
+      |                             [01;35m[K~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:57:9:[m[K [01;35m[Kwarning: [m[Kvariable ‘[01m[Kglob_retval[m[K’ set but not used [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-but-set-variable-Wunused-but-set-variable]8;;[m[K]
+   57 |     int [01;35m[Kglob_retval[m[K = glob(patterns[0].c_str(), 0, NULL, &glob_results);
+      |         [01;35m[K^~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:[m[K In function ‘[01m[Kstd::string[01;32m[K format[m[K(const char*, ...)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/serial/src/impl/list_ports/list_ports_linux.cc:246:31:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Kint[m[K’ and ‘[01m[Ksize_t[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare-Wsign-compare]8;;[m[K]
+  246 |         else if( [01;35m[Kreturn_value >= buffer_size_bytes[m[K )
+      |                  [01;35m[K~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~[m[K
+[ 50%] [32m[1mLinking CXX shared library libur_serial.so[0m
+[ 50%] Built target ur_serial
+[ 62%] [32mBuilding CXX object CMakeFiles/ubiquity_motor_ros2.dir/src/motor_message.cc.o[0m
+[ 75%] [32mBuilding CXX object CMakeFiles/ubiquity_motor_ros2.dir/src/motor_serial.cc.o[0m
+[ 87%] [32mBuilding CXX object CMakeFiles/ubiquity_motor_ros2.dir/src/motor_hardware.cc.o[0m
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_serial.cc:[m[K In member function ‘[01m[Kbool MotorSerial::[01;32m[KopenPort[m[K()[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_serial.cc:98:25:[m[K [01;35m[Kwarning: [m[Kcatching polymorphic type ‘[01m[Kconst class std::invalid_argument[m[K’ by value [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wcatch-value=-Wcatch-value=]8;;[m[K]
+   98 |     } catch (const std::[01;35m[Kinvalid_argument[m[K) {
+      |                         [01;35m[K^~~~~~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:[m[K In member function ‘[01m[Kvirtual hardware_interface::CallbackReturn ubiquity_motor_ros2::MotorHardware::[01;32m[Kon_configure[m[K(const rclcpp_lifecycle::State&)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:174:96:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kprevious_state[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+  174 | hardware_interface::CallbackReturn MotorHardware::on_configure([01;35m[Kconst rclcpp_lifecycle::State & previous_state[m[K)
+      |                                                                [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:[m[K In member function ‘[01m[Kvirtual hardware_interface::CallbackReturn ubiquity_motor_ros2::MotorHardware::[01;32m[Kon_activate[m[K(const rclcpp_lifecycle::State&)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:370:94:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kprevious_state[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+  370 | hardware_interface::CallbackReturn MotorHardware::on_activate([01;35m[Kconst rclcpp_lifecycle::State& previous_state[m[K)
+      |                                                               [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:[m[K In member function ‘[01m[Kvirtual hardware_interface::return_type ubiquity_motor_ros2::MotorHardware::[01;32m[Kread[m[K(const rclcpp::Time&, const rclcpp::Duration&)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:465:73:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kcurrent_time[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+  465 | hardware_interface::return_type MotorHardware::read([01;35m[Kconst rclcpp::Time& current_time[m[K, const rclcpp::Duration& elapsed_loop_time) {
+      |                                                     [01;35m[K~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:465:111:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kelapsed_loop_time[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+  465 | hardware_interface::return_type MotorHardware::read(const rclcpp::Time& current_time, [01;35m[Kconst rclcpp::Duration& elapsed_loop_time[m[K) {
+      |                                                                                       [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:[m[K In member function ‘[01m[Kvoid ubiquity_motor_ros2::MotorHardware::[01;32m[KsetWheelVelocities[m[K(const rclcpp::Time&, const rclcpp::Duration&)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:574:99:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kelapsed_loop_time[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+  574 | void MotorHardware::setWheelVelocities(const rclcpp::Time& current_time, [01;35m[Kconst rclcpp::Duration & elapsed_loop_time[m[K) {
+      |                                                                          [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:[m[K In member function ‘[01m[Kvoid ubiquity_motor_ros2::MotorHardware::[01;32m[KreadInputs[m[K(uint32_t)[m[K’:
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:1004:17:[m[K [01;35m[Kwarning: [m[Kthis statement may fall through [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wimplicit-fallthrough=-Wimplicit-fallthrough=]8;;[m[K]
+ 1004 |                 [01;35m[K}[m[K
+      |                 [01;35m[K^[m[K
+[01m[K/home/drbot/ros2_ws/src/ubiquity_motor_ros2/src/motor_hardware.cc:1006:17:[m[K [01;36m[Knote: [m[Khere
+ 1006 |                 [01;36m[Kcase[m[K MotorMessage::REG_TINT_BOTH_WHLS: {   // As of v41 show time between wheel enc edges
+      |                 [01;36m[K^~~~[m[K
+[100%] [32m[1mLinking CXX shared library libubiquity_motor_ros2.so[0m
+[100%] Built target ubiquity_motor_ros2
+-- Install configuration: ""
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/libur_serial.so
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/v8stdint.h
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/impl
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/impl/win.h
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/impl/unix.h
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/include/serial/serial.h
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/library_path.sh
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/library_path.dsv
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/plugin_description.xml
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/libubiquity_motor_ros2.so
+-- Set non-toolchain portion of runtime path of "/home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/libubiquity_motor_ros2.so" to ""
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/upgrade_firmware.py
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/test_motor_board.py
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/lib/ubiquity_motor_ros2/test_pi_gpio.py
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/launch
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/launch/new.launch.py
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/launch/motors.launch.py
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cfg
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cfg/conf.yaml
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/package_run_dependencies/ubiquity_motor_ros2
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/parent_prefix_path/ubiquity_motor_ros2
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/ament_prefix_path.sh
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/ament_prefix_path.dsv
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/path.sh
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/environment/path.dsv
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.bash
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.sh
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.zsh
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/local_setup.dsv
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.dsv
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/packages/ubiquity_motor_ros2
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ament_index/resource_index/hardware_interface__pluginlib__plugin/ubiquity_motor_ros2
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ament_cmake_export_include_directories-extras.cmake
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ament_cmake_export_libraries-extras.cmake
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ubiquity_motor_ros2Config.cmake
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/cmake/ubiquity_motor_ros2Config-version.cmake
+-- Installing: /home/drbot/ros2_ws/src/install/ubiquity_motor_ros2/share/ubiquity_motor_ros2/package.xml
