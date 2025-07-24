@@ -20,7 +20,7 @@ xz -T0 -z -f "${ORIG_IMAGE}"
 # 2. Rename the compressed .img.xz to have timestamp and random number
 mv "${ORIG_IMAGE}.xz" "${COMPRESSED_IMAGE_FILE}"
 
-UPLOAD_URL=$(python3 generate_presigned_url.py "${COMPRESSED_IMAGE_NAME}")
+UPLOAD_URL=$(python3 generate-presign-key.py "${COMPRESSED_IMAGE_NAME}")
 curl --fail -H "x-amz-acl: public-read" --upload-file "${COMPRESSED_IMAGE_FILE}" "${UPLOAD_URL}"
 
 echo "Done."
