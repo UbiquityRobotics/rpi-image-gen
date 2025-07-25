@@ -44,14 +44,5 @@ echo "[INFO] Uploading to DigitalOcean Spaces bucket: ${SPACES_BUCKET}"
 # Upload using s3cmd with the temporary config file
 s3cmd -c "$S3CMD_CONFIG_FILE" put "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
 
-echo "[INFO] Generating SHA256 checksum:"
-sha256sum "${COMPRESSED_IMAGE_FILE}"
-
-echo "[INFO] Copying image to master destination: ${MASTER_DEST}"
-cp "${COMPRESSED_IMAGE_FILE}" "${MASTER_DEST}"
-
-# Clean up
-rm -f "$S3CMD_CONFIG_FILE"
-
 echo "[SUCCESS] Upload and processing complete."
 
