@@ -16,44 +16,40 @@ mmdebstrap:
     - python3-pip
 
   customize-hooks:
-    # --- Add Marco Sonic PPA with trusted=yes (insecure, use only if you trust the source) ---
+    # Add Marco Sonic PPA (trusted=yes)
     - |
       echo "deb [trusted=yes] http://ppa.launchpad.net/marco-sonic/rasppios/ubuntu noble main" > "$1/etc/apt/sources.list.d/marco-sonic-rasppios-noble.list"
 
     - echo "installing picam"
 
-    # --- Add ROS 2 Jazzy repository and key ---
+    # Add ROS 2 Jazzy repository and key
     - |
       export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
       curl -L -o "$1/tmp/ros2-apt-source.deb" "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.noble_all.deb"
       chroot "$1" dpkg -i /tmp/ros2-apt-source.deb || true
-    # --- System updates and installations ---
+
+    # System updates and installs
     - chroot "$1" apt upgrade -y
     - chroot "$1" apt install -y libcamera-tools gstreamer1.0-libcamera libcamera-dev libcamera-doc libcamera-ipa libcamera-v4l2 python3-libcamera
 
-    # --- Workspace setup ---
-    - |
-      chroot "$1" mkdir -p /home/ubuntu/ros2_ws/src
-    - |
-      chroot "$1" git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
+    # Workspace setup
+    - chroot "$1" mkdir -p /home/ubuntu/ros2_ws/src
+    - chroot "$1" git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
 
-    # --- Initialize rosdep ---
+    # Initialize rosdep
     - chroot "$1" rosdep update
 
-    # --- Install dependencies with rosdep ---
-
-    # --- Final updates ---
+    # Add universe repository and update
     - chroot "$1" add-apt-repository -y universe
     - chroot "$1" apt update
 
-    # --- ADDED: Create udev rule for dma_heap access for picam ---
+    # Udev rule for dma_heap access for picam
     - |
       echo 'SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"' > "$1/etc/udev/rules.d/picam.rules"
     - chroot "$1" udevadm control --reload-rules
     - chroot "$1" udevadm trigger
 
-
-    # --- ADDED: Locale setup for en_US.UTF-8 ---
+    # Locale setup for en_US.UTF-8
     - chroot "$1" apt update
     - chroot "$1" apt install -y locales
     - chroot "$1" locale-gen en_US en_US.UTF-8
@@ -61,28 +57,47 @@ mmdebstrap:
     - |
       echo 'export LANG=en_US.UTF-8' >> "$1/etc/profile.d/locale.sh"
 
-
-    # --- ADDED: ROS tools and camera info manager ---
+    # Install ROS developer tools and camera info manager
     - chroot "$1" apt update
     - chroot "$1" apt install -y ros-dev-tools ros-jazzy-camera-info-manager
 
-    # --- ADDED: rosdep initialization and update ---
+    # rosdep init and update
     - chroot "$1" rosdep init || true
     - chroot "$1" rosdep update
 
-    # --- ADDED: rosdep install for workspace, skipping libcamera as before ---
+    # Install rosdep dependencies for workspace (skip libcamera)
     - |
       chroot "$1" rosdep install -y --from-paths /home/ubuntu/ros2_ws/src --ignore-src --rosdistro jazzy --skip-keys=libcamera
 
-    # --- ADDED: Build the workspace with colcon ---
-    - chroot "$1" apt install -y ros-jazzy-ament-cmake  # Ensure ament_cmake is present
+    # Ensure ament_cmake is present and build workspace
+    - chroot "$1" apt install -y ros-jazzy-ament-cmake
     - chroot "$1" bash -c "source /opt/ros/jazzy/setup.bash && cd /home/ubuntu/ros2_ws && colcon build"
-    # --- ADDED: Source ROS2 workspace on login ---
+
+    # Source ROS2 workspace on user login
     - |
       echo 'source /home/ubuntu/ros2_ws/install/setup.bash' >> "$1/home/ubuntu/.bashrc"
       cp -a ros2_ws/src/. "$1/home/ubuntu/ros2_ws/src/"
 
-    # --- NOTE: The actual camera node run command is not included here as it should be run interactively after boot ---
-    # Example for user after boot:
-    # ros2 run camera_ros camera_node --ros-args -p width:=640 -p height:=480 -p format:=YUYV
+    # Install ros-jazzy-image-pipeline for image processing utilities
+    - chroot "$1" apt install -y ros-jazzy-image-pipeline
+
+    # Add script to run camera calibration interactively
+    - |
+      echo '#!/bin/bash
+ros2 run camera_calibration cameracalibrator --size 6x8 --square 0.025 --ros-args -r image:=/camera/image_raw -p camera:=/camera' > "$1/usr/local/bin/run_camera_calibration.sh"
+      chmod +x "$1/usr/local/bin/run_camera_calibration.sh"
+
+    # Clone fiducials package and build it
+    - |
+      chroot "$1" git clone -b jazzy-devel https://github.com/UbiquityRobotics/fiducials /home/ubuntu/ros2_ws/src/fiducials
+    - |
+      chroot "$1" bash -c "source /opt/ros/jazzy/setup.bash && cd /home/ubuntu/ros2_ws && colcon build --packages-select fiducials"
+
+    # Add script to launch fiducial detection
+    - |
+      echo '#!/bin/bash
+source /opt/ros/jazzy/setup.bash
+source /home/ubuntu/ros2_ws/install/setup.bash
+ros2 launch aruco_detect aruco_detect.launch.py' > "$1/usr/local/bin/start_aruco_detect.sh"
+      chmod +x "$1/usr/local/bin/start_aruco_detect.sh"
 
