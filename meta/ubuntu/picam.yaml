@@ -84,7 +84,7 @@ mmdebstrap:
     # Add script to run camera calibration interactively
     - |
       echo '#!/bin/bash
-ros2 run camera_calibration cameracalibrator --size 6x8 --square 0.025 --ros-args -r image:=/camera/image_raw -p camera:=/camera' > "$1/usr/local/bin/run_camera_calibration.sh"
+      ros2 run camera_calibration cameracalibrator --size 6x8 --square 0.025 --ros-args -r image:=/camera/image_raw -p camera:=/camera' > "$1/usr/local/bin/run_camera_calibration.sh"
       chmod +x "$1/usr/local/bin/run_camera_calibration.sh"
 
     # Clone fiducials package and build it
@@ -96,8 +96,8 @@ ros2 run camera_calibration cameracalibrator --size 6x8 --square 0.025 --ros-arg
     # Add script to launch fiducial detection
     - |
       echo '#!/bin/bash
-source /opt/ros/jazzy/setup.bash
-source /home/ubuntu/ros2_ws/install/setup.bash
-ros2 launch aruco_detect aruco_detect.launch.py' > "$1/usr/local/bin/start_aruco_detect.sh"
+      source /opt/ros/jazzy/setup.bash
+      source /home/ubuntu/ros2_ws/install/setup.bash
+      ros2 launch aruco_detect aruco_detect.launch.py' > "$1/usr/local/bin/start_aruco_detect.sh"
       chmod +x "$1/usr/local/bin/start_aruco_detect.sh"
 
