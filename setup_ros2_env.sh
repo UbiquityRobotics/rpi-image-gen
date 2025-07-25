@@ -5,7 +5,7 @@ set -e
 sudo apt update
 
 # Install Git and Podman
-sudo apt install -y git podman dosfstools mtools
+sudo apt install -y git podman dosfstools mtools s3cmd
 
 # Run your dependency installation script
 sudo ./install_deps.sh
