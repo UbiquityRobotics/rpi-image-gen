@@ -1,12 +1,11 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Fixed paths and names
+# --- Configuration ---
+
 IMG_DIR="work/ros2/deploy"
 ORIG_IMAGE="${IMG_DIR}/ros2.img"
 BASE_NAME="ros2"
-
-# Generate date and random number
 CURRENT_DATE=$(date +%Y%m%d)
 RANDOM_NUMBER=$(shuf -i 1000-9999 -n 1)
 IMAGE_NAME="${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.img"
@@ -14,14 +13,45 @@ COMPRESSED_IMAGE_NAME="${IMAGE_NAME}.xz"
 COMPRESSED_IMAGE_FILE="${IMG_DIR}/${COMPRESSED_IMAGE_NAME}"
 MASTER_DEST="/buildwork/${COMPRESSED_IMAGE_NAME}"
 
-# 1. Compress the image using xz with all threads and force overwrite
+# DigitalOcean Spaces config (passed as env vars)
+: "${SPACES_REGION:=sfo2}"                        
+: "${SPACES_ENDPOINT:=${SPACES_REGION}.digitaloceanspaces.com}"
+: "${SPACES_BUCKET:=ubiquity-pi-image}"            
+
+# Temporary config file for s3cmd
+S3CMD_CONFIG_FILE="$(mktemp)"
+
+# Create the s3cmd config file dynamically
+cat > "$S3CMD_CONFIG_FILE" <<EOF
+[default]
+access_key = ${S3_ACCESS_KEY}
+secret_key = ${S3_SECRET_KEY}
+bucket_location = US
+host_base = ${SPACES_ENDPOINT}
+host_bucket = %(bucket)s.${SPACES_ENDPOINT}
+use_https = True
+signature_v2 = False
+EOF
+
+echo "[INFO] Compressing image..."
 xz -T0 -z -f "${ORIG_IMAGE}"
 
-# 2. Rename the compressed .img.xz to have timestamp and random number
+echo "[INFO] Renaming compressed image to: ${COMPRESSED_IMAGE_FILE}"
 mv "${ORIG_IMAGE}.xz" "${COMPRESSED_IMAGE_FILE}"
 
-UPLOAD_URL=$(python3 generate-presign-key.py "${COMPRESSED_IMAGE_NAME}")
-curl --fail -H "x-amz-acl: public-read" --upload-file "${COMPRESSED_IMAGE_FILE}" "${UPLOAD_URL}"
+echo "[INFO] Uploading to DigitalOcean Spaces bucket: ${SPACES_BUCKET}"
 
-echo "Done."
+# Upload using s3cmd with the temporary config file
+s3cmd -c "$S3CMD_CONFIG_FILE" put "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
+
+echo "[INFO] Generating SHA256 checksum:"
+sha256sum "${COMPRESSED_IMAGE_FILE}"
+
+echo "[INFO] Copying image to master destination: ${MASTER_DEST}"
+cp "${COMPRESSED_IMAGE_FILE}" "${MASTER_DEST}"
+
+# Clean up
+rm -f "$S3CMD_CONFIG_FILE"
+
+echo "[SUCCESS] Upload and processing complete."
 
