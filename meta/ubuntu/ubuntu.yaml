@@ -62,7 +62,6 @@ mmdebstrap:
     # Remove default repository entries
     - sed -i '/^deb.*ubuntu.com/d' "$1/etc/apt/sources.list"
     - rm -f "$1/etc/apt/sources.list.d/"*.list  # Remove any default list files
-
   # Now add your custom repositories
     - |
       cat > "$1/etc/apt/sources.list" <<EOF

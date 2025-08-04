@@ -33,7 +33,7 @@ mmdebstrap:
       printf "start_x=1\n" >> "$1/boot/firmware/config.txt"
       printf "display_auto_detect=1\n" >> "$1/boot/firmware/config.txt"
       printf "dtoverlay=imx219\n" >> "$1/boot/firmware/config.txt"
-      printf "camera_detect=1\n" >> "$1/boot/firmware/config.txt"
+      printf "camera_auto_detect=1\n" >> "$1/boot/firmware/config.txt"
 
     # ===== Firmware Symlinks =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin

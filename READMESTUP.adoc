@@ -1,0 +1,19 @@
+= rpi-image-gen
+
+This is a custom image made by ubiquity robotics to be used on magni5 and magni6 robot.
+
+This readme will provide some instructions to the user when logs into the image for the first time.
+
+First you will need to connect to the wifi.
+
+To do this first run the command: nmcli dev wifi list
+
+This will give you a list of all available wifi networks. 
+
+Once you know which one you want to connect to run: sudo nmcli dev wifi connect "NetworkName" password "NetworkPassword" ifname wlan0
+
+This will connect you to the wifi
+
+**NOTE** If you connected to the robot trough the Access Point you will lose the connection after the wifi is connected. To connect back to the roboto find the IP that the router has assigned to the roboto and SSH into it. 
+
+Then you can run: sudo apt update
