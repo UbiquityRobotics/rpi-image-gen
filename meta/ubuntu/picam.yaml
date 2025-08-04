@@ -110,4 +110,4 @@ mmdebstrap:
       ros2 launch aruco_detect aruco_detect.launch.py
       EOF
       chmod +x "$1/usr/local/bin/start_aruco_detect.sh"
-    - cp READMESTUP.adoc $1/home/ubuntu/
+    - cp README.adoc $1/home/ubuntu/

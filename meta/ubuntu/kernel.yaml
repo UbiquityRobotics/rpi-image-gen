@@ -132,7 +132,7 @@ mmdebstrap:
           ipv4.method shared \
           ipv4.addresses 192.168.4.1/24 \
           wifi-sec.key-mgmt wpa-psk \
-          wifi-sec.psk "ubiquityPassword123"; then
+          wifi-sec.psk "robotseverywhere"; then
           
           echo "AP connection created successfully"
           
