@@ -9,7 +9,7 @@ mmdebstrap:
   keyrings:
     - /usr/share/keyrings/ubuntu-archive-keyring.gpg
   architecture: arm64
-  variant: minbase
+  variant: buildd
 
   setup-hooks:
     - rm -f "$1/etc/apt/sources.list.d/ros2-testing.list"
@@ -19,30 +19,54 @@ mmdebstrap:
     - echo "deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > "$1/etc/apt/sources.list.d/ros2.list"
 
   packages:
+    - apt
+    - apt-utils
+    - dpkg
+    - bash
     - curl
     - gnupg
     - lsb-release
-    - ros-jazzy-ros-base
-    - python3-rosdep
     - python3-colcon-common-extensions
     - ros-jazzy-controller-manager
     - ros-jazzy-joint-state-publisher
     - ros-jazzy-xacro
     - ros-jazzy-ros2-control
     - ros-jazzy-ros2-controllers
-
+    - python3-rosdep
   customize-hooks:
-    # System setup
+    # Pin key packages and libraries to Ubuntu repositories to avoid broken dependencies
+    - |
+      cat > "$1/etc/apt/preferences.d/pin-ubuntu-libs" << EOF
+      Package: libdrm2 libdrm-amdgpu1 libwayland-client0 libwayland-server0 libwayland-cursor0 libwayland-egl1
+      Pin: release o=Ubuntu
+      Pin-Priority: 1001
+
+      Package: *
+      Pin: release o=Ubuntu
+      Pin-Priority: 500
+      EOF
+
+    # Update apt repositories with ros2 repo and universe enabled
     - chroot "$1" apt-get update
     - chroot "$1" apt-get install -y software-properties-common
     - chroot "$1" add-apt-repository -y universe
+    - chroot "$1" apt-get update
+
+    # Install packages now able to resolve because of pinning
+    - |
+      chroot "$1" bash -c '
+        export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F"\"" '"'"'{print $4}'"'"')
+        curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo $VERSION_CODENAME)_all.deb"
+        dpkg -i /tmp/ros2-apt-source.deb
+        apt-get update
+      '
+    - chroot "$1" apt-get install -y --allow-downgrades ros-jazzy-desktop
+    # Do system upgrade and finalize setup
     - chroot "$1" apt-get -y full-upgrade
 
-    # Create ubuntu user
+    # Create user and configure environment
     - chroot "$1" useradd --create-home --shell /bin/bash ubuntu
     - chroot "$1" passwd -d ubuntu
-
-    # ROS configuration
     - chroot "$1" rosdep init
     - chroot "$1" runuser -u ubuntu -- rosdep update --include-eol-distros
     - echo "source /opt/ros/jazzy/setup.bash" >> "$1/home/ubuntu/.bashrc"
