@@ -19,7 +19,7 @@ When the device boots for the first time:
 1. The system automatically configures a **WiFi Access Point**
 2. The hostname is set to `ubiquityrobotXXXX` where `XXXX` are the last 4 digits of the MAC address
 3. The Access Point uses the same name as the hostname
-4. Default credentials: **username:** `ubuntu` **password:** `robotseverywhere`
+4. Default credentials: **username:** `ubuntu` **password:** `ubuntu`
 
 **Connecting to the Access Point**
 
@@ -31,11 +31,11 @@ When the device boots for the first time:
 2. **Connect using the password:** `robotseverywhere`
 
 
-3. **Your device should receive an IP address** in the range `192.168.4.2` - `192.168.4.20`
+3. **Your device should receive an IP address** in should be `192.168.4.1`
 
 **Step 2: SSH into the Device**
 
-    ssh ubuntu@IPadresss
+    ssh ubuntu@192.168.4.1
 
 Once connected to the Access Point:
 
@@ -47,11 +47,15 @@ Once you're connected via SSH, you can configure the device to connect to your h
 
 **List Available Networks**
 
-     sudo nmcli dev wifi
+     nmcli dev wifi
 
 
 **Connect to Your WiFi Network**
 
     sudo nmcli dev wifi connect “YourWiFiNetworkName” password “YourWiFiPassword”
 
-Once you connected to the wifi you will probably lose your connection to the Raspberry Pi. Now find the IP that your router assigned to the Pi and again ssh into it.
+Once you connected to the wifi you will lose your connection to the Raspberry Pi. Now your Pi is connected to the network. You can now ssh into it from your configured network.
+
+**Step 4: SSH into the Device**
+
+  ssh ubuntu@ubiquityrobotXXXX
