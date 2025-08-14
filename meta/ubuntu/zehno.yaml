@@ -5,6 +5,7 @@ mmdebstrap:
     - g++
     - python3-vcstool  # Added to provide vcs command
   customize-hooks:
+
     # Initialize rosdep without privileged operations
     - |
       chroot "$1" bash -c '
@@ -43,13 +44,30 @@ mmdebstrap:
 
     # Download and configure router
     - |
-      cp -a DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5 "$1/home/ubuntu/"    
+      cp -a DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5 "$1/home/ubuntu/"   
+      cp -a DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5 "$1/home/ubuntu/"
+  
+
+    # ===== Create wrapper script to pick correct config =====
     - |
-      chroot "$1" bash -c '
-        echo "export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5" >> /home/ubuntu/.profile
-        echo "source /home/ubuntu/zenoh_ws/install/setup.bash" >> /home/ubuntu/.profile
-        echo "export RMW_IMPLEMENTATION=rmw_zenoh_cpp" >> /home/ubuntu/.profile'
-  # Create systemd service to start rmw_zenohd at boot
+      chroot "$1" bash -c 'cat <<EOF > /usr/local/bin/start-zenoh.sh
+      #!/bin/bash
+      if grep -iq "Raspberry Pi 5" /proc/device-tree/model; then
+        export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5
+      elif grep -iq "Raspberry Pi 4" /proc/device-tree/model; then
+        export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5
+      else
+        export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5
+      fi
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      source /opt/ros/jazzy/setup.bash
+      source /home/ubuntu/zenoh_ws/install/setup.bash
+      exec ros2 run rmw_zenoh_cpp rmw_zenohd
+      EOF
+      chmod +x /usr/local/bin/start-zenoh.sh
+      '
+
+      # Create systemd service to start rmw_zenohd at boot
     - |
       chroot "$1" bash -c 'cat <<EOF > /etc/systemd/system/rmw_zenohd.service
       [Unit]
@@ -60,10 +78,8 @@ mmdebstrap:
       Type=simple
       User=ubuntu
       Environment=HOME=/home/ubuntu
-      Environment=ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG.json5
-      Environment=RMW_IMPLEMENTATION=rmw_zenoh_cpp
       WorkingDirectory=/home/ubuntu
-      ExecStart=/bin/bash -c "source /opt/ros/jazzy/setup.bash && source /home/ubuntu/zenoh_ws/install/setup.bash && ros2 run rmw_zenoh_cpp rmw_zenohd"
+      ExecStart=/usr/local/bin/start-zenoh.sh
       Restart=on-failure
 
       [Install]

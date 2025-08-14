@@ -8,32 +8,39 @@ mmdebstrap:
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
-    # ===== Device Tree Configuration =====
+    # ===== Device Tree Configuration (Simpler approach) =====
     - |
-      # Pi4 Configuration
-      printf "\n[pi4]\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=disable-bt\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=uart0\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=uart1\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=uart2\n" >> "$1/boot/firmware/config.txt"
+      # Backup original config
+      cp "$1/boot/firmware/config.txt" "$1/boot/firmware/config.txt.backup"
+      
+      # Remove all existing [pi4], [pi5], and duplicate [all] sections
+      sed -i '/^\[pi4\]/,/^\[/{/^\[pi4\]/d; /^\[/!d; /^\[/i\
+      }' "$1/boot/firmware/config.txt"
+      sed -i '/^\[pi5\]/,/^\[/{/^\[pi5\]/d; /^\[/!d; /^\[/i\
+      }' "$1/boot/firmware/config.txt"
+      
+      # Add our clean sections at the end
+      cat >> "$1/boot/firmware/config.txt" << 'EOF'
 
-      # Pi5 Configuration
-      printf "\n[pi5]\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=uart3-pi5\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=uart4\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=uart5\n" >> "$1/boot/firmware/config.txt"
+      [pi4]
+      enable_uart=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1,pin_tx=32,pin_rx=33
+      dtoverlay=uart2
 
-      # Common UART Configuration
-      printf "\n[all]\n" >> "$1/boot/firmware/config.txt"
-      printf "enable_uart=1\n" >> "$1/boot/firmware/config.txt"
+      [pi5]
+      BOOT_UART=1
+      dtoverlay=uart3-pi5
+      dtoverlay=uart4
+      dtoverlay=uart5
 
-      # Camera Configuration (applies to all models)
-      printf "\n# Camera settings\n" >> "$1/boot/firmware/config.txt"
-      printf "camera_auto_detect=0\n" >> "$1/boot/firmware/config.txt"
-      printf "start_x=1\n" >> "$1/boot/firmware/config.txt"
-      printf "display_auto_detect=1\n" >> "$1/boot/firmware/config.txt"
-      printf "dtoverlay=imx219\n" >> "$1/boot/firmware/config.txt"
-      printf "camera_auto_detect=1\n" >> "$1/boot/firmware/config.txt"
+      # Camera settings
+      camera_auto_detect=0
+      start_x=1
+      display_auto_detect=1
+      dtoverlay=imx219
+      EOF
 
     # ===== Firmware Symlinks =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin

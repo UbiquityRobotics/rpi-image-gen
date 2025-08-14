@@ -17,13 +17,11 @@ ARGUMENTS = [
                           choices=['true', 'false'], description='Tower'),
         DeclareLaunchArgument('shell_installed', default_value='false',
                           choices=['true', 'false'],  description='shell'),
-        DeclareLaunchArgument('sonars_installed', default_value='true', 
+        DeclareLaunchArgument('sonars_installed', default_value='true',
                           choices=['true', 'false'], description='sonars'),
-        DeclareLaunchArgument('camera_extrinsics_file', default_value='extrinsics/camera_extrinsics_forward.yaml', 
-                          choices=['extrinsics/camera_extrinsics_forward.yaml'], 
+        DeclareLaunchArgument('camera_extrinsics_file', default_value='extrinsics/camera_extrinsics_forward.yaml',
                           description='Path to camera extrinsics file'),
-        DeclareLaunchArgument('lidar_extrinsics_file', default_value='extrinsics/lidar_extrinsics_top_plate_center.yaml', 
-                          choices=['extrinsics/lidar_extrinsics_top_plate_center.yaml'],
+        DeclareLaunchArgument('lidar_extrinsics_file', default_value='extrinsics/lidar_extrinsics_top_plate_center.yaml',
                           description='Path to lidar extrinsics file'),
                                      ]
 
