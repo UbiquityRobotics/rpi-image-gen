@@ -40,8 +40,6 @@
     ///
     /// See https://docs.rs/zenoh/latest/zenoh/config/struct.EndPoint.html
     endpoints: [
-      "serial//dev/ttyAMA3#baudrate=1000000",
-      "tcp/0.0.0.0:7447"
     ],
 
     /// Global connect configuration,
@@ -90,7 +88,8 @@
     ///
     /// See https://docs.rs/zenoh/latest/zenoh/config/struct.EndPoint.html
     endpoints: [
-      "tcp/[::]:7447"
+      "serial//dev/ttyAMA3#baudrate=1000000",
+      "tcp/0.0.0.0:7447"
     ],
 
     /// Global listen configuration,
