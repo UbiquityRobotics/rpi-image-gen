@@ -1,0 +1,188 @@
+mmdebstrap:
+  mode: unshare
+  suite: noble
+  target: rootfs
+  mirrors:
+    - http://ports.ubuntu.com/ubuntu-ports noble main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-updates main restricted universe multiverse
+    - http://ports.ubuntu.com/ubuntu-ports noble-security main restricted universe multiverse
+  keyrings:
+    - /usr/share/keyrings/ubuntu-archive-keyring.gpg
+  architecture: arm64
+  variant: buildd
+
+  setup-hooks:
+    - rm -f "$1/etc/apt/sources.list.d/ros2-testing.list"
+    - mkdir -p "$1/usr/share/keyrings"
+    - curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o "$1/usr/share/keyrings/ros-archive-keyring.gpg"
+    - chmod 644 "$1/usr/share/keyrings/ros-archive-keyring.gpg"
+    - echo "deb [arch=arm64 signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu noble main" > "$1/etc/apt/sources.list.d/ros2.list"
+
+  packages:
+    - apt
+    - apt-utils
+    - dpkg
+    - bash
+    - curl
+    - gnupg
+    - git
+    - lsb-release
+    - software-properties-common
+    - python3-colcon-common-extensions
+    - ros-jazzy-ros-base
+    - ros-jazzy-ament-cmake
+    - ros-jazzy-rviz-visual-tools
+    - ros-jazzy-vision-msgs              # Add this
+    - ros-jazzy-image-transport
+    - ros-jazzy-camera-info-manager
+    - ros-dev-tools
+    - python3-vcstool
+    - gh
+    - nodejs
+    - npm
+
+  customize-hooks:
+    # Update apt repositories and enable universe
+    - chroot "$1" apt-get update
+    - chroot "$1" add-apt-repository -y universe
+    - chroot "$1" apt-get update
+
+    # Install additional ROS packages
+    - chroot "$1" apt-get install -y ros-jazzy-gps-umd libpcl-dev ros-jazzy-pcl-conversions libpcap-dev ros-jazzy-rosbridge-server ros-jazzy-tf-transformations ros-jazzy-nav2-msgs ros-jazzy-nav2-util libudev-dev
+
+    # Create ubuntu user
+    - chroot "$1" useradd --create-home --shell /bin/bash ubuntu || true
+    - chroot "$1" passwd -d ubuntu
+
+    # rosdep setup
+    - chroot "$1" rosdep init || true
+    - chroot "$1" runuser -u ubuntu -- rosdep update --include-eol-distros
+
+    # Create CORRECTLY formatted dummy camera calibration files
+    - |
+      mkdir -p "$1/home/ubuntu/.ros/camera_info"
+      cat > "$1/home/ubuntu/.ros/camera_info/imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml" << 'EOF'
+      image_width: 640
+      image_height: 480
+      camera_name: imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480
+      camera_matrix:
+        rows: 3
+        cols: 3
+         [500.0, 0.0, 320.0,
+               0.0, 500.0, 240.0,
+               0.0, 0.0, 1.0]
+      distortion_model: plumb_bob
+      distortion_coefficients:
+        rows: 1
+        cols: 5
+         [0.0, 0.0, 0.0, 0.0, 0.0]
+      rectification_matrix:
+        rows: 3
+        cols: 3
+         [1.0, 0.0, 0.0,
+               0.0, 1.0, 0.0,
+               0.0, 0.0, 1.0]
+      projection_matrix:
+        rows: 3
+        cols: 4
+         [500.0, 0.0, 320.0, 0.0,
+               0.0, 500.0, 240.0, 0.0,
+               0.0, 0.0, 1.0, 0.0]
+      EOF
+
+      cat > "$1/home/ubuntu/.ros/camera_info/imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480.yaml" << 'EOF'
+      image_width: 640
+      image_height: 480
+      camera_name: imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480
+      camera_matrix:
+        rows: 3
+        cols: 3
+         [500.0, 0.0, 320.0,
+               0.0, 500.0, 240.0,
+               0.0, 0.0, 1.0]
+      distortion_model: plumb_bob
+      distortion_coefficients:
+        rows: 1
+        cols: 5
+         [0.0, 0.0, 0.0, 0.0, 0.0]
+      rectification_matrix:
+        rows: 3
+        cols: 3
+         [1.0, 0.0, 0.0,
+               0.0, 1.0, 0.0,
+               0.0, 0.0, 1.0]
+      projection_matrix:
+        rows: 3
+        cols: 4
+         [500.0, 0.0, 320.0, 0.0,
+               0.0, 500.0, 240.0, 0.0,
+               0.0, 0.0, 1.0, 0.0]
+      EOF
+
+    # Clone and build ezmap_pro with proper error handling
+    - |
+      if [ -z "${GITHUB_TOKEN:-}" ]; then
+        echo "ERROR: GITHUB_TOKEN not set"
+        exit 1
+      fi
+      
+      chroot "$1" bash -c "
+        export GITHUB_TOKEN='${GITHUB_TOKEN}'
+        source /opt/ros/jazzy/setup.bash
+        cd /home/ubuntu
+        mkdir -p ezmap_ws/src
+        cd ezmap_ws/src
+        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-gen6
+        cd ezmap_pro
+        sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
+        vcs import < ezmap_pro.repos
+        
+        # Skip problematic packages
+        touch ../aruco_detect/COLCON_IGNORE || true
+        touch ../ld19_lidar/COLCON_IGNORE || true
+        
+        # Build route_select_ui touchscreen web app
+        cd route_select_ui/web_app
+        npm install --silent
+        npm run build
+        
+        # Back to workspace and build ROS
+        cd /home/ubuntu/ezmap_ws
+        source /opt/ros/jazzy/setup.bash
+        export CMAKE_PREFIX_PATH=/opt/ros/jazzy:\$CMAKE_PREFIX_PATH
+        # Install dependencies first
+        rosdep install --from-paths src --ignore-src -r -y || true
+        ./src/ezmap_pro/build.sh
+      "
+
+    # Create a service for ezmap startup
+    - |
+      cat > "$1/etc/systemd/system/ezmap.service" << 'EOF'
+      [Unit]
+      Description=ROS2 ezmap bringup
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=ubuntu
+      WorkingDirectory=/home/ubuntu/ezmap_ws
+      Environment=ROS_DOMAIN_ID=0
+      ExecStartPre=/bin/bash -c 'pkill -f "ros2|launch" || true'
+      ExecStart=/bin/bash -c 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch ezmap_bringup base.launch.py'
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+    # Enable the service
+    - chroot "$1" systemctl enable ezmap.service
+
+    # Add ROS setup to ubuntu user's bashrc
+    - echo "source /opt/ros/jazzy/setup.bash" >> "$1/home/ubuntu/.bashrc"
+    - echo "source ~/ezmap_ws/install/setup.bash" >> "$1/home/ubuntu/.bashrc"
+
+    # Ensure permissions for service/camera files
+    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/.ros /home/ubuntu/ezmap_ws
+
