@@ -46,7 +46,13 @@ mmdebstrap:
     - |
       cp -a DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5 "$1/home/ubuntu/"   
       cp -a DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5 "$1/home/ubuntu/"
-  
+
+    - |
+      cat >> "$1/home/ubuntu/.profile" << 'EOF'
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      source /opt/ros/jazzy/setup.bash
+      source /home/ubuntu/zenoh_ws/install/setup.bash
+      EOF  
 
     # ===== Create wrapper script to pick correct config =====
     - |

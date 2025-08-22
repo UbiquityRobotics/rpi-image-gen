@@ -66,7 +66,7 @@ mmdebstrap:
 
     # Build workspace as ubuntu user (ignore broken packages)
     - |
-      chroot "$1" sudo -u ubuntu bash -c "source /opt/ros/jazzy/setup.bash && cd /home/ubuntu/ros2_ws && colcon build --packages-ignore fiducials fiducial_slam aruco_detect stag_detect"
+      chroot "$1" sudo -u ubuntu bash -c "source /opt/ros/jazzy/setup.bash && cd /home/ubuntu/ros2_ws && colcon build --base-paths src/camera_ros/"
 
     # Copy additional sources if they exist (as ubuntu user)
     - |

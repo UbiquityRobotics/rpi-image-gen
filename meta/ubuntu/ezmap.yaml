@@ -48,7 +48,7 @@ mmdebstrap:
     - chroot "$1" apt-get update
 
     # Install additional ROS packages
-    - chroot "$1" apt-get install -y ros-jazzy-gps-umd libpcl-dev ros-jazzy-pcl-conversions libpcap-dev ros-jazzy-rosbridge-server ros-jazzy-tf-transformations ros-jazzy-nav2-msgs ros-jazzy-nav2-util libudev-dev
+    - chroot "$1" apt-get install -y ros-jazzy-nav2-map-server ros-jazzy-gps-umd libpcl-dev ros-jazzy-pcl-conversions libpcap-dev ros-jazzy-rosbridge-server ros-jazzy-tf-transformations ros-jazzy-nav2-msgs ros-jazzy-nav2-util libudev-dev
 
     # Create ubuntu user
     - chroot "$1" useradd --create-home --shell /bin/bash ubuntu || true
@@ -125,27 +125,27 @@ mmdebstrap:
         echo "ERROR: GITHUB_TOKEN not set"
         exit 1
       fi
-      
+
       chroot "$1" bash -c "
         export GITHUB_TOKEN='${GITHUB_TOKEN}'
         source /opt/ros/jazzy/setup.bash
         cd /home/ubuntu
         mkdir -p ezmap_ws/src
         cd ezmap_ws/src
-        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-gen6
+        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-gen5-and-6
         cd ezmap_pro
         sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
         vcs import < ezmap_pro.repos
-        
+
         # Skip problematic packages
         touch ../aruco_detect/COLCON_IGNORE || true
         touch ../ld19_lidar/COLCON_IGNORE || true
-        
+
         # Build route_select_ui touchscreen web app
         cd route_select_ui/web_app
         npm install --silent
         npm run build
-        
+
         # Back to workspace and build ROS
         cd /home/ubuntu/ezmap_ws
         source /opt/ros/jazzy/setup.bash
@@ -154,6 +154,67 @@ mmdebstrap:
         rosdep install --from-paths src --ignore-src -r -y || true
         ./src/ezmap_pro/build.sh
       "
+
+    # Network configuration for lidar
+    - |
+      # Create systemd network configuration
+      mkdir -p "$1/etc/systemd/network"
+      cat > "$1/etc/systemd/network/10-eth-dhcp.network" << 'EOF'
+      [Match]
+      Name=end0
+
+      [Link]
+      RequiredForOnline=no
+
+      [Network]
+      ConfigureWithoutCarrier=true
+      Address=192.168.42.125/24
+      EOF
+
+      # Create netplan configuration
+      mkdir -p "$1/etc/netplan"
+      cat > "$1/etc/netplan/01-netcfg.yaml" << 'EOF'
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          end0:
+            dhcp4: no
+            addresses: [192.168.42.125/24]
+            gateway4: 0.0.0.0
+            nameservers:
+              addresses: [8.8.8.8]
+      EOF
+
+    # Setup udev rules for robot serial
+    - |
+      mkdir -p "$1/etc/udev/rules.d"
+      cat > "$1/etc/udev/rules.d/99-robot-serial.rules" << 'EOF'
+      SUBSYSTEM=="tty", KERNEL=="ttyAMA0", SYMLINK+="robot_serial"
+      SUBSYSTEM=="tty", KERNEL=="ttyS0", SYMLINK+="robot_serial"
+      EOF
+
+    # Create robot configuration
+    - |
+      mkdir -p "$1/etc/ubiquity"
+      cat > "$1/etc/ubiquity/robot.yaml" << 'EOF'
+      force_time_sync: true
+      generation: gen6
+      gps_installed: none
+      gps_position: top_plate
+      lidar_installed: cx
+      lidar_position: top_plate_center_custom
+      oled_display:
+        controller: SH1106
+      raspicam_markertype: marker_stag_18
+      raspicam_position: upward
+      shell_installed: false
+      sonars_installed: false
+      tower_installed: false
+      EOF
+
+    # Reload udev rules (this will take effect on first boot)
+    - chroot "$1" bash -c "udevadm control --reload-rules 2>/dev/null || true"
 
     # Create a service for ezmap startup
     - |
@@ -167,7 +228,7 @@ mmdebstrap:
       User=ubuntu
       WorkingDirectory=/home/ubuntu/ezmap_ws
       Environment=ROS_DOMAIN_ID=0
-      ExecStartPre=/bin/bash -c 'pkill -f "ros2|launch" || true'
+      ExecStartPre=/bin/bash -c 'ps aux | grep ros | grep -v grep | grep -v "rmw_zenohd" | grep -v "ros2cli.daemon.daemonize" | awk '"'"'{print $2}'"'"' | xargs -r sudo kill -9 || true'
       ExecStart=/bin/bash -c 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch ezmap_bringup base.launch.py'
       Restart=on-failure
       RestartSec=5
@@ -180,7 +241,6 @@ mmdebstrap:
     - chroot "$1" systemctl enable ezmap.service
 
     # Add ROS setup to ubuntu user's bashrc
-    - echo "source /opt/ros/jazzy/setup.bash" >> "$1/home/ubuntu/.bashrc"
     - echo "source ~/ezmap_ws/install/setup.bash" >> "$1/home/ubuntu/.bashrc"
 
     # Ensure permissions for service/camera files
