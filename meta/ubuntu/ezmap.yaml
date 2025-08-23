@@ -215,7 +215,32 @@ mmdebstrap:
 
     # Reload udev rules (this will take effect on first boot)
     - chroot "$1" bash -c "udevadm control --reload-rules 2>/dev/null || true"
+    # Create ezmap startup script
+    - |
+      cat > "$1/home/ubuntu/ezmap_ws/start_ezmap.sh" << 'EOF'
+      #!/bin/bash
+      set -e
 
+      cd /home/ubuntu/ros2_ws
+
+      # Build camera_ros workspace if not already built
+      if [ ! -f install/setup.bash ]; then
+        echo "[ezmap.service] Building camera_ros in ros2_ws..."
+        colcon build --base-paths src/camera_ros
+      fi
+
+      # Source environments
+      source /opt/ros/jazzy/setup.bash
+      source /home/ubuntu/ros2_ws/install/setup.bash
+      cd /home/ubuntu/ezmap_ws
+      source install/setup.bash
+
+      # Launch ezmap bringup
+      ros2 launch ezmap_bringup base.launch.py
+      EOF
+
+    # Make startup script executable
+    - chroot "$1" chmod +x /home/ubuntu/ezmap_ws/start_ezmap.sh
     # Create a service for ezmap startup
     - |
       cat > "$1/etc/systemd/system/ezmap.service" << 'EOF'
@@ -228,8 +253,7 @@ mmdebstrap:
       User=ubuntu
       WorkingDirectory=/home/ubuntu/ezmap_ws
       Environment=ROS_DOMAIN_ID=0
-      ExecStartPre=/bin/bash -c 'ps aux | grep ros | grep -v grep | grep -v "rmw_zenohd" | grep -v "ros2cli.daemon.daemonize" | awk '"'"'{print $2}'"'"' | xargs -r sudo kill -9 || true'
-      ExecStart=/bin/bash -c 'source /opt/ros/jazzy/setup.bash && source install/setup.bash && ros2 launch ezmap_bringup base.launch.py'
+      ExecStart=/home/ubuntu/ezmap_ws/start_ezmap.sh
       Restart=on-failure
       RestartSec=5
 

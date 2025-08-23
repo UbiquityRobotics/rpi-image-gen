@@ -32,7 +32,20 @@ mmdebstrap:
         cd /home/ubuntu/ament_ws
         colcon build --packages-up-to ament_cmake_vendor_package
         source install/setup.bash'
+    - |
+      mkdir -p "$1/etc/NetworkManager/dispatcher.d"
+      cat > "$1/etc/NetworkManager/dispatcher.d/90-zenoh-restart" << 'EOF'
+      #!/bin/bash
 
+      IFACE="$1"
+      STATUS="$2"
+
+      if [ "$IFACE" = "wlan0" ] && [ "$STATUS" = "up" ]; then
+          logger "NetworkManager dispatcher: Restarting rmw_zenohd.service because $IFACE is up"
+          systemctl restart rmw_zenohd.service
+      fi
+      EOF
+      chmod 755 "$1/etc/NetworkManager/dispatcher.d/90-zenoh-restart"
     # Build rmw_zenoh with serial transport
     - |
       chroot "$1" bash -c '
