@@ -105,6 +105,8 @@ META_HOOKS="${IGTOP}/meta-hooks"
 RPI_TEMPLATES="${IGTOP}/templates/rpi"
 
 
+
+
 # Establish the top level directory hierarchy by detecting the config file
 INCONFIG="${INCONFIG%.cfg}.cfg"
 if [[ -d ${EXT_DIR} ]] && \
@@ -438,3 +440,7 @@ elif [ -x ${IGIMAGE}/post-image.sh ] ; then
 else
    runh ${IGTOP_IMAGE}/post-image.sh $IGconf_sys_deploydir
 fi
+
+export IGconf_sys_deploydir="deploy"
+export IGconf_image_name="test-image-for-devops"
+export IGconf_image_suffix="img"
