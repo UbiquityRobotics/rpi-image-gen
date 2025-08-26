@@ -44,6 +44,16 @@ done
 files+=("${IGconf_sys_outputdir}/${IGconf_image_name}"*.${IGconf_image_suffix}.sparse)
 files+=("${IGconf_sys_outputdir}/${IGconf_image_name}"*.sbom)
 
+# --- BEGIN DEBUGGING ---
+msg "--- DEBUGGING: Checking for files ---"
+msg "Output directory is: ${IGconf_sys_outputdir}"
+msg "Looking for image with pattern: ${IGconf_sys_outputdir}/${IGconf_image_name}*.${IGconf_image_suffix}"
+msg "Listing all files in output directory:"
+ls -l "${IGconf_sys_outputdir}"
+msg "List of files found to deploy:"
+printf '%s\n' "${files[@]}"
+msg "--- END DEBUGGING ---"
+
 msg "Deploying image and SBOM"
 
 for f in "${files[@]}" ; do
