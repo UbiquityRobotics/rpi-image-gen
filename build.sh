@@ -438,3 +438,7 @@ elif [ -x ${IGIMAGE}/post-image.sh ] ; then
 else
    runh ${IGTOP_IMAGE}/post-image.sh $IGconf_sys_deploydir
 fi
+
+# Save variables for subsequent build steps
+mkdir -p "${IGconf_sys_deploydir}"
+declare -p | grep IGconf_ > "${IGconf_sys_deploydir}/export_vars.sh"

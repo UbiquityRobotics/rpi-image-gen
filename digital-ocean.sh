@@ -3,13 +3,42 @@ set -euo pipefail
 
 # --- Configuration ---
 
-IMG_DIR="work/ros2/deploy"
-ORIG_IMAGE="${IMG_DIR}/ros2.img"
-BASE_NAME="ros2"
+# Load variables from the build step
+if [ -f "deploy/export_vars.sh" ]; then
+    echo "Loading variables from deploy/export_vars.sh"
+    source "deploy/export_vars.sh"
+fi
+
+# These variables should be exported by the main build.sh script.
+# This allows this deployment script to use the same configuration as the build.
+IMG_DIR="${IGconf_sys_deploydir:-deploy}"
+BASE_NAME="${IGconf_image_name:-ros2}"
+IMAGE_SUFFIX="${IGconf_image_suffix:-img}"
+ORIG_IMAGE="${IMG_DIR}/${BASE_NAME}.${IMAGE_SUFFIX}"
+
+set -euo pipefail
+
+# --- Configuration ---
+
+# These variables should be exported by the build.sh script.
+# This allows this deployment script to use the same configuration as the build.
+IMG_DIR="${IGconf_sys_deploydir:-deploy}"
+BASE_NAME="${IGconf_image_name:-michaels-test-build}"
+IMAGE_SUFFIX="${IGconf_image_suffix:-img}"
+ORIG_IMAGE="${IMG_DIR}/${BASE_NAME}.${IMAGE_SUFFIX}"
+
+# Check if the original image file actually exists before proceeding.
+if [ ! -f "${ORIG_IMAGE}" ]; then
+    echo "[ERROR] Image file not found: ${ORIG_IMAGE}"
+    echo "[ERROR] Make sure the build completed and IGconf_ variables are exported."
+    exit 1
+fi
+
+# Create a unique name for the compressed image to be uploaded.
 CURRENT_DATE=$(date +%Y%m%d)
 RANDOM_NUMBER=$(shuf -i 1000-9999 -n 1)
-IMAGE_NAME="${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.img"
-COMPRESSED_IMAGE_NAME="${IMAGE_NAME}.xz"
+UPLOAD_IMAGE_NAME="${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.${IMAGE_SUFFIX}"
+COMPRESSED_IMAGE_NAME="${UPLOAD_IMAGE_NAME}.xz"
 COMPRESSED_IMAGE_FILE="${IMG_DIR}/${COMPRESSED_IMAGE_NAME}"
 MASTER_DEST="/buildwork/${COMPRESSED_IMAGE_NAME}"
 

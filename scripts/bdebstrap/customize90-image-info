@@ -1,0 +1,35 @@
+#!/bin/bash
+set -eu
+
+ROOTFS_DIR="$1"
+INFO_FILE="${ROOTFS_DIR}/etc/image_info.txt"
+
+# get distribution information from the image's /etc/os-release file.
+DISTRO_INFO="Unknown"
+if [ -f "${ROOTFS_DIR}/etc/os-release" ]; then
+    DISTRO_INFO=$(. "${ROOTFS_DIR}/etc/os-release"; echo "$PRETTY_NAME")
+fi
+
+# the Git hash of the rpi-image-gen
+GIT_HASH="${GH:-"Not available"}"
+
+# All IGconf_* variables are provided by the build system from the config and options files.
+echo "Creating image info file at ${INFO_FILE}..."
+cat << EOF > "${INFO_FILE}"
+# Robot Image Information
+# This file was automatically generated during the image build process.
+IMAGE_NAME="${IGconf_image_name}"
+IMAGE_VERSION="${IGconf_image_version}"
+BUILD_DATE="$(date --utc +'%Y-%m-%d %H:%M:%S UTC')"
+DISTRIBUTION="${DISTRO_INFO}"
+BUILD_REPO_HASH="${GIT_HASH}"
+EOF
+
+# Add key info to the issue file
+ISSUE_FILE="${ROOTFS_DIR}/etc/rpi-issue"
+if [ -f "${ISSUE_FILE}" ]; then
+    echo "" >> "${ISSUE_FILE}"
+    echo "Image: ${IGconf_image_name} (${IGconf_image_version})" >> "${ISSUE_FILE}"
+fi
+
+echo "Image information successfully written."
