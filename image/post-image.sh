@@ -48,8 +48,6 @@ msg "Deploying image and SBOM"
 
 for f in "${files[@]}" ; do
    [[ -f "$f" ]] || continue
-   cp -v $f ${deploydir}/
-done
    case ${IGconf_image_compression} in
       zstd)
          zstd -v -f $f --sparse --output-dir-flat $deploydir
