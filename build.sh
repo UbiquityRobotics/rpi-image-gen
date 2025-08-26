@@ -441,6 +441,6 @@ else
    runh ${IGTOP_IMAGE}/post-image.sh $IGconf_sys_deploydir
 fi
 
-export IGconf_sys_deploydir="deploy"
-export IGconf_image_name="test-image-for-devops"
-export IGconf_image_suffix="img"
+export IGconf_sys_deploydir
+export IGconf_image_name
+export IGconf_image_suffix
