@@ -30,42 +30,33 @@ if [ -f ${IGconf_sys_outputdir}/genimage.cfg ] ; then
    image2json -g ${IGconf_sys_outputdir}/genimage.cfg "${opts[@]}" > ${IGconf_sys_outputdir}/image.json
 fi
 
+msg "Deploying image and SBOM to ${deploydir}"
 
-files=()
+# Define the known source and desired destination file paths
+SRC_IMG="${IGconf_sys_outputdir}/ros2.img"
+SRC_SBOM="${IGconf_sys_outputdir}/${IGconf_image_name}.sbom"
 
-for f in "${IGconf_sys_outputdir}/${IGconf_image_name}"*.${IGconf_image_suffix} ; do
-   files+=($f)
-   [[ -f "$f" ]] || continue
-   
-   # Ensure that the output image is a multiple of the selected sector size
-   truncate -s %${IGconf_device_sector_size} $f
-done
+DEST_IMG="${deploydir}/${IGconf_image_name}.${IGconf_image_suffix}"
+DEST_SBOM="${deploydir}/${IGconf_image_name}.sbom"
 
-files+=("${IGconf_sys_outputdir}/${IGconf_image_name}"*.${IGconf_image_suffix}.sparse)
-files+=("${IGconf_sys_outputdir}/${IGconf_image_name}"*.sbom)
+# --- Deploy the image file ---
+# Check if the source image file actually exists
+if [ -f "${SRC_IMG}" ]; then
+    # Copy the source file to the destination, renaming it in the process
+    msg "Copying ${SRC_IMG} to ${DEST_IMG}"
+    cp -v "${SRC_IMG}" "${DEST_IMG}"
+else
+    # If the source image isn't found, print a clear error and exit
+    die "FATAL: Source image ${SRC_IMG} not found!"
+fi
 
-# --- BEGIN DEBUGGING ---
-msg "--- DEBUGGING: Checking for files ---"
-msg "Output directory is: ${IGconf_sys_outputdir}"
-msg "Looking for image with pattern: ${IGconf_sys_outputdir}/${IGconf_image_name}*.${IGconf_image_suffix}"
-msg "Listing all files in output directory:"
-ls -l "${IGconf_sys_outputdir}"
-msg "List of files found to deploy:"
-printf '%s\n' "${files[@]}"
-msg "--- END DEBUGGING ---"
-
-msg "Deploying image and SBOM"
-
-for f in "${files[@]}" ; do
-   [[ -f "$f" ]] || continue
-   case ${IGconf_image_compression} in
-      zstd)
-         zstd -v -f $f --sparse --output-dir-flat $deploydir
-         ;;
-      none)
-         install -v -D -m 644 $f $deploydir
-         ;;
-      *)
-         ;;
-   esac
-done
+# --- Deploy the SBOM file ---
+# Check if the source SBOM file exists
+if [ -f "${SRC_SBOM}" ]; then
+    # Copy the source file to the destination
+    msg "Copying ${SRC_SBOM} to ${DEST_SBOM}"
+    cp -v "${SRC_SBOM}" "${DEST_SBOM}"
+else
+    # This is not fatal, so just print a warning
+    msg "Warning: SBOM file ${SRC_SBOM} not found."
+fi
