@@ -105,8 +105,6 @@ META_HOOKS="${IGTOP}/meta-hooks"
 RPI_TEMPLATES="${IGTOP}/templates/rpi"
 
 
-
-
 # Establish the top level directory hierarchy by detecting the config file
 INCONFIG="${INCONFIG%.cfg}.cfg"
 if [[ -d ${EXT_DIR} ]] && \
@@ -360,13 +358,6 @@ if [ -x ${IGDEVICE}/pre-build.sh ] ; then
 fi
 
 
-# Clean up previous build's working directory
-if [ -d "${IGconf_sys_workdir}" ]; then
-    msg "Removing previous work directory: ${IGconf_sys_workdir}"
-    rm -rf "${IGconf_sys_workdir}"
-fi
-
-
 # Generate rootfs
 [[ $ONLY_IMAGE = 1 ]] && true || rund "$IGTOP" podman unshare bdebstrap \
    "${ARGS_LAYERS[@]}" \
@@ -451,7 +442,3 @@ fi
 # Save variables for subsequent build steps
 mkdir -p "${IGconf_sys_deploydir}"
 declare -p | grep IGconf_ > "${IGconf_sys_deploydir}/export_vars.sh"
-
-export IGconf_sys_deploydir
-export IGconf_image_name
-export IGconf_image_suffix
