@@ -6,7 +6,7 @@ set -euo pipefail
 # These variables should be exported by the main build.sh script.
 # This allows this deployment script to use the same configuration as the build.
 IMG_DIR="${IGconf_sys_deploydir:-deploy}"
-BASE_NAME="${IGconf_image_name:-ros2}"
+BASE_NAME="${IGconf_image_name:-michaels-test-build}"
 IMAGE_SUFFIX="${IGconf_image_suffix:-img}"
 ORIG_IMAGE="${IMG_DIR}/${BASE_NAME}.${IMAGE_SUFFIX}"
 
