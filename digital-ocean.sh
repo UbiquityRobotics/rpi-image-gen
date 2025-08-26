@@ -3,7 +3,24 @@ set -euo pipefail
 
 # --- Configuration ---
 
+# Load variables from the build step
+if [ -f "deploy/export_vars.sh" ]; then
+    echo "Loading variables from deploy/export_vars.sh"
+    source "deploy/export_vars.sh"
+fi
+
 # These variables should be exported by the main build.sh script.
+# This allows this deployment script to use the same configuration as the build.
+IMG_DIR="${IGconf_sys_deploydir:-deploy}"
+BASE_NAME="${IGconf_image_name:-ros2}"
+IMAGE_SUFFIX="${IGconf_image_suffix:-img}"
+ORIG_IMAGE="${IMG_DIR}/${BASE_NAME}.${IMAGE_SUFFIX}"
+
+set -euo pipefail
+
+# --- Configuration ---
+
+# These variables should be exported by the build.sh script.
 # This allows this deployment script to use the same configuration as the build.
 IMG_DIR="${IGconf_sys_deploydir:-deploy}"
 BASE_NAME="${IGconf_image_name:-michaels-test-build}"

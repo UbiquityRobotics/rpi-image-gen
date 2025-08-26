@@ -360,6 +360,13 @@ if [ -x ${IGDEVICE}/pre-build.sh ] ; then
 fi
 
 
+# Clean up previous build's working directory
+if [ -d "${IGconf_sys_workdir}" ]; then
+    msg "Removing previous work directory: ${IGconf_sys_workdir}"
+    rm -rf "${IGconf_sys_workdir}"
+fi
+
+
 # Generate rootfs
 [[ $ONLY_IMAGE = 1 ]] && true || rund "$IGTOP" podman unshare bdebstrap \
    "${ARGS_LAYERS[@]}" \
@@ -440,6 +447,10 @@ elif [ -x ${IGIMAGE}/post-image.sh ] ; then
 else
    runh ${IGTOP_IMAGE}/post-image.sh $IGconf_sys_deploydir
 fi
+
+# Save variables for subsequent build steps
+mkdir -p "${IGconf_sys_deploydir}"
+declare -p | grep IGconf_ > "${IGconf_sys_deploydir}/export_vars.sh"
 
 export IGconf_sys_deploydir
 export IGconf_image_name
