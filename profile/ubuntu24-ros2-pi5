@@ -1,12 +1,4 @@
 ubuntu/ubuntu
-ubuntu/ros2
-rpi/misc-utils
-rpi/base/essential
-ubuntu/firmware
-ubuntu/kernel
-ubuntu/ezmap
-ubuntu/picam
-ubuntu/zehno
 rpi/user-credentials
 rpi/misc-skel
 ubuntu/dns
