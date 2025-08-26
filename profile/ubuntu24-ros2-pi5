@@ -1,10 +1,6 @@
 ubuntu/ubuntu
+ubuntu/firmware
+ubuntu/kernel
 rpi/user-credentials
 rpi/misc-skel
 ubuntu/dns
-
-# Create /boot/firmware directory
-customize_add_script -p 200 -s - <<EOM
-mkdir -p "${ROOTFS_DIR}/boot/firmware"
-EOM
-
