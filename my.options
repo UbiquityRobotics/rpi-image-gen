@@ -1,0 +1,8 @@
+# image.options.template
+# Copy this file to 'my.options' and edit it to customize your build.
+# Then, run the build with the -o flag: ./build.sh -c <config_file> -o my.options
+
+# Set a custom name for the final image file and the internal id.
+# This is very recommended for tracking builds in a lab environment.
+image_name="michaels-test-build"
+image_version="1.0.1-testing"
