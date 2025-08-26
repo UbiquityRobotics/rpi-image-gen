@@ -32,7 +32,7 @@ mmdebstrap:
     - ros-jazzy-ros-base
     - ros-jazzy-ament-cmake
     - ros-jazzy-rviz-visual-tools
-    - ros-jazzy-vision-msgs              # Add this
+    - ros-jazzy-vision-msgs
     - ros-jazzy-image-transport
     - ros-jazzy-camera-info-manager
     - ros-dev-tools
@@ -137,6 +137,9 @@ mmdebstrap:
         sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
         vcs import < ezmap_pro.repos
 
+        # Remove token from ezmap_pro.repos file for security
+        sed -i 's|https://${GITHUB_TOKEN}@github.com/|https://github.com/|g' ezmap_pro.repos
+
         # Skip problematic packages
         touch ../aruco_detect/COLCON_IGNORE || true
         touch ../ld19_lidar/COLCON_IGNORE || true
@@ -194,7 +197,7 @@ mmdebstrap:
       SUBSYSTEM=="tty", KERNEL=="ttyS0", SYMLINK+="robot_serial"
       EOF
 
-    # Create robot configuration
+    # Create robot configuration with ubuntu write permissions
     - |
       mkdir -p "$1/etc/ubiquity"
       cat > "$1/etc/ubiquity/robot.yaml" << 'EOF'
@@ -212,47 +215,53 @@ mmdebstrap:
       sonars_installed: false
       tower_installed: false
       EOF
+      # Give ubuntu user write permissions to robot.yaml
+      chroot "$1" chown ubuntu:ubuntu /etc/ubiquity/robot.yaml
+      chroot "$1" chmod 644 /etc/ubiquity/robot.yaml
 
     # Reload udev rules (this will take effect on first boot)
     - chroot "$1" bash -c "udevadm control --reload-rules 2>/dev/null || true"
-    # Create ezmap startup script
+
+    # Create ezmap startup script (second option - run as ubuntu)
     - |
       cat > "$1/home/ubuntu/ezmap_ws/start_ezmap.sh" << 'EOF'
       #!/bin/bash
       set -e
 
       cd /home/ubuntu/ros2_ws
-
-      # Build camera_ros workspace if not already built
-      if [ ! -f install/setup.bash ]; then
-        echo "[ezmap.service] Building camera_ros in ros2_ws..."
-        colcon build --base-paths src/camera_ros
+      if [ ! -x install/camera_ros/lib/camera_ros/camera_node ]; then
+          chmod +x install/camera_ros/lib/camera_ros/camera_node
       fi
 
       # Source environments
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
       source /opt/ros/jazzy/setup.bash
+      source /home/ubuntu/zenoh_ws/install/setup.bash
       source /home/ubuntu/ros2_ws/install/setup.bash
       cd /home/ubuntu/ezmap_ws
       source install/setup.bash
-
-      # Launch ezmap bringup
       ros2 launch ezmap_bringup base.launch.py
       EOF
 
     # Make startup script executable
     - chroot "$1" chmod +x /home/ubuntu/ezmap_ws/start_ezmap.sh
+
     # Create a service for ezmap startup
     - |
       cat > "$1/etc/systemd/system/ezmap.service" << 'EOF'
       [Unit]
       Description=ROS2 ezmap bringup
-      After=network.target
+      After=network.target rmw_zenohd.service
+      Wants=rmw_zenohd.service
 
       [Service]
       Type=simple
       User=ubuntu
+      Group=ubuntu
       WorkingDirectory=/home/ubuntu/ezmap_ws
       Environment=ROS_DOMAIN_ID=0
+      Environment=HOME=/home/ubuntu
+      Environment=RMW_IMPLEMENTATION=rmw_zenoh_cpp
       ExecStart=/home/ubuntu/ezmap_ws/start_ezmap.sh
       Restart=on-failure
       RestartSec=5

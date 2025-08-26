@@ -65,7 +65,6 @@ mmdebstrap:
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
       source /opt/ros/jazzy/setup.bash
       source /home/ubuntu/zenoh_ws/install/setup.bash
-      EOF  
 
     # ===== Create wrapper script to pick correct config =====
     - |
@@ -107,3 +106,8 @@ mmdebstrap:
       systemctl daemon-reload
       systemctl enable rmw_zenohd.service
       '
+          # ====== Make everything OWNED and WRITABLE by ubuntu user ======
+    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/
+    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/.ros/
+    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/zenoh_ws/
+    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/ament_ws/
