@@ -8,17 +8,20 @@ mmdebstrap:
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
-    # ===== Device Tree Configuration (Simpler approach) =====
+    # ===== Device Tree Configuration (Enhanced approach) =====
     - |
       # Backup original config
       cp "$1/boot/firmware/config.txt" "$1/boot/firmware/config.txt.backup"
-      
+
       # Remove all existing [pi4], [pi5], and duplicate [all] sections
       sed -i '/^\[pi4\]/,/^\[/{/^\[pi4\]/d; /^\[/!d; /^\[/i\
       }' "$1/boot/firmware/config.txt"
       sed -i '/^\[pi5\]/,/^\[/{/^\[pi5\]/d; /^\[/!d; /^\[/i\
       }' "$1/boot/firmware/config.txt"
       
+      # Comment out any existing dtoverlay=disable-bt lines
+      sed -i 's/^dtoverlay=disable-bt/#dtoverlay=disable-bt/' "$1/boot/firmware/config.txt"
+
       # Add our clean sections at the end
       cat >> "$1/boot/firmware/config.txt" << 'EOF'
 
@@ -31,6 +34,10 @@ mmdebstrap:
 
       [pi5]
       BOOT_UART=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1
+      dtoverlay=uart2
       dtoverlay=uart3-pi5
       dtoverlay=uart4
       dtoverlay=uart5
@@ -41,6 +48,13 @@ mmdebstrap:
       display_auto_detect=1
       dtoverlay=imx219
       EOF
+
+    # ===== Cmdline.txt modification =====
+    - |
+      # Remove console=serial0,115200 from the beginning of cmdline.txt if present
+      sed -i 's/^console=serial0,115200[[:space:]]*//' "$1/boot/firmware/cmdline.txt"
+      # Also remove if it appears anywhere else in the line
+      sed -i 's/[[:space:]]console=serial0,115200//g' "$1/boot/firmware/cmdline.txt"
 
     # ===== Firmware Symlinks =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin

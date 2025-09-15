@@ -263,6 +263,11 @@ mmdebstrap:
       Environment=HOME=/home/ubuntu
       Environment=RMW_IMPLEMENTATION=rmw_zenoh_cpp
       ExecStart=/home/ubuntu/ezmap_ws/start_ezmap.sh
+      ExecStop=/bin/kill -TERM $MAINPID
+      KillMode=mixed
+      KillSignal=SIGTERM
+      TimeoutStopSec=10
+      SendSIGKILL=yes
       Restart=on-failure
       RestartSec=5
 
