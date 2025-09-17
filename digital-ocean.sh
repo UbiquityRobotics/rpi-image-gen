@@ -22,16 +22,16 @@ MASTER_DEST="/buildwork/${COMPRESSED_IMAGE_NAME}"
 S3CMD_CONFIG_FILE="$(mktemp)"
 
 # Create the s3cmd config file dynamically
-#cat > "$S3CMD_CONFIG_FILE" <<EOF
-#[default]
-#access_key = ${S3_ACCESS_KEY}
-#secret_key = ${S3_SECRET_KEY}
-#bucket_location = US
-#host_base = ${SPACES_ENDPOINT}
-#host_bucket = %(bucket)s.${SPACES_ENDPOINT}
-#use_https = True
-#signature_v2 = False
-#EOF
+cat > "$S3CMD_CONFIG_FILE" <<EOF
+[default]
+access_key = ${S3_ACCESS_KEY}
+secret_key = ${S3_SECRET_KEY}
+bucket_location = US
+host_base = ${SPACES_ENDPOINT}
+host_bucket = %(bucket)s.${SPACES_ENDPOINT}
+use_https = True
+signature_v2 = False
+EOF
 
 echo "[INFO] Compressing image..."
 xz -T0 -z -f "${ORIG_IMAGE}"
@@ -42,7 +42,7 @@ mv "${ORIG_IMAGE}.xz" "${COMPRESSED_IMAGE_FILE}"
 echo "[INFO] Uploading to DigitalOcean Spaces bucket: ${SPACES_BUCKET}"
 
 # Upload using s3cmd with the temporary config file
-#s3cmd -c "$S3CMD_CONFIG_FILE" put "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
+s3cmd -c "$S3CMD_CONFIG_FILE" put "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
 
 echo "[SUCCESS] Upload and processing complete."
 
