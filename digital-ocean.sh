@@ -5,7 +5,7 @@ set -euo pipefail
 
 IMG_DIR="work/ros2/deploy"
 ORIG_IMAGE="${IMG_DIR}/ros2.img"
-BASE_NAME="ros2"
+BASE_NAME="ros2-ezmap-lite"
 CURRENT_DATE=$(date +%Y%m%d)
 RANDOM_NUMBER=$(shuf -i 1000-9999 -n 1)
 IMAGE_NAME="${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.img"
