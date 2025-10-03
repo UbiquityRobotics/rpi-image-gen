@@ -132,7 +132,7 @@ mmdebstrap:
         cd /home/ubuntu
         mkdir -p ezmap_ws/src
         cd ezmap_ws/src
-        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-gen5-and-6
+        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-lite
         cd ezmap_pro
         sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
         vcs import < ezmap_pro.repos
@@ -202,6 +202,7 @@ mmdebstrap:
       mkdir -p "$1/etc/ubiquity"
       cat > "$1/etc/ubiquity/robot.yaml" << 'EOF'
       force_time_sync: true
+      lite_version: true
       generation: gen6
       gps_installed: none
       gps_position: top_plate
