@@ -151,6 +151,8 @@ mmdebstrap:
 
         # Back to workspace and build ROS
         cd /home/ubuntu/ezmap_ws
+        rm -rf src/ezmap_pro/ezmap_enterprise
+        ls src/ezmap_pro
         source /opt/ros/jazzy/setup.bash
         export CMAKE_PREFIX_PATH=/opt/ros/jazzy:\$CMAKE_PREFIX_PATH
         # Install dependencies first
