@@ -132,7 +132,7 @@ mmdebstrap:
         cd /home/ubuntu
         mkdir -p ezmap_ws/src
         cd ezmap_ws/src
-        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-lite
+        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-gen5-and-6
         cd ezmap_pro
         sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
         vcs import < ezmap_pro.repos
@@ -141,8 +141,8 @@ mmdebstrap:
         sed -i 's|https://${GITHUB_TOKEN}@github.com/|https://github.com/|g' ezmap_pro.repos
 
         # Skip problematic packages
-        touch ../aruco_detect/COLCON_IGNORE || true
-        touch ../ld19_lidar/COLCON_IGNORE || true
+        #touch ../aruco_detect/COLCON_IGNORE || true
+        #touch ../ld19_lidar/COLCON_IGNORE || true
 
         # Build route_select_ui touchscreen web app
         cd route_select_ui/web_app
@@ -197,6 +197,8 @@ mmdebstrap:
       cat > "$1/etc/udev/rules.d/99-robot-serial.rules" << 'EOF'
       SUBSYSTEM=="tty", KERNEL=="ttyAMA0", SYMLINK+="robot_serial"
       SUBSYSTEM=="tty", KERNEL=="ttyS0", SYMLINK+="robot_serial"
+      SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ENV{ID_SERIAL_SHORT}=="0001",\
+      SYMLINK+="ldlidar", MODE="0660", GROUP="dialout", TAG+="uaccess"
       EOF
 
     # Create robot configuration with ubuntu write permissions
