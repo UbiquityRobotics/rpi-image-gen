@@ -42,7 +42,7 @@ mv "${ORIG_IMAGE}.xz" "${COMPRESSED_IMAGE_FILE}"
 echo "[INFO] Uploading to DigitalOcean Spaces bucket: ${SPACES_BUCKET}"
 
 # Upload using s3cmd with the temporary config file
-s3cmd -c "$S3CMD_CONFIG_FILE" put "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
+s3cmd -c "$S3CMD_CONFIG_FILE" put --acl-public "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
 
 echo "[SUCCESS] Upload and processing complete."
 

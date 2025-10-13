@@ -1,0 +1,26 @@
+image_width: 640
+image_height: 480
+camera_name: imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [500.0, 0.0, 320.0,
+         0.0, 500.0, 240.0,
+         0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.0, 0.0, 0.0, 0.0, 0.0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.0, 0.0, 0.0,
+         0.0, 1.0, 0.0,
+         0.0, 0.0, 1.0]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [500.0, 0.0, 320.0, 0.0,
+         0.0, 500.0, 240.0, 0.0,
+         0.0, 0.0, 1.0, 0.0]
