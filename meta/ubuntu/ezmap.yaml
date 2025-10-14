@@ -85,8 +85,8 @@ mmdebstrap:
         sed -i 's|https://${GITHUB_TOKEN}@github.com/|https://github.com/|g' ezmap_pro.repos
 
         # Skip problematic packages
-        touch ../aruco_detect/COLCON_IGNORE || true
-        touch ../ld19_lidar/COLCON_IGNORE || true
+        #touch ../aruco_detect/COLCON_IGNORE || true
+        #touch ../ld19_lidar/COLCON_IGNORE || true
 
         # Build route_select_ui touchscreen web app
         cd route_select_ui/web_app
@@ -95,6 +95,8 @@ mmdebstrap:
 
         # Back to workspace and build ROS
         cd /home/ubuntu/ezmap_ws
+        rm -rf src/ezmap_pro/ezmap_enterprise
+        ls src/ezmap_pro
         source /opt/ros/jazzy/setup.bash
         export CMAKE_PREFIX_PATH=/opt/ros/jazzy:\$CMAKE_PREFIX_PATH
         # Install dependencies first
@@ -139,15 +141,21 @@ mmdebstrap:
       cat > "$1/etc/udev/rules.d/99-robot-serial.rules" << 'EOF'
       SUBSYSTEM=="tty", KERNEL=="ttyAMA0", SYMLINK+="robot_serial"
       SUBSYSTEM=="tty", KERNEL=="ttyS0", SYMLINK+="robot_serial"
-      SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ENV{ID_SERIAL_SHORT}=="0001", \
+      SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ENV{ID_SERIAL_SHORT}=="0001",\
       SYMLINK+="ldlidar", MODE="0660", GROUP="dialout", TAG+="uaccess"
       EOF
-
+      
+    - |
+      cat >> "$1/home/ubuntu/.bashrc" << 'EOF'
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      source /opt/ros/jazzy/setup.bash
+      source /home/ubuntu/zenoh_ws/install/setup.bash
     # Create robot configuration with ubuntu write permissions
     - |
       mkdir -p "$1/etc/ubiquity"
       cat > "$1/etc/ubiquity/robot.yaml" << 'EOF'
       force_time_sync: true
+      lite_version: true
       generation: gen6
       gps_installed: none
       gps_position: top_plate
