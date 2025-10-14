@@ -139,6 +139,8 @@ mmdebstrap:
       cat > "$1/etc/udev/rules.d/99-robot-serial.rules" << 'EOF'
       SUBSYSTEM=="tty", KERNEL=="ttyAMA0", SYMLINK+="robot_serial"
       SUBSYSTEM=="tty", KERNEL=="ttyS0", SYMLINK+="robot_serial"
+      SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ENV{ID_SERIAL_SHORT}=="0001", \
+      SYMLINK+="ldlidar", MODE="0660", GROUP="dialout", TAG+="uaccess"
       EOF
 
     # Create robot configuration with ubuntu write permissions
