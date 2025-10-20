@@ -33,7 +33,7 @@ mmdebstrap:
         colcon build --packages-up-to ament_cmake_vendor_package
         source install/setup.bash'
     - |
-      mkdir -p "$1/etc/NetworkManager/dispatcher.d"
+      mkdir -p "$1/etc/NetworkManager/dispatcher.d" << 'EOF'
       #!/bin/bash
 
       IFACE="$1"
