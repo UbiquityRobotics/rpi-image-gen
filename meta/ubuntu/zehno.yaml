@@ -33,7 +33,8 @@ mmdebstrap:
         colcon build --packages-up-to ament_cmake_vendor_package
         source install/setup.bash'
     - |
-      mkdir -p "$1/etc/NetworkManager/dispatcher.d" << 'EOF'
+      mkdir -p "$1/etc/NetworkManager/dispatcher.d"
+      cat > "$1/etc/NetworkManager/dispatcher.d/90-zenoh-restart" << 'EOF'
       #!/bin/bash
 
       IFACE="$1"
