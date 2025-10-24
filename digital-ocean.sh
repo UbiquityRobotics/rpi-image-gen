@@ -5,7 +5,7 @@ set -euo pipefail
 
 IMG_DIR="work/ros2/deploy"
 ORIG_IMAGE="${IMG_DIR}/ros2.img"
-BASE_NAME="ros2"
+BASE_NAME="ros2-ezmap-pro"
 CURRENT_DATE=$(date +%Y%m%d)
 RANDOM_NUMBER=$(shuf -i 1000-9999 -n 1)
 IMAGE_NAME="${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.img"
@@ -42,7 +42,7 @@ mv "${ORIG_IMAGE}.xz" "${COMPRESSED_IMAGE_FILE}"
 echo "[INFO] Uploading to DigitalOcean Spaces bucket: ${SPACES_BUCKET}"
 
 # Upload using s3cmd with the temporary config file
-s3cmd -c "$S3CMD_CONFIG_FILE" put "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
+s3cmd -c "$S3CMD_CONFIG_FILE" put --acl-public "${COMPRESSED_IMAGE_FILE}" "s3://${SPACES_BUCKET}/${COMPRESSED_IMAGE_NAME}"
 
 echo "[SUCCESS] Upload and processing complete."
 

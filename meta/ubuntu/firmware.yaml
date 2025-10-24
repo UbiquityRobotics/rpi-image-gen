@@ -47,6 +47,7 @@ mmdebstrap:
       start_x=1
       display_auto_detect=1
       dtoverlay=imx219
+      camera_auto_detect=1
       EOF
 
     # ===== Cmdline.txt modification =====

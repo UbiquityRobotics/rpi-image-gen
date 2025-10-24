@@ -32,8 +32,7 @@ mmdebstrap:
     # System updates and installs
     - chroot "$1" apt update
     - chroot "$1" apt upgrade -y
-    - chroot "$1" apt install -y libcamera-tools gstreamer1.0-libcamera libcamera-dev libcamera-doc libcamera-ipa libcamera-v4l2 python3-libcamera v4l-utils
-
+    - chroot "$1" apt install -y python3-ply libjpeg-dev libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libdrm-dev libexif-dev libtiff-dev libudev-dev libv4l-dev libyaml-cpp-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libglib2.0-dev python3-colcon-meson
     # Add universe repository
     - chroot "$1" add-apt-repository -y universe
     - chroot "$1" apt update
@@ -55,7 +54,17 @@ mmdebstrap:
     - chroot "$1" sudo -u ubuntu mkdir -p /home/ubuntu/ros2_ws/src
     - chroot "$1" sudo -u ubuntu git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
     - chroot "$1" sudo -u ubuntu git clone -b jazzy-devel https://github.com/UbiquityRobotics/fiducials /home/ubuntu/ros2_ws/src/fiducials
+    # Clone libcamera repo as ubuntu user into ros2 workspace
+    - chroot "$1" sudo -u ubuntu git clone --recursive https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
 
+    # Build and install libcamera from source
+    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && meson setup build --buildtype=release -Dpipelines=rpi/vc4,rpi/pisp -Dipas=rpi/vc4,rpi/pisp -Dv4l2=true -Dgstreamer=enabled -Dtest=false -Dlc-compliance=disabled -Dcam=disabled -Dqcam=disabled -Ddocumentation=disabled -Dpycamera=enabled"
+    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && ninja -C build"
+    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && ninja -C build install"
+
+    # Clean up build files and apt cache to reduce image size
+    - chroot "$1" rm -rf /home/ubuntu/ros2_ws/src/libcamera/build
+    - chroot "$1" apt clean
     # Install ROS dev tools and common camera packages
     - chroot "$1" apt install -y ros-dev-tools ros-jazzy-camera-info-manager ros-jazzy-image-pipeline ros-jazzy-ament-cmake
 

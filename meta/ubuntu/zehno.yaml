@@ -39,10 +39,21 @@ mmdebstrap:
 
       IFACE="$1"
       STATUS="$2"
+      STATE_FILE="/run/zenoh_wlan0_up"
 
-      if [ "$IFACE" = "wlan0" ] && [ "$STATUS" = "up" ]; then
-          logger "NetworkManager dispatcher: Restarting rmw_zenohd.service because $IFACE is up"
-          systemctl restart rmw_zenohd.service
+      if [ "$IFACE" = "wlan0" ]; then
+          if [ "$STATUS" = "up" ]; then
+              if [ ! -f "$STATE_FILE" ]; then
+                  logger "NetworkManager dispatcher: Restarting rmw_zenohd.service (first wlan0 up)"
+                  systemctl restart rmw_zenohd.service
+                  touch "$STATE_FILE"
+              else
+                  logger "NetworkManager dispatcher: wlan0 up event ignored (already handled)"
+              fi
+          elif [ "$STATUS" = "down" ]; then
+              rm -f "$STATE_FILE"
+              logger "NetworkManager dispatcher: wlan0 went down, reset state"
+          fi
       fi
       EOF
       chmod 755 "$1/etc/NetworkManager/dispatcher.d/90-zenoh-restart"

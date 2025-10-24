@@ -61,64 +61,8 @@ mmdebstrap:
     # Create CORRECTLY formatted dummy camera calibration files
     - |
       mkdir -p "$1/home/ubuntu/.ros/camera_info"
-      cat > "$1/home/ubuntu/.ros/camera_info/imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml" << 'EOF'
-      image_width: 640
-      image_height: 480
-      camera_name: imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480
-      camera_matrix:
-        rows: 3
-        cols: 3
-         [500.0, 0.0, 320.0,
-               0.0, 500.0, 240.0,
-               0.0, 0.0, 1.0]
-      distortion_model: plumb_bob
-      distortion_coefficients:
-        rows: 1
-        cols: 5
-         [0.0, 0.0, 0.0, 0.0, 0.0]
-      rectification_matrix:
-        rows: 3
-        cols: 3
-         [1.0, 0.0, 0.0,
-               0.0, 1.0, 0.0,
-               0.0, 0.0, 1.0]
-      projection_matrix:
-        rows: 3
-        cols: 4
-         [500.0, 0.0, 320.0, 0.0,
-               0.0, 500.0, 240.0, 0.0,
-               0.0, 0.0, 1.0, 0.0]
-      EOF
-
-      cat > "$1/home/ubuntu/.ros/camera_info/imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480.yaml" << 'EOF'
-      image_width: 640
-      image_height: 480
-      camera_name: imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480
-      camera_matrix:
-        rows: 3
-        cols: 3
-         [500.0, 0.0, 320.0,
-               0.0, 500.0, 240.0,
-               0.0, 0.0, 1.0]
-      distortion_model: plumb_bob
-      distortion_coefficients:
-        rows: 1
-        cols: 5
-         [0.0, 0.0, 0.0, 0.0, 0.0]
-      rectification_matrix:
-        rows: 3
-        cols: 3
-         [1.0, 0.0, 0.0,
-               0.0, 1.0, 0.0,
-               0.0, 0.0, 1.0]
-      projection_matrix:
-        rows: 3
-        cols: 4
-         [500.0, 0.0, 320.0, 0.0,
-               0.0, 500.0, 240.0, 0.0,
-               0.0, 0.0, 1.0, 0.0]
-      EOF
-
+      cp -a imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml "$1/home/ubuntu/.ros/camera_info/"
+      cp -a imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480.yaml "$1/home/ubuntu/.ros/camera_info/"
     # Clone and build ezmap_pro with proper error handling
     - |
       if [ -z "${GITHUB_TOKEN:-}" ]; then
@@ -195,6 +139,8 @@ mmdebstrap:
       cat > "$1/etc/udev/rules.d/99-robot-serial.rules" << 'EOF'
       SUBSYSTEM=="tty", KERNEL=="ttyAMA0", SYMLINK+="robot_serial"
       SUBSYSTEM=="tty", KERNEL=="ttyS0", SYMLINK+="robot_serial"
+      SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ENV{ID_SERIAL_SHORT}=="0001", \
+      SYMLINK+="ldlidar", MODE="0660", GROUP="dialout", TAG+="uaccess"
       EOF
 
     # Create robot configuration with ubuntu write permissions
