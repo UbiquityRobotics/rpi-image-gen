@@ -5,7 +5,6 @@ rpi/base/essential
 ubuntu/firmware
 ubuntu/kernel
 ubuntu/picam
-ubuntu/ezmap
 ubuntu/zehno
 rpi/user-credentials
 rpi/misc-skel
