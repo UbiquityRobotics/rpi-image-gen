@@ -151,15 +151,15 @@ mmdebstrap:
 
     # ===== Install ROS Real-Time Kernel packages =====
     # Copy RT kernel .deb packages to image root
-    - cp ../../kernel_debs/linux-image-*.deb $1/root/
-    - cp ../../kernel_debs/linux-headers-*.deb $1/root/
-    - cp ../../kernel_debs/linux-libc-dev_*.deb $1/root/
+    - cp kernel/RPI4/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
+    - cp kernel/RPI4/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
+    - cp kernel/RPI4/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
 
     # Install RT kernel packages inside chroot
-    - chroot $1 dpkg -i /root/linux-image-*.deb /root/linux-headers-*.deb /root/linux-libc-dev_*.deb
+    - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb
 
     # Clean up the deb packages
-    - rm -f $1/root/linux-image-*.deb $1/root/linux-headers-*.deb $1/root/linux-libc-dev_*.deb
+    - rm -f $1/root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb
 
 dpkgopts:
   - path-include=/usr/lib/raspi-firmware/brcm/*
