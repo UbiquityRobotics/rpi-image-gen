@@ -3,7 +3,6 @@ mmdebstrap:
   architectures:
     - arm64
   packages:
-    - linux-image-rpi-v8
     - firmware-brcm80211
     - raspi-firmware
     - initramfs-tools
@@ -39,7 +38,7 @@ mmdebstrap:
     - echo "country=US" > $1/etc/regulatory/regulatory.db
     - chmod 644 $1/etc/regulatory/regulatory.db
 
-    # ===== Kernel Parameters =====
+    # ===== Kernel Parameter Patch =====
     - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
 
     # ===== SSH Performance Optimization =====
@@ -73,11 +72,8 @@ mmdebstrap:
     - |
       cat <<EOF > $1/usr/local/bin/setup-hostname.sh
       #!/bin/bash
-      # Get last 4 digits of wlan0 MAC address
       MAC_SUFFIX=\$(cat /sys/class/net/wlan0/address | tr -d ':' | tail -c 5 | tr '[:lower:]' '[:upper:]')
       NEW_HOSTNAME="ubiquityrobot\${MAC_SUFFIX}"
-      
-      # Set hostname if different from current
       if [ "\$(hostname)" != "\${NEW_HOSTNAME}" ]; then
           echo "\${NEW_HOSTNAME}" > /etc/hostname
           sed -i "s/127.0.1.1.*/127.0.1.1\t\${NEW_HOSTNAME}/" /etc/hosts
@@ -91,70 +87,26 @@ mmdebstrap:
       cat <<EOF > $1/usr/local/bin/setup-ap.sh
       #!/bin/bash
       set -e
-      
-      # Exit if already configured
-      if [ -f /etc/accesspoint-configured ]; then
-          exit 0
-      fi
-      
-      # Wait for NetworkManager to be fully ready
+      if [ -f /etc/accesspoint-configured ]; then exit 0; fi
       sleep 5
-      
-      # Wait for wlan0 interface (up to 30 seconds)
       for i in {1..30}; do
-          if [ -e /sys/class/net/wlan0/address ]; then
-              echo "wlan0 interface found"
-              break
-          fi
-          echo "Waiting for wlan0 interface... (\$i/30)"
+          if [ -e /sys/class/net/wlan0/address ]; then break; fi
           sleep 1
       done
-      
-      # Setup hostname based on MAC
       /usr/local/bin/setup-hostname.sh
-      
-      # Get hostname for SSID
       HOSTNAME=\$(hostname)
-      
-      # Set regulatory domain
       iw reg set US 2>/dev/null || true
-      
-      # Remove any existing AP connections
       nmcli con delete ap 2>/dev/null || true
-      
-      # Configure access point with explicit error handling
-      if nmcli con add type wifi ifname wlan0 con-name ap \
-          autoconnect yes \
-          ssid "\${HOSTNAME}" \
-          802-11-wireless.mode ap \
-          802-11-wireless.channel 6 \
-          802-11-wireless.band bg \
-          ipv4.method shared \
-          ipv4.addresses 192.168.0.1/24 \
-          wifi-sec.key-mgmt wpa-psk \
-          wifi-sec.psk "robotseverywhere"; then
-          
-          echo "AP connection created successfully"
-          
-          # Enable connection with retry logic
+      if nmcli con add type wifi ifname wlan0 con-name ap autoconnect yes ssid "\${HOSTNAME}" 802-11-wireless.mode ap 802-11-wireless.channel 6 802-11-wireless.band bg ipv4.method shared ipv4.addresses 192.168.0.1/24 wifi-sec.key-mgmt wpa-psk wifi-sec.psk "robotseverywhere"; then
           for i in {1..5}; do
-              if nmcli con up ap; then
-                  echo "AP activated successfully"
-                  break
-              fi
-              echo "Retry \$i/5: Failed to activate AP, retrying in 3 seconds..."
+              if nmcli con up ap; then break; fi
               sleep 3
           done
       else
-          echo "Failed to create AP connection"
           exit 1
       fi
-      
-      # Create marker file with proper permissions
       touch /etc/accesspoint-configured
       chmod 644 /etc/accesspoint-configured
-      
-      echo "Access Point configured with SSID: \${HOSTNAME}"
       EOF
       chmod +x $1/usr/local/bin/setup-ap.sh
 
@@ -165,13 +117,11 @@ mmdebstrap:
       Description=Setup Dynamic Hostname from MAC
       Before=network.target
       After=systemd-udev-settle.service
-      
       [Service]
       Type=oneshot
       User=root
       ExecStart=/usr/local/bin/setup-hostname.sh
       RemainAfterExit=yes
-      
       [Install]
       WantedBy=multi-user.target
       EOF
@@ -184,7 +134,6 @@ mmdebstrap:
       After=network.target NetworkManager.service setup-hostname.service
       Wants=setup-hostname.service NetworkManager.service
       ConditionPathExists=!/etc/accesspoint-configured
-      
       [Service]
       Type=oneshot
       User=root
@@ -192,7 +141,6 @@ mmdebstrap:
       RemainAfterExit=yes
       Restart=on-failure
       RestartSec=10
-      
       [Install]
       WantedBy=multi-user.target
       EOF
@@ -201,6 +149,17 @@ mmdebstrap:
     - chroot $1 systemctl enable setup-hostname.service
     - chroot $1 systemctl enable firstboot-ap.service
 
-  dpkgopts:
-    - path-include=/usr/lib/raspi-firmware/brcm/*
+    # ===== Install ROS Real-Time Kernel packages =====
+    # Copy RT kernel .deb packages to image root
+    - cp ../../kernel_debs/linux-image-*.deb $1/root/
+    - cp ../../kernel_debs/linux-headers-*.deb $1/root/
+    - cp ../../kernel_debs/linux-libc-dev_*.deb $1/root/
 
+    # Install RT kernel packages inside chroot
+    - chroot $1 dpkg -i /root/linux-image-*.deb /root/linux-headers-*.deb /root/linux-libc-dev_*.deb
+
+    # Clean up the deb packages
+    - rm -f $1/root/linux-image-*.deb $1/root/linux-headers-*.deb $1/root/linux-libc-dev_*.deb
+
+dpkgopts:
+  - path-include=/usr/lib/raspi-firmware/brcm/*
