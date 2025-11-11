@@ -52,11 +52,9 @@ mmdebstrap:
 
     # ===== Cmdline.txt modification =====
     - |
-      # Set root device explicitly for Raspberry Pi root partition (adjust PARTUUID accordingly)
-      sed -i '/^root=/d' "$1/boot/firmware/cmdline.txt"
-      echo "root=PARTUUID=REPLACE_WITH_YOUR_PARTUUID rootfstype=ext4 rootwait" >> "$1/boot/firmware/cmdline.txt"
-
-      # Remove serial console param
+      # Remove existing root= params and set correct PARTUUID and console for rootfs mounting & debugging
+      sed -i '/root=/d' "$1/boot/firmware/cmdline.txt"
+      echo "root=PARTUUID=/dev/mmcblk0p2 rootfstype=ext4 rootwait earlyprintk=serial console=serial0,115200" >> "$1/boot/firmware/cmdline.txt"
       sed -i 's/^console=serial0,115200[[:space:]]*//' "$1/boot/firmware/cmdline.txt"
       sed -i 's/[[:space:]]console=serial0,115200//g' "$1/boot/firmware/cmdline.txt"
 
@@ -66,8 +64,8 @@ mmdebstrap:
 
     # ===== Sync latest Raspberry Pi firmware matching kernel =====
     - git clone --depth 1 https://github.com/raspberrypi/firmware.git /tmp/rpi-firmware
-    # Optionally checkout a commit/tag matching kernel build here:
-    # - cd /tmp/rpi-firmware && git checkout <commit-or-tag>
+    # Optionally checkout a commit/tag for version matching:
+    # - cd /tmp/rpi-firmware && git checkout <tag-or-commit>
     - cp -r /tmp/rpi-firmware/boot/* $1/boot/firmware/
     - cp -r /tmp/rpi-firmware/modules/* $1/lib/modules/ || true
     - rm -rf /tmp/rpi-firmware
