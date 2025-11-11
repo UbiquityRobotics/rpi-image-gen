@@ -94,14 +94,20 @@ mmdebstrap:
       camera_auto_detect=1
       EOF
 
-    # ===== Step 9: Modify cmdline.txt (optional - only if you need to change root) =====
-    # Uncomment and adjust if you need to modify cmdline.txt:
-    # - |
-    #   if grep -q "\broot=" "$1/boot/firmware/cmdline.txt"; then
-    #     sed -i "s|\broot=[^ ]*|root=/dev/mmcblk0p2|" "$1/boot/firmware/cmdline.txt"
-    #   fi
+     ===== Step 9: Modify cmdline.txt (optional - only if you need to change root) =====
+     Uncomment and adjust if you need to modify cmdline.txt:
+    - |
+  # Remove any existing root, rootfstype, and rootwait parameters
+      sed -i 's|\broot=[^ ]*||g; s|rootfstype=[^ ]*||g; s|rootwait||g' "$1/boot/firmware/cmdline.txt"
+  # Remove extra spaces
+      sed -i 's/  */ /g' "$1/boot/firmware/cmdline.txt"
+  # Append the complete root configuration
+      sed -i 's|$| root=/dev/mmcblk0p2 rootfstype=ext4 rootwait|' "$1/boot/firmware/cmdline.txt"
+  # Clean up leading/trailing spaces
+      sed -i 's/^ *//; s/ *$//' "$1/boot/firmware/cmdline.txt"
 
-    # ===== Step 10: Firmware symlinks for wireless driver =====
+
+     ===== Step 10: Firmware symlinks for wireless driver =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
     - ln -sf brcmfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
 
