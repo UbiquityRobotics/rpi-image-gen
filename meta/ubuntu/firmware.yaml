@@ -52,23 +52,14 @@ mmdebstrap:
 
     # ===== Cmdline.txt modification =====
     - |
-      # Remove existing root= params and set correct PARTUUID and console for rootfs mounting & debugging
-      sed -i '/root=/d' "$1/boot/firmware/cmdline.txt"
-      echo "root=PARTUUID=/dev/mmcblk0p2 rootfstype=ext4 rootwait earlyprintk=serial console=serial0,115200" >> "$1/boot/firmware/cmdline.txt"
+      # Remove console=serial0,115200 from the beginning of cmdline.txt if present
       sed -i 's/^console=serial0,115200[[:space:]]*//' "$1/boot/firmware/cmdline.txt"
+      # Also remove if it appears anywhere else in the line
       sed -i 's/[[:space:]]console=serial0,115200//g' "$1/boot/firmware/cmdline.txt"
 
     # ===== Firmware Symlinks =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
     - ln -sf brcmfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
-
-    # ===== Sync latest Raspberry Pi firmware matching kernel =====
-    - git clone --depth 1 https://github.com/raspberrypi/firmware.git /tmp/rpi-firmware
-    # Optionally checkout a commit/tag for version matching:
-    # - cd /tmp/rpi-firmware && git checkout <tag-or-commit>
-    - cp -r /tmp/rpi-firmware/boot/* $1/boot/firmware/
-    - cp -r /tmp/rpi-firmware/modules/* $1/lib/modules/ || true
-    - rm -rf /tmp/rpi-firmware
 
     # Legacy boot notices
     - for f in cmdline.txt config.txt; do
