@@ -64,9 +64,8 @@ mmdebstrap:
     - ls -l $1/root/
 
 
-    - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb \
-                       /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb \
-                       /root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb
+    - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb
+
 
     # ===== Generate initramfs for RT kernel =====
     - chroot $1 update-initramfs -c -k 6.8.4-rt11-raspi
