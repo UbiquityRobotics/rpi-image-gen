@@ -174,7 +174,7 @@ mmdebstrap:
         echo "No kernel image found in /boot" >&2
         exit 1
       fi
-    '
+      '
 
     # Copy device tree blobs if available
     - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
