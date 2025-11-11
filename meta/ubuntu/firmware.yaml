@@ -56,10 +56,13 @@ mmdebstrap:
       EOF
 
     # ===== Kernel Packages Installation =====
-    - cp kernel/RPI4/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
-    - cp kernel/RPI4/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
-    - cp kernel/RPI4/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
-    - sleep 10
+    - echo "Copying kernel packages to $1/root/"
+    - ls -l kernel/RPI4/
+    - cp kernel/RPI4/linux-headers-*.deb $1/root/
+    - cp kernel/RPI4/linux-image-*.deb $1/root/
+    - cp kernel/RPI4/linux-libc-dev_*.deb $1/root/
+    - ls -l $1/root/
+
 
     - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb \
                        /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb \
