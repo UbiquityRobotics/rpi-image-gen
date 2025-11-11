@@ -95,7 +95,6 @@ mmdebstrap:
       EOF
 
      ===== Step 9: Modify cmdline.txt (optional - only if you need to change root) =====
-     Uncomment and adjust if you need to modify cmdline.txt:
     - |
       sed -i 's|\broot=[^ ]*||g; s|rootfstype=[^ ]*||g; s|rootwait||g' "$1/boot/firmware/cmdline.txt"
       sed -i 's/  */ /g' "$1/boot/firmware/cmdline.txt"
