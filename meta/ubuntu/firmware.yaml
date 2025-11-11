@@ -73,21 +73,23 @@ mmdebstrap:
     # ===== Manage boot kernel files =====
     - chroot $1 /bin/bash -c 'mkdir -p /boot/firmware'
     - chroot $1 /bin/bash -c 'rm -f /boot/firmware/kernel*.img /boot/firmware/vmlinuz* /boot/firmware/Image*'
-    - chroot $1 /bin/bash -c '
-        KERNEL_IMG=""
-        for f in /boot/Image /boot/Image-6.8.4-rt11-raspi /boot/kernel8.img /boot/vmlinuz-*; do
-          if [ -f "$f" ]; then
-            KERNEL_IMG="$f"
-            break
-          fi
-        done
-        if [ -n "$KERNEL_IMG" ]; then
-          cp "$KERNEL_IMG" /boot/firmware/kernel8.img
-        else
-          echo "No kernel image found" >&2
-          exit 1
+    - |
+      chroot $1 /bin/bash -c '
+      KERNEL_IMG=""
+      for f in /boot/Image /boot/Image-6.8.4-rt11-raspi /boot/kernel8.img /boot/vmlinuz-*; do
+        if [ -f "$f" ]; then
+          KERNEL_IMG="$f"
+          break
         fi
-        '
+      done
+      if [ -n "$KERNEL_IMG" ]; then
+        cp "$KERNEL_IMG" /boot/firmware/kernel8.img
+      else
+        echo "No kernel image found" >&2
+        exit 1
+      fi
+      '
+
 
     # ===== Copy Device Trees and Overlays =====
     - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
