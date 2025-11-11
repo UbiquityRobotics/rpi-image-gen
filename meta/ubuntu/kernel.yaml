@@ -4,7 +4,6 @@ mmdebstrap:
     - arm64
   packages:
     - firmware-brcm80211
-    - raspi-firmware
     - initramfs-tools
     - iw
     - network-manager
@@ -12,143 +11,6 @@ mmdebstrap:
     - hostapd
 
   customize-hooks:
-    # ===== Firmware Installation =====
-    - mkdir -p $1/lib/firmware/brcm
-    - install -Dm644 firmware/brcm/cyfmac43455-sdio.* $1/lib/firmware/brcm/
-    - install -Dm644 firmware/brcm/brcmfmac43455-sdio.txt $1/lib/firmware/brcm/
-
-    # ===== Device Symlinks =====
-    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
-    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
-    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.bin
-    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob
-
-    # ===== Enhanced NVRAM Configuration =====
-    - |
-      cat <<EOF >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
-      boardflags3=0x44200100
-      sromrev=11
-      xtalfreq=40000
-      boardtype=0x0e00
-      boardrev=0x1100
-      EOF
-
-    # ===== Regulatory Domain Setup =====
-    - mkdir -p $1/etc/regulatory
-    - echo "country=US" > $1/etc/regulatory/regulatory.db
-    - chmod 644 $1/etc/regulatory/regulatory.db
-
-    # ===== Kernel Parameter Patch =====
-    - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
-
-    # ===== SSH Performance Optimization =====
-    - |
-      cat <<EOF >> $1/etc/ssh/sshd_config
-      # Performance optimizations
-      UseDNS no
-      GSSAPIAuthentication no
-      IPQoS cs0 cs0
-      EOF
-
-    # ===== PAM Optimization for Low-Resource Devices =====
-    - |
-      sed -i 's/session\s*optional\s*pam_systemd.so/#&/' $1/etc/pam.d/common-session
-      sed -i 's/session\s*optional\s*pam_chksshpwd.so/#&/' $1/etc/pam.d/common-session
-
-    # ===== NetworkManager Configuration =====
-    - |
-      cat <<EOF > $1/etc/NetworkManager/conf.d/ap-optimized.conf
-      [connection]
-      match-device=interface-name:wlan0
-      ipv4.dhcp-timeout=5
-      ipv4.may-fail=no
-
-      [main]
-      dns=dnsmasq
-      dhcp=internal
-      EOF
-
-    # ===== Dynamic Hostname Setup Script =====
-    - |
-      cat <<EOF > $1/usr/local/bin/setup-hostname.sh
-      #!/bin/bash
-      MAC_SUFFIX=\$(cat /sys/class/net/wlan0/address | tr -d ':' | tail -c 5 | tr '[:lower:]' '[:upper:]')
-      NEW_HOSTNAME="ubiquityrobot\${MAC_SUFFIX}"
-      if [ "\$(hostname)" != "\${NEW_HOSTNAME}" ]; then
-          echo "\${NEW_HOSTNAME}" > /etc/hostname
-          sed -i "s/127.0.1.1.*/127.0.1.1\t\${NEW_HOSTNAME}/" /etc/hosts
-          hostnamectl set-hostname "\${NEW_HOSTNAME}"
-      fi
-      EOF
-      chmod +x $1/usr/local/bin/setup-hostname.sh
-
-    # ===== Enhanced Access Point Setup Script =====
-    - |
-      cat <<EOF > $1/usr/local/bin/setup-ap.sh
-      #!/bin/bash
-      set -e
-      if [ -f /etc/accesspoint-configured ]; then exit 0; fi
-      sleep 5
-      for i in {1..30}; do
-          if [ -e /sys/class/net/wlan0/address ]; then break; fi
-          sleep 1
-      done
-      /usr/local/bin/setup-hostname.sh
-      HOSTNAME=\$(hostname)
-      iw reg set US 2>/dev/null || true
-      nmcli con delete ap 2>/dev/null || true
-      if nmcli con add type wifi ifname wlan0 con-name ap autoconnect yes ssid "\${HOSTNAME}" 802-11-wireless.mode ap 802-11-wireless.channel 6 802-11-wireless.band bg ipv4.method shared ipv4.addresses 192.168.0.1/24 wifi-sec.key-mgmt wpa-psk wifi-sec.psk "robotseverywhere"; then
-          for i in {1..5}; do
-              if nmcli con up ap; then break; fi
-              sleep 3
-          done
-      else
-          exit 1
-      fi
-      touch /etc/accesspoint-configured
-      chmod 644 /etc/accesspoint-configured
-      EOF
-      chmod +x $1/usr/local/bin/setup-ap.sh
-
-    # ===== Hostname Setup Service =====
-    - |
-      cat <<EOF > $1/etc/systemd/system/setup-hostname.service
-      [Unit]
-      Description=Setup Dynamic Hostname from MAC
-      Before=network.target
-      After=systemd-udev-settle.service
-      [Service]
-      Type=oneshot
-      User=root
-      ExecStart=/usr/local/bin/setup-hostname.sh
-      RemainAfterExit=yes
-      [Install]
-      WantedBy=multi-user.target
-      EOF
-
-    # ===== First-Boot AP Service =====
-    - |
-      cat <<EOF > $1/etc/systemd/system/firstboot-ap.service
-      [Unit]
-      Description=First-boot Access Point Setup
-      After=network.target NetworkManager.service setup-hostname.service
-      Wants=setup-hostname.service NetworkManager.service
-      ConditionPathExists=!/etc/accesspoint-configured
-      [Service]
-      Type=oneshot
-      User=root
-      ExecStart=/usr/local/bin/setup-ap.sh
-      RemainAfterExit=yes
-      Restart=on-failure
-      RestartSec=10
-      [Install]
-      WantedBy=multi-user.target
-      EOF
-
-    # ===== Enable Services =====
-    - chroot $1 systemctl enable setup-hostname.service
-    - chroot $1 systemctl enable firstboot-ap.service
-
     # ===== Install ROS Real-Time Kernel packages =====
     - cp kernel/RPI4/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
     - cp kernel/RPI4/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
@@ -156,16 +18,16 @@ mmdebstrap:
 
     - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb
 
-    # Make sure /boot/firmware directory exists
+    # Ensure /boot/firmware exists
     - chroot $1 /bin/bash -c 'mkdir -p /boot/firmware'
 
-    # Copy kernel image robustly to /boot/firmware/kernel8.img
+    # Copy kernel image from common candidates to /boot/firmware/kernel8.img
     - chroot $1 /bin/bash -c 'KERNEL_IMG=""; for f in /boot/Image /boot/Image-6.8.4-rt11-raspi /boot/kernel8.img /boot/vmlinuz-*; do if [ -f "$f" ]; then KERNEL_IMG="$f"; break; fi; done; if [ -n "$KERNEL_IMG" ]; then cp "$KERNEL_IMG" /boot/firmware/kernel8.img; else echo "No kernel image found in /boot" >&2; exit 1; fi'
 
-    # Copy device tree blobs if available
+    # Copy device tree blobs if present
     - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
 
-    # Copy overlays if not present
+    # Copy overlays if not already present
     - chroot $1 /bin/bash -c 'if [ ! -d /boot/firmware/overlays ]; then cp -r /boot/overlays /boot/firmware/; fi'
 
     # Clean up kernel deb packages
