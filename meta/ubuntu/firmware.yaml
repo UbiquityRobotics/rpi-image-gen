@@ -4,6 +4,7 @@ mmdebstrap:
   customize-hooks:
     - mkdir -p $1/boot/firmware
     - ln -sf firmware/overlays $1/boot/overlays
+
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
@@ -51,20 +52,23 @@ mmdebstrap:
 
     # ===== Cmdline.txt modification =====
     - |
-      # Remove console=serial0,115200 from the beginning of cmdline.txt if present
+      # Set root device explicitly for Raspberry Pi root partition (adjust PARTUUID accordingly)
+      sed -i '/^root=/d' "$1/boot/firmware/cmdline.txt"
+      echo "root=PARTUUID=REPLACE_WITH_YOUR_PARTUUID rootfstype=ext4 rootwait" >> "$1/boot/firmware/cmdline.txt"
+
+      # Remove serial console param
       sed -i 's/^console=serial0,115200[[:space:]]*//' "$1/boot/firmware/cmdline.txt"
-      # Also remove if it appears anywhere else in the line
       sed -i 's/[[:space:]]console=serial0,115200//g' "$1/boot/firmware/cmdline.txt"
 
     # ===== Firmware Symlinks =====
     - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
     - ln -sf brcmfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
 
-    # ===== Sync latest Raspberry Pi firmware matching RT kernel =====
+    # ===== Sync latest Raspberry Pi firmware matching kernel =====
     - git clone --depth 1 https://github.com/raspberrypi/firmware.git /tmp/rpi-firmware
-    # Optionally checkout a commit/tag here matching your kernel build for exact compatibility
+    # Optionally checkout a commit/tag matching kernel build here:
+    # - cd /tmp/rpi-firmware && git checkout <commit-or-tag>
     - cp -r /tmp/rpi-firmware/boot/* $1/boot/firmware/
-    # If your RT kernel modules need firmware blobs, also copy them
     - cp -r /tmp/rpi-firmware/modules/* $1/lib/modules/ || true
     - rm -rf /tmp/rpi-firmware
 
