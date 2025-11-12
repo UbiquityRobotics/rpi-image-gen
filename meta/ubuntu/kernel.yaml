@@ -1,11 +1,10 @@
-name: pi-universal-wifi
+name: pi-universal-rpi-image
 mmdebstrap:
   architectures:
     - arm64
   packages:
-    - linux-image-rpi-v8
+    - linux-image-raspi  # Install standard kernel first for proper boot infrastructure
     - firmware-brcm80211
-    - raspi-firmware
     - initramfs-tools
     - iw
     - network-manager
@@ -13,6 +12,9 @@ mmdebstrap:
     - hostapd
 
   customize-hooks:
+    # ===== Step 1: Create boot/firmware directory structure FIRST =====
+    - mkdir -p $1/boot/firmware
+    - mkdir -p $1/boot/overlays
     # ===== Firmware Installation =====
     - mkdir -p $1/lib/firmware/brcm
     - install -Dm644 firmware/brcm/cyfmac43455-sdio.* $1/lib/firmware/brcm/
@@ -24,6 +26,134 @@ mmdebstrap:
     - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.bin
     - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob
 
+    # ===== Step 2: Install base template files for cmdline.txt and config.txt =====
+    - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
+    - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
+    
+    # ===== Step 3: Clone and copy Raspberry Pi firmware =====
+    - git clone --depth 1 https://github.com/raspberrypi/firmware.git /tmp/rpi-firmware
+    - cp -r /tmp/rpi-firmware/boot/* $1/boot/firmware/
+    - cp -r /tmp/rpi-firmware/boot/overlays/* $1/boot/overlays/
+    - cp -r /tmp/rpi-firmware/modules/* $1/lib/modules/ || true
+    - rm -rf /tmp/rpi-firmware
+
+    # ===== Step 4: Install your RT kernel packages =====
+    - cp kernel/RPI4/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
+    - cp kernel/RPI4/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
+    - cp kernel/RPI4/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
+    - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb
+
+    # ===== Step 5: Ensure critical modules are in initramfs =====
+    - |
+      chroot $1 /bin/bash -c '
+      mkdir -p /etc/initramfs-tools
+      touch /etc/initramfs-tools/modules
+      # Add critical Raspberry Pi storage and filesystem modules
+      echo "bcm2835-mmc" >> /etc/initramfs-tools/modules
+      echo "sdhci-bcm2835" >> /etc/initramfs-tools/modules
+      echo "mmc_block" >> /etc/initramfs-tools/modules
+      echo "ext4" >> /etc/initramfs-tools/modules
+      echo "usb_storage" >> /etc/initramfs-tools/modules
+      '
+
+    # ===== Step 6: Generate initramfs for RT kernel with required modules =====
+    - chroot $1 update-initramfs -c -k 6.8.4-rt11-raspi
+
+    # ===== Step 7: Clean old firmware kernel files =====
+    - chroot $1 /bin/bash -c 'rm -f /boot/firmware/kernel*.img /boot/firmware/vmlinuz* /boot/firmware/Image*'
+
+    # ===== Step 8: Copy RT kernel image AS THE LAST step =====
+    - |
+      chroot $1 /bin/bash -c '
+      KERNEL_IMG=""
+      for f in /boot/Image-6.8.4-rt11-raspi /boot/vmlinuz-6.8.4-rt11-raspi /boot/Image /boot/kernel8.img; do
+        if [ -f "$f" ]; then
+          KERNEL_IMG="$f"
+          break
+        fi
+      done
+      if [ -n "$KERNEL_IMG" ]; then
+        cp "$KERNEL_IMG" /boot/firmware/kernel8.img
+        echo "Copied kernel: $KERNEL_IMG to /boot/firmware/kernel8.img"
+      else
+        echo "No kernel image found" >&2
+        exit 1
+      fi
+      '
+
+    # ===== Step 9: Copy initramfs to boot partition =====
+    - |
+      chroot $1 /bin/bash -c '
+      if [ -f /boot/initrd.img-6.8.4-rt11-raspi ]; then
+        cp /boot/initrd.img-6.8.4-rt11-raspi /boot/firmware/initrd.img
+        echo "Copied initramfs to /boot/firmware/initrd.img"
+      else
+        echo "Warning: initramfs not found for RT kernel" >&2
+      fi
+      '
+
+    # ===== Step 10: Copy device trees if available =====
+    - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
+
+    # ===== Step 11: Fix config.txt device tree overlays and add initramfs =====
+    - |
+      cp "$1/boot/firmware/config.txt" "$1/boot/firmware/config.txt.backup"
+      sed -i '/^\[pi4\]/,/^\[/{/^\[pi4\]/d; /^\[/!d; /^\[/i\
+      }' "$1/boot/firmware/config.txt"
+      sed -i '/^\[pi5\]/,/^\[/{/^\[pi5\]/d; /^\[/!d; /^\[/i\
+      }' "$1/boot/firmware/config.txt"
+      sed -i 's/^dtoverlay=disable-bt/#dtoverlay=disable-bt/' "$1/boot/firmware/config.txt"
+      cat >> "$1/boot/firmware/config.txt" << 'EOF'
+
+      [pi4]
+      enable_uart=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1,pin_tx=32,pin_rx=33
+      dtoverlay=uart2
+
+      [pi5]
+      BOOT_UART=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1
+      dtoverlay=uart2
+      dtoverlay=uart3-pi5
+      dtoverlay=uart4
+      dtoverlay=uart5
+
+      # Camera settings
+      camera_auto_detect=0
+      start_x=1
+      display_auto_detect=1
+      dtoverlay=imx219
+      camera_auto_detect=1
+
+      # Load initramfs
+      initramfs initrd.img followkernel
+      EOF
+
+    # ===== Step 12: Modify cmdline.txt to use device path (most reliable for testing) =====
+    - |
+      sed -i 's|\broot=[^ ]*||g; s|rootfstype=[^ ]*||g; s|rootwait||g' "$1/boot/firmware/cmdline.txt"
+      sed -i 's/  */ /g' "$1/boot/firmware/cmdline.txt"
+      sed -i 's|$| root=/dev/mmcblk0p2 rootfstype=ext4 rootwait|' "$1/boot/firmware/cmdline.txt"
+      sed -i 's/^ *//; s/ *$//' "$1/boot/firmware/cmdline.txt"
+
+    # ===== Step 13: Firmware symlinks for wireless driver =====
+    - ln -sf brcmfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
+    - ln -sf brcmfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
+
+    # ===== Step 14: Legacy boot notices =====
+    - |
+      for f in cmdline.txt config.txt; do
+        printf "DO NOT EDIT THIS FILE\n\nThe file you are looking for has moved to /boot/firmware/%s\n" "$f" > "$1/boot/$f"
+      done
+
+    # ===== Step 15: Clean kernel packages from root to save space =====
+    - rm -f $1/root/linux-headers-6.8.4-rt11-raspi_*_arm64.deb $1/root/linux-image-6.8.4-rt11-raspi_*_arm64.deb $1/root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb
+    
+    
     # ===== Enhanced NVRAM Configuration =====
     - |
       cat <<EOF >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
@@ -201,6 +331,7 @@ mmdebstrap:
     - chroot $1 systemctl enable setup-hostname.service
     - chroot $1 systemctl enable firstboot-ap.service
 
-  dpkgopts:
-    - path-include=/usr/lib/raspi-firmware/brcm/*
 
+dpkgopts:
+  - path-include=/usr/lib/raspi-firmware/brcm/brcmfmac43455*
+  - path-include=/usr/lib/raspi-firmware/LICENCE.broadcom
