@@ -43,31 +43,33 @@ mmdebstrap:
     - cp kernel/RPI4/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb $1/root/
     - chroot $1 dpkg -i /root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-image-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb /root/linux-headers-6.8.4-rt11-raspi_6.8.4-g75867ff0890f-1_arm64.deb
 
-    # ===== Step 5: Ensure critical modules are in initramfs =====
+    # ===== Step 5: Ensure critical modules for BOTH Pi4 and Pi5 =====
     - |
       chroot $1 /bin/bash -c '
       mkdir -p /etc/initramfs-tools
       touch /etc/initramfs-tools/modules
       
-      # Pi 5 specific modules
+      # Pi 5 MMC/SD drivers
       echo "bcm2835-mmc" >> /etc/initramfs-tools/modules
       echo "sdhci-bcm2835" >> /etc/initramfs-tools/modules
       
-      # Pi 4 specific modules
+      # Pi 4 MMC/SD drivers
       echo "sdhci_iproc" >> /etc/initramfs-tools/modules
       echo "bcm2835_dma" >> /etc/initramfs-tools/modules
       echo "sdhci" >> /etc/initramfs-tools/modules
       
-      # Common modules for both
+      # Common storage modules
       echo "mmc_block" >> /etc/initramfs-tools/modules
       echo "mmc_core" >> /etc/initramfs-tools/modules
       echo "ext4" >> /etc/initramfs-tools/modules
       echo "usb_storage" >> /etc/initramfs-tools/modules
       echo "uas" >> /etc/initramfs-tools/modules
-      # Ensure all available modules are included
-      echo "MODULES=most" > /etc/initramfs-tools/initramfs.conf
+      
+      # Update MODULES setting in existing config (preserve other settings)
+      sed -i "s/^MODULES=.*/MODULES=most/" /etc/initramfs-tools/initramfs.conf
+      # Ensure COMPRESS is set if not present
+      grep -q "^COMPRESS=" /etc/initramfs-tools/initramfs.conf || echo "COMPRESS=gzip" >> /etc/initramfs-tools/initramfs.conf
       '
-
     # ===== Step 6: Generate initramfs for RT kernel with required modules =====
     - chroot $1 update-initramfs -c -k 6.8.4-rt11-raspi
 
