@@ -48,12 +48,24 @@ mmdebstrap:
       chroot $1 /bin/bash -c '
       mkdir -p /etc/initramfs-tools
       touch /etc/initramfs-tools/modules
-      # Add critical Raspberry Pi storage and filesystem modules
+      
+      # Pi 5 specific modules
       echo "bcm2835-mmc" >> /etc/initramfs-tools/modules
       echo "sdhci-bcm2835" >> /etc/initramfs-tools/modules
+      
+      # Pi 4 specific modules
+      echo "sdhci_iproc" >> /etc/initramfs-tools/modules
+      echo "bcm2835_dma" >> /etc/initramfs-tools/modules
+      echo "sdhci" >> /etc/initramfs-tools/modules
+      
+      # Common modules for both
       echo "mmc_block" >> /etc/initramfs-tools/modules
+      echo "mmc_core" >> /etc/initramfs-tools/modules
       echo "ext4" >> /etc/initramfs-tools/modules
       echo "usb_storage" >> /etc/initramfs-tools/modules
+      echo "uas" >> /etc/initramfs-tools/modules
+      # Ensure all available modules are included
+      echo "MODULES=most" > /etc/initramfs-tools/initramfs.conf
       '
 
     # ===== Step 6: Generate initramfs for RT kernel with required modules =====
@@ -94,25 +106,48 @@ mmdebstrap:
 
     # ===== Step 10: Copy device trees if available =====
     - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
-
-    # ===== Step 11: Fix config.txt device tree overlays and add initramfs =====
+    # ===== After Step 10: Verify device trees =====
+    - |
+      chroot $1 /bin/bash -c '
+      # Explicitly copy Pi4 device tree if available
+      if [ -f /boot/bcm2711-rpi-4-b.dtb ]; then
+        cp /boot/bcm2711-rpi-4-b.dtb /boot/firmware/
+        echo "Copied Pi4 DTB"
+      fi
+      # Copy all available DTBs
+      if compgen -G "/boot/*.dtb" > /dev/null; then 
+        cp /boot/*.dtb /boot/firmware/
+      fi
+      '
+    # ===== Step 11: Fix config.txt for both Pi4 and Pi5 =====
     - |
       cp "$1/boot/firmware/config.txt" "$1/boot/firmware/config.txt.backup"
+      
+      # Remove old sections
       sed -i '/^\[pi4\]/,/^\[/{/^\[pi4\]/d; /^\[/!d; /^\[/i\
       }' "$1/boot/firmware/config.txt"
       sed -i '/^\[pi5\]/,/^\[/{/^\[pi5\]/d; /^\[/!d; /^\[/i\
       }' "$1/boot/firmware/config.txt"
       sed -i 's/^dtoverlay=disable-bt/#dtoverlay=disable-bt/' "$1/boot/firmware/config.txt"
+      
       cat >> "$1/boot/firmware/config.txt" << 'EOF'
 
+      [all]
+      # Load initramfs for all Pi models
+      initramfs initrd.img followkernel
+      
       [pi4]
+      kernel=kernel8.img
       enable_uart=1
       dtoverlay=disable-bt
       dtoverlay=uart0
       dtoverlay=uart1,pin_tx=32,pin_rx=33
       dtoverlay=uart2
-
+      # Pi4 specific settings
+      arm_64bit=1
+      
       [pi5]
+      kernel=kernel8.img
       BOOT_UART=1
       dtoverlay=disable-bt
       dtoverlay=uart0
@@ -122,15 +157,12 @@ mmdebstrap:
       dtoverlay=uart4
       dtoverlay=uart5
 
-      # Camera settings
+      # Camera settings (if needed)
       camera_auto_detect=0
       start_x=1
       display_auto_detect=1
       dtoverlay=imx219
       camera_auto_detect=1
-
-      # Load initramfs
-      initramfs initrd.img followkernel
       EOF
 
     # ===== Step 12: Modify cmdline.txt to use device path (most reliable for testing) =====
