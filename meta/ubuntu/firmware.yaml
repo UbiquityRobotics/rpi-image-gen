@@ -15,6 +15,16 @@ mmdebstrap:
     # ===== Step 1: Create boot/firmware directory structure FIRST =====
     - mkdir -p $1/boot/firmware
     - mkdir -p $1/boot/overlays
+    # ===== Firmware Installation =====
+    - mkdir -p $1/lib/firmware/brcm
+    - install -Dm644 firmware/brcm/cyfmac43455-sdio.* $1/lib/firmware/brcm/
+    - install -Dm644 firmware/brcm/brcmfmac43455-sdio.txt $1/lib/firmware/brcm/
+
+    # ===== Device Symlinks =====
+    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.bin
+    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.raspberrypi,model-b-2712.clm_blob
+    - ln -sf cyfmac43455-sdio.bin $1/lib/firmware/brcm/brcmfmac43455-sdio.bin
+    - ln -sf cyfmac43455-sdio.clm_blob $1/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob
 
     # ===== Step 2: Install base template files for cmdline.txt and config.txt =====
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
@@ -142,6 +152,185 @@ mmdebstrap:
 
     # ===== Step 15: Clean kernel packages from root to save space =====
     - rm -f $1/root/linux-headers-6.8.4-rt11-raspi_*_arm64.deb $1/root/linux-image-6.8.4-rt11-raspi_*_arm64.deb $1/root/linux-libc-dev_6.8.4-g75867ff0890f-1_arm64.deb
+    
+    
+    # ===== Enhanced NVRAM Configuration =====
+    - |
+      cat <<EOF >> $1/lib/firmware/brcm/brcmfmac43455-sdio.txt
+      boardflags3=0x44200100
+      sromrev=11
+      xtalfreq=40000
+      boardtype=0x0e00
+      boardrev=0x1100
+      EOF
+
+    # ===== Regulatory Domain Setup =====
+    - mkdir -p $1/etc/regulatory
+    - echo "country=US" > $1/etc/regulatory/regulatory.db
+    - chmod 644 $1/etc/regulatory/regulatory.db
+
+    # ===== Kernel Parameters =====
+    - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
+
+    # ===== SSH Performance Optimization =====
+    - |
+      cat <<EOF >> $1/etc/ssh/sshd_config
+      # Performance optimizations
+      UseDNS no
+      GSSAPIAuthentication no
+      IPQoS cs0 cs0
+      EOF
+
+    # ===== PAM Optimization for Low-Resource Devices =====
+    - |
+      sed -i 's/session\s*optional\s*pam_systemd.so/#&/' $1/etc/pam.d/common-session
+      sed -i 's/session\s*optional\s*pam_chksshpwd.so/#&/' $1/etc/pam.d/common-session
+
+    # ===== NetworkManager Configuration =====
+    - |
+      cat <<EOF > $1/etc/NetworkManager/conf.d/ap-optimized.conf
+      [connection]
+      match-device=interface-name:wlan0
+      ipv4.dhcp-timeout=5
+      ipv4.may-fail=no
+      
+      [main]
+      dns=dnsmasq
+      dhcp=internal
+      EOF
+
+    # ===== Dynamic Hostname Setup Script =====
+    - |
+      cat <<EOF > $1/usr/local/bin/setup-hostname.sh
+      #!/bin/bash
+      # Get last 4 digits of wlan0 MAC address
+      MAC_SUFFIX=\$(cat /sys/class/net/wlan0/address | tr -d ':' | tail -c 5 | tr '[:lower:]' '[:upper:]')
+      NEW_HOSTNAME="ubiquityrobot\${MAC_SUFFIX}"
+      
+      # Set hostname if different from current
+      if [ "\$(hostname)" != "\${NEW_HOSTNAME}" ]; then
+          echo "\${NEW_HOSTNAME}" > /etc/hostname
+          sed -i "s/127.0.1.1.*/127.0.1.1\t\${NEW_HOSTNAME}/" /etc/hosts
+          hostnamectl set-hostname "\${NEW_HOSTNAME}"
+      fi
+      EOF
+      chmod +x $1/usr/local/bin/setup-hostname.sh
+
+    # ===== Enhanced Access Point Setup Script =====
+    - |
+      cat <<EOF > $1/usr/local/bin/setup-ap.sh
+      #!/bin/bash
+      set -e
+      
+      # Exit if already configured
+      if [ -f /etc/accesspoint-configured ]; then
+          exit 0
+      fi
+      
+      # Wait for NetworkManager to be fully ready
+      sleep 5
+      
+      # Wait for wlan0 interface (up to 30 seconds)
+      for i in {1..30}; do
+          if [ -e /sys/class/net/wlan0/address ]; then
+              echo "wlan0 interface found"
+              break
+          fi
+          echo "Waiting for wlan0 interface... (\$i/30)"
+          sleep 1
+      done
+      
+      # Setup hostname based on MAC
+      /usr/local/bin/setup-hostname.sh
+      
+      # Get hostname for SSID
+      HOSTNAME=\$(hostname)
+      
+      # Set regulatory domain
+      iw reg set US 2>/dev/null || true
+      
+      # Remove any existing AP connections
+      nmcli con delete ap 2>/dev/null || true
+      
+      # Configure access point with explicit error handling
+      if nmcli con add type wifi ifname wlan0 con-name ap \
+          autoconnect yes \
+          ssid "\${HOSTNAME}" \
+          802-11-wireless.mode ap \
+          802-11-wireless.channel 6 \
+          802-11-wireless.band bg \
+          ipv4.method shared \
+          ipv4.addresses 192.168.0.1/24 \
+          wifi-sec.key-mgmt wpa-psk \
+          wifi-sec.psk "robotseverywhere"; then
+          
+          echo "AP connection created successfully"
+          
+          # Enable connection with retry logic
+          for i in {1..5}; do
+              if nmcli con up ap; then
+                  echo "AP activated successfully"
+                  break
+              fi
+              echo "Retry \$i/5: Failed to activate AP, retrying in 3 seconds..."
+              sleep 3
+          done
+      else
+          echo "Failed to create AP connection"
+          exit 1
+      fi
+      
+      # Create marker file with proper permissions
+      touch /etc/accesspoint-configured
+      chmod 644 /etc/accesspoint-configured
+      
+      echo "Access Point configured with SSID: \${HOSTNAME}"
+      EOF
+      chmod +x $1/usr/local/bin/setup-ap.sh
+
+    # ===== Hostname Setup Service =====
+    - |
+      cat <<EOF > $1/etc/systemd/system/setup-hostname.service
+      [Unit]
+      Description=Setup Dynamic Hostname from MAC
+      Before=network.target
+      After=systemd-udev-settle.service
+      
+      [Service]
+      Type=oneshot
+      User=root
+      ExecStart=/usr/local/bin/setup-hostname.sh
+      RemainAfterExit=yes
+      
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+    # ===== First-Boot AP Service =====
+    - |
+      cat <<EOF > $1/etc/systemd/system/firstboot-ap.service
+      [Unit]
+      Description=First-boot Access Point Setup
+      After=network.target NetworkManager.service setup-hostname.service
+      Wants=setup-hostname.service NetworkManager.service
+      ConditionPathExists=!/etc/accesspoint-configured
+      
+      [Service]
+      Type=oneshot
+      User=root
+      ExecStart=/usr/local/bin/setup-ap.sh
+      RemainAfterExit=yes
+      Restart=on-failure
+      RestartSec=10
+      
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
+    # ===== Enable Services =====
+    - chroot $1 systemctl enable setup-hostname.service
+    - chroot $1 systemctl enable firstboot-ap.service
+
 
 dpkgopts:
   - path-include=/usr/lib/raspi-firmware/brcm/brcmfmac43455*
