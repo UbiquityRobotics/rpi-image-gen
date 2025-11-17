@@ -82,7 +82,7 @@ mmdebstrap:
         git submodule update --init --recursive
       
         # Build route_select_ui touchscreen web app
-        cd route_select_ui/web_app
+        cd route_select_ui/route_select_ui
         npm install --silent
         npm run build
       
