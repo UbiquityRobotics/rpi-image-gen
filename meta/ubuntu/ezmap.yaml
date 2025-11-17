@@ -76,17 +76,8 @@ mmdebstrap:
         cd /home/ubuntu
         mkdir -p ezmap_ws/src
         cd ezmap_ws/src
-        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-devel
+        git clone --recurse-submodules -j4 https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-devel
         cd ezmap_pro
-        sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
-        vcs import < ezmap_pro.repos
-
-        # Remove token from ezmap_pro.repos file for security
-        sed -i 's|https://${GITHUB_TOKEN}@github.com/|https://github.com/|g' ezmap_pro.repos
-
-        # Skip problematic packages
-        touch ../aruco_detect/COLCON_IGNORE || true
-        touch ../ld19_lidar/COLCON_IGNORE || true
 
         # Build route_select_ui touchscreen web app
         cd route_select_ui/web_app
