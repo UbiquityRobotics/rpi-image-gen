@@ -72,34 +72,26 @@ mmdebstrap:
 
       chroot "$1" bash -c "
         export GITHUB_TOKEN='${GITHUB_TOKEN}'
+        git config --global url.\"https://${GITHUB_TOKEN}@github.com/\".insteadOf \"https://github.com/\"
         source /opt/ros/jazzy/setup.bash
         cd /home/ubuntu
         mkdir -p ezmap_ws/src
         cd ezmap_ws/src
-        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-gen5-and-6
+        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-devel
         cd ezmap_pro
-        sed -i 's|https://github.com/|https://${GITHUB_TOKEN}@github.com/|g' ezmap_pro.repos
-        vcs import < ezmap_pro.repos
-
-        # Remove token from ezmap_pro.repos file for security
-        sed -i 's|https://${GITHUB_TOKEN}@github.com/|https://github.com/|g' ezmap_pro.repos
-
-        # Skip problematic packages
-        touch ../aruco_detect/COLCON_IGNORE || true
-        touch ../ld19_lidar/COLCON_IGNORE || true
-
+        git submodule update --init --recursive
+      
         # Build route_select_ui touchscreen web app
-        cd route_select_ui/web_app
+        cd route_select_ui/route_select_ui/web_app
         npm install --silent
         npm run build
-
+      
         # Back to workspace and build ROS
         cd /home/ubuntu/ezmap_ws
         source /opt/ros/jazzy/setup.bash
         export CMAKE_PREFIX_PATH=/opt/ros/jazzy:\$CMAKE_PREFIX_PATH
-        # Install dependencies first
         rosdep install --from-paths src --ignore-src -r -y || true
-        ./src/ezmap_pro/build.sh
+        colcon build
       "
 
     # Network configuration for lidar
