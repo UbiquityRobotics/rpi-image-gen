@@ -77,8 +77,8 @@ mmdebstrap:
         cd /home/ubuntu
         mkdir -p ezmap_ws/src
         cd ezmap_ws/src
-        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap_pro.git -b jazzy-devel
-        cd ezmap_pro
+        git clone https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/ezmap.git -b jazzy-devel
+        cd ezmap
         git submodule update --init --recursive
       
         # Build route_select_ui touchscreen web app
