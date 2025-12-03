@@ -37,7 +37,7 @@ image root.ext4 {
       mke2fs-conf = "/home/admin/rpi-image-gen/image/mbr/simple_dual/mke2fs.conf"
       extraargs = "-U fd3a839a-24af-4e52-8993-74ed74aa824b -b 4096"
    }
-   size = "32G"  # Size ONLY in image blocks
+   size = "25G"  # Size ONLY in image blocks
    mountpoint = "/"
    exec-pre = "image/mbr/simple_dual/setup-clear.sh ROOT eea4db02 fd3a839a-24af-4e52-8993-74ed74aa824b"
 }
