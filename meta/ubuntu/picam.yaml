@@ -56,7 +56,9 @@ mmdebstrap:
     - chroot "$1" sudo -u ubuntu git clone -b jazzy-devel https://github.com/UbiquityRobotics/fiducials /home/ubuntu/ros2_ws/src/fiducials
     # Clone libcamera repo as ubuntu user into ros2 workspace
     - chroot "$1" sudo -u ubuntu git clone --recursive https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
-    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && git checkout v0.5.2+rpt20250903"
+    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera "
+    - chroot "$1" sudo -u ubuntu git clone https://github.com/raspberrypi/libpisp /home/ubuntu/ros2_ws/src/libpisp
+
     # Build and install libcamera from source
     - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && meson setup build --buildtype=release -Dpipelines=rpi/vc4,rpi/pisp -Dipas=rpi/vc4,rpi/pisp -Dv4l2=true -Dgstreamer=enabled -Dtest=false -Dlc-compliance=disabled -Dcam=disabled -Dqcam=disabled -Ddocumentation=disabled -Dpycamera=enabled"
     - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && ninja -C build"
