@@ -1,9 +1,9 @@
 name: github-repo-clone
 mmdebstrap:
   packages:
-    - make
-    - g++
-    - python3-vcstool  # Added to provide vcs command
+    - build-essential
+    - git
+    - ros-jazzy-rmw-zenoh-cpp
   customize-hooks:
 
     # Initialize rosdep without privileged operations
@@ -16,22 +16,10 @@ mmdebstrap:
         export ROS_ETC_DIR=/home/ubuntu/.ros
         rosdep update'
 
-    # Clone rmw_zenoh repository
+    # Create empty zenoh workspace
     - |
-      chroot "$1" bash -c '
-        mkdir -p /home/ubuntu/zenoh_ws/src
-        cd /home/ubuntu/zenoh_ws/src
-        git clone -b jazzy https://github.com/ros2/rmw_zenoh.git'
+      chroot "$1" bash -c 'mkdir -p /home/ubuntu/zenoh_ws/src'
 
-    # Build ament_cmake_vendor_package from source
-    - |
-      chroot "$1" bash -c '
-        mkdir -p /home/ubuntu/ament_ws/src
-        git clone -b jazzy https://github.com/ament/ament_cmake /home/ubuntu/ament_ws/src/ament_cmake
-        source /opt/ros/jazzy/setup.bash
-        cd /home/ubuntu/ament_ws
-        colcon build --packages-up-to ament_cmake_vendor_package
-        source install/setup.bash'
     - |
       mkdir -p "$1/etc/NetworkManager/dispatcher.d"
       cat > "$1/etc/NetworkManager/dispatcher.d/90-zenoh-restart" << 'EOF'
@@ -57,14 +45,6 @@ mmdebstrap:
       fi
       EOF
       chmod 755 "$1/etc/NetworkManager/dispatcher.d/90-zenoh-restart"
-    # Build rmw_zenoh with serial transport
-    - |
-      chroot "$1" bash -c '
-        source /opt/ros/jazzy/setup.bash
-        source /home/ubuntu/ament_ws/install/setup.bash
-        cd /home/ubuntu/zenoh_ws
-        rosdep install --from-paths src --ignore-src --rosdistro jazzy -y
-        colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release'
 
     # Download and configure router
     - |
@@ -75,7 +55,7 @@ mmdebstrap:
       cat >> "$1/home/ubuntu/.profile" << 'EOF'
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
       source /opt/ros/jazzy/setup.bash
-      source /home/ubuntu/zenoh_ws/install/setup.bash
+      EOF
 
     # ===== Create wrapper script to pick correct config =====
     - |
@@ -90,7 +70,6 @@ mmdebstrap:
       fi
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
       source /opt/ros/jazzy/setup.bash
-      source /home/ubuntu/zenoh_ws/install/setup.bash
       exec ros2 run rmw_zenoh_cpp rmw_zenohd
       EOF
       chmod +x /usr/local/bin/start-zenoh.sh
@@ -121,4 +100,3 @@ mmdebstrap:
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/.ros/
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/zenoh_ws/
-    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/ament_ws/
