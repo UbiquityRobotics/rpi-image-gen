@@ -3,7 +3,7 @@ mmdebstrap:
   architectures:
     - arm64
   packages:
-    - linux-image-rpi-v8
+    - linux-image-raspi
     - firmware-brcm80211
     - raspi-firmware
     - initramfs-tools
@@ -39,7 +39,12 @@ mmdebstrap:
     - echo "country=US" > $1/etc/regulatory/regulatory.db
     - chmod 644 $1/etc/regulatory/regulatory.db
 
-    # ===== Kernel Parameters =====
+    # ===== Install Base Config Files =====
+    - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
+    - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
+
+    # ===== Kernel Parameters & Boot Config =====
+    - sed -i 's/ROOTDEV/\/dev\/mmcblk0p2/' $1/boot/firmware/cmdline.txt
     - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
 
     # ===== SSH Performance Optimization =====
