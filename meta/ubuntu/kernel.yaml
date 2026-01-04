@@ -43,8 +43,33 @@ mmdebstrap:
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
-    # ===== Copy Device Trees to expected location =====
-    - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
+    # ===== Copy Device Trees to expected location (Recursive) =====
+    - |
+      chroot $1 /bin/bash -c '
+      # Find the directory where the kernel package installed the DTBs (usually /usr/lib/linux-image-*-raspi/)
+      # We look for the broadcom directory which contains the main DTBs
+      DTB_SOURCE=$(find /usr/lib -type d -name "broadcom" -path "*linux-image-*-raspi*" | head -n 1)
+      
+      if [ -d "$DTB_SOURCE" ]; then
+         echo "Found DTB source at: $DTB_SOURCE"
+         # Copy main DTBs
+         cp "$DTB_SOURCE"/*.dtb /boot/firmware/
+         
+         # Copy overlays (usually in ../overlays relative to broadcom)
+         OVERLAYS_SOURCE=$(dirname "$DTB_SOURCE")/overlays
+         if [ -d "$OVERLAYS_SOURCE" ]; then
+             echo "Found Overlays source at: $OVERLAYS_SOURCE"
+             cp "$OVERLAYS_SOURCE"/*.dtbo /boot/overlays/
+         fi
+      else
+         echo "WARNING: Could not find installed Device Trees in /usr/lib/"
+         # Fallback: Try to find them in /boot/dtbs/ if they exist there
+         if [ -d "/boot/dtbs" ]; then
+             find /boot/dtbs -name "*.dtb" -exec cp {} /boot/firmware/ \;
+             find /boot/dtbs -name "*.dtbo" -exec cp {} /boot/overlays/ \;
+         fi
+      fi
+      '
 
     # ===== Kernel Parameters & Boot Config =====
     - sed -i 's/ROOTDEV/\/dev\/mmcblk0p2/' $1/boot/firmware/cmdline.txt
