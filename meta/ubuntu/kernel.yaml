@@ -55,7 +55,16 @@ mmdebstrap:
       KERNEL_FILE=$(find /boot -name "vmlinuz*raspi" | sort -V | tail -n 1)
       if [ -f "$KERNEL_FILE" ]; then
           echo "Found kernel: $KERNEL_FILE"
-          cp "$KERNEL_FILE" /boot/firmware/kernel8.img
+          
+          # Check if kernel is gzipped
+          if file "$KERNEL_FILE" | grep -q "gzip compressed"; then
+              echo "Kernel is compressed. Uncompressing to kernel8.img..."
+              zcat "$KERNEL_FILE" > /boot/firmware/kernel8.img
+          else
+              echo "Kernel is uncompressed. Copying to kernel8.img..."
+              cp "$KERNEL_FILE" /boot/firmware/kernel8.img
+          fi
+          
           echo "Installed to /boot/firmware/kernel8.img"
       else
           echo "CRITICAL ERROR: No vmlinuz kernel found in /boot"
