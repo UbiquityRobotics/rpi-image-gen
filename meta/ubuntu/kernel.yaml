@@ -43,6 +43,9 @@ mmdebstrap:
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
+    # ===== Copy Device Trees to expected location =====
+    - chroot $1 /bin/bash -c 'if compgen -G "/boot/*.dtb" > /dev/null; then cp /boot/*.dtb /boot/firmware/; fi'
+
     # ===== Kernel Parameters & Boot Config =====
     - sed -i 's/ROOTDEV/\/dev\/mmcblk0p2/' $1/boot/firmware/cmdline.txt
     - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
