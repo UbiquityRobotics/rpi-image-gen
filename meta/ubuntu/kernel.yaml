@@ -43,32 +43,72 @@ mmdebstrap:
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
 
-    # ===== Copy Device Trees to expected location (Recursive) =====
+    # ===== Robust Kernel & DTB Installation =====
     - |
       chroot $1 /bin/bash -c '
-      # Find the directory where the kernel package installed the DTBs (usually /usr/lib/linux-image-*-raspi/)
-      # We look for the broadcom directory which contains the main DTBs
-      DTB_SOURCE=$(find /usr/lib -type d -name "broadcom" -path "*linux-image-*-raspi*" | head -n 1)
+      set -e
       
-      if [ -d "$DTB_SOURCE" ]; then
-         echo "Found DTB source at: $DTB_SOURCE"
-         # Copy main DTBs
-         cp "$DTB_SOURCE"/*.dtb /boot/firmware/
-         
-         # Copy overlays (usually in ../overlays relative to broadcom)
-         OVERLAYS_SOURCE=$(dirname "$DTB_SOURCE")/overlays
-         if [ -d "$OVERLAYS_SOURCE" ]; then
-             echo "Found Overlays source at: $OVERLAYS_SOURCE"
-             cp "$OVERLAYS_SOURCE"/*.dtbo /boot/overlays/
-         fi
+      echo "=== Starting Kernel Artifact Search ==="
+      
+      # 1. Find and Install Kernel Image
+      # Look for the standard Ubuntu kernel file
+      KERNEL_FILE=$(find /boot -name "vmlinuz*raspi" | sort -V | tail -n 1)
+      if [ -f "$KERNEL_FILE" ]; then
+          echo "Found kernel: $KERNEL_FILE"
+          cp "$KERNEL_FILE" /boot/firmware/kernel8.img
+          echo "Installed to /boot/firmware/kernel8.img"
       else
-         echo "WARNING: Could not find installed Device Trees in /usr/lib/"
-         # Fallback: Try to find them in /boot/dtbs/ if they exist there
-         if [ -d "/boot/dtbs" ]; then
-             find /boot/dtbs -name "*.dtb" -exec cp {} /boot/firmware/ \;
-             find /boot/dtbs -name "*.dtbo" -exec cp {} /boot/overlays/ \;
-         fi
+          echo "CRITICAL ERROR: No vmlinuz kernel found in /boot"
+          exit 1
       fi
+
+      # 2. Find and Install Initramfs
+      INITRD_FILE=$(find /boot -name "initrd.img*raspi" | sort -V | tail -n 1)
+      if [ -f "$INITRD_FILE" ]; then
+          echo "Found initrd: $INITRD_FILE"
+          cp "$INITRD_FILE" /boot/firmware/initrd.img
+          echo "Installed to /boot/firmware/initrd.img"
+      else
+          echo "WARNING: No initrd found. System might not boot if modules are needed."
+      fi
+
+      # 3. Find and Install Device Trees (DTBs)
+      # We search for a specific Pi 5 DTB to find the correct directory
+      echo "Searching for Device Trees..."
+      DTB_FILE=$(find /usr/lib /boot /lib -name "bcm2712-rpi-5-b.dtb" 2>/dev/null | head -n 1)
+      
+      if [ -n "$DTB_FILE" ]; then
+          DTB_DIR=$(dirname "$DTB_FILE")
+          echo "Found DTBs at: $DTB_DIR"
+          
+          # Copy all DTBs to firmware root
+          cp "$DTB_DIR"/*.dtb /boot/firmware/
+          echo "Copied .dtb files"
+          
+          # Find overlays relative to the DTB directory
+          # Check for "overlays" subdir or sibling directory
+          if [ -d "$DTB_DIR/overlays" ]; then
+              OVERLAYS_DIR="$DTB_DIR/overlays"
+          elif [ -d "$(dirname "$DTB_DIR")/overlays" ]; then
+              OVERLAYS_DIR="$(dirname "$DTB_DIR")/overlays"
+          fi
+          
+          if [ -n "$OVERLAYS_DIR" ] && [ -d "$OVERLAYS_DIR" ]; then
+              echo "Found Overlays at: $OVERLAYS_DIR"
+              mkdir -p /boot/firmware/overlays
+              cp "$OVERLAYS_DIR"/*.dtbo /boot/firmware/overlays/
+              echo "Copied .dtbo files"
+          else
+              echo "WARNING: Could not locate overlays directory!"
+          fi
+      else
+          echo "CRITICAL ERROR: Could not find bcm2712-rpi-5-b.dtb anywhere on the system!"
+          echo "Listing /usr/lib/linux-image* contents for debugging:"
+          ls -R /usr/lib/linux-image* 2>/dev/null || true
+          exit 1
+      fi
+      
+      echo "=== Kernel Artifact Installation Complete ==="
       '
 
     # ===== Kernel Parameters & Boot Config =====
