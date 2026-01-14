@@ -124,14 +124,53 @@ mmdebstrap:
     - sed -i 's/ROOTDEV/\/dev\/mmcblk0p2/' $1/boot/firmware/cmdline.txt
     - sed -i 's/$/ brcmfmac.run_oob=1 brcmfmac.htavail_timeout=1000000 cfg80211.ieee80211_regdom=US/' $1/boot/firmware/cmdline.txt
     
-    # ===== Fix config.txt for Pi 5 Kernel =====
+    # ===== Fix config.txt for MCB Communication (UARTs) =====
     - |
-      # Ensure [pi5] section has kernel=kernel8.img
-      if grep -q "\[pi5\]" $1/boot/firmware/config.txt; then
-          sed -i '/\[pi5\]/a kernel=kernel8.img' $1/boot/firmware/config.txt
-      else
-          echo -e "\n[pi5]\nkernel=kernel8.img" >> $1/boot/firmware/config.txt
-      fi
+      cp "$1/boot/firmware/config.txt" "$1/boot/firmware/config.txt.backup"
+
+      # Remove old sections to prevent duplicates
+      sed -i '/^\[pi4\]/,/^\[/{/^\[pi4\]/d; /^\[/!d; /^\[/i\
+      }' "$1/boot/firmware/config.txt"
+      sed -i '/^\[pi5\]/,/^\[/{/^\[pi5\]/d; /^\[/!d; /^\[/i\
+      }' "$1/boot/firmware/config.txt"
+      
+      # Disable conflicting bluetooth overlay if present
+      sed -i 's/^dtoverlay=disable-bt/#dtoverlay=disable-bt/' "$1/boot/firmware/config.txt"
+
+      cat >> "$1/boot/firmware/config.txt" << 'EOF'
+
+      [all]
+      # Load initramfs for all Pi models
+      initramfs initrd.img followkernel
+
+      [pi4]
+      kernel=kernel8.img
+      enable_uart=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1,pin_tx=32,pin_rx=33
+      dtoverlay=uart2
+      # Pi4 specific settings
+      arm_64bit=1
+
+      [pi5]
+      kernel=kernel8.img
+      BOOT_UART=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1
+      dtoverlay=uart2
+      dtoverlay=uart3-pi5
+      dtoverlay=uart4
+      dtoverlay=uart5
+
+      # Camera settings (if needed)
+      camera_auto_detect=0
+      start_x=1
+      display_auto_detect=1
+      dtoverlay=imx219
+      camera_auto_detect=1
+      EOF
 
     # ===== SSH Performance Optimization =====
     - |
