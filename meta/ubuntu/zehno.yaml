@@ -17,8 +17,8 @@ mmdebstrap:
         rosdep update'
 
     # Create empty zenoh workspace
-    - |
-      chroot "$1" bash -c 'mkdir -p /home/ubuntu/zenoh_ws/src'
+    #- |
+    #  chroot "$1" bash -c 'mkdir -p /home/ubuntu/zenoh_ws/src'
 
     - |
       mkdir -p "$1/etc/NetworkManager/dispatcher.d"
@@ -99,4 +99,3 @@ mmdebstrap:
           # ====== Make everything OWNED and WRITABLE by ubuntu user ======
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/.ros/
-    - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/zenoh_ws/

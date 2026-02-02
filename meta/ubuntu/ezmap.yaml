@@ -174,7 +174,6 @@ mmdebstrap:
       # Source environments
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
       source /opt/ros/jazzy/setup.bash
-      source /home/ubuntu/zenoh_ws/install/setup.bash
       source /home/ubuntu/ros2_ws/install/setup.bash
       cd /home/ubuntu/ezmap_ws
       source install/setup.bash
