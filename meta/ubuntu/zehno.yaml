@@ -61,6 +61,13 @@ mmdebstrap:
     - |
       chroot "$1" bash -c 'cat <<EOF > /usr/local/bin/start-zenoh.sh
       #!/bin/bash
+      
+      # 1. Cleanup stray processes
+      pkill -9 -f "rmw_zenohd" || true
+      pkill -9 -f "ros2" || true
+      ros2 daemon stop || true
+      
+      # 2. Select Config
       if grep -iq "Raspberry Pi 5" /proc/device-tree/model; then
         export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5
       elif grep -iq "Raspberry Pi 4" /proc/device-tree/model; then
@@ -68,8 +75,16 @@ mmdebstrap:
       else
         export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5
       fi
+      
+      # 3. Setup Environment
       export RMW_IMPLEMENTATION=rmw_zenoh_cpp
       source /opt/ros/jazzy/setup.bash
+      export RUST_LOG=zenoh=debug
+      
+      echo "Starting Zenoh Router with config: \$ZENOH_ROUTER_CONFIG_URI"
+      echo "RUST_LOG level: \$RUST_LOG"
+      
+      # 4. Launch
       exec ros2 run rmw_zenoh_cpp rmw_zenohd
       EOF
       chmod +x /usr/local/bin/start-zenoh.sh
