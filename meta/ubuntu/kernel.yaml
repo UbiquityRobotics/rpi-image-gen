@@ -216,6 +216,34 @@ mmdebstrap:
       EOF
       chmod +x $1/usr/local/bin/setup-hostname.sh
 
+    # ===== Fix All User UART Pins Service =====
+    # Forces pins to Alt2 (UART) for UART2, UART3, UART4, UART5
+    - |
+      cat <<'EOF' > $1/etc/systemd/system/fix-uart3-pins.service
+      [Unit]
+      Description=Force All User UART GPIOs to Alt2 Mode
+      After=multi-user.target
+
+      [Service]
+      Type=oneshot
+      # UART2 (GPIO 0, 1)
+      ExecStart=/usr/bin/pinctrl set 0 a2
+      ExecStart=/usr/bin/pinctrl set 1 a2
+      # UART3 (GPIO 4, 5)
+      ExecStart=/usr/bin/pinctrl set 4 a2
+      ExecStart=/usr/bin/pinctrl set 5 a2
+      # UART4 (GPIO 8, 9)
+      ExecStart=/usr/bin/pinctrl set 8 a2
+      ExecStart=/usr/bin/pinctrl set 9 a2
+      # UART5 (GPIO 12, 13)
+      ExecStart=/usr/bin/pinctrl set 12 a2
+      ExecStart=/usr/bin/pinctrl set 13 a2
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+      EOF
+
     # ===== Enhanced Access Point Setup Script =====
     - |
       cat <<'EOF' > $1/usr/local/bin/setup-ap.sh
@@ -330,6 +358,7 @@ mmdebstrap:
     # ===== Enable Services =====
     - chroot $1 systemctl enable setup-hostname.service
     - chroot $1 systemctl enable firstboot-ap.service
+    - chroot $1 systemctl enable fix-uart3-pins.service
 
 dpkgopts:
   - path-include=/usr/lib/raspi-firmware/brcm/*
