@@ -10,6 +10,23 @@ source "${IGTOP}/scripts/common"
 source "${IGTOP}/scripts/core"
 source "${IGTOP}/bin/igconf"
 
+# --- Automated Image Stamping Metadata ---
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BUILD_DATE=$(date --utc +'%Y-%m-%d %H:%M:%S UTC')
+
+case "$GIT_BRANCH" in
+   master)     IMAGE_VARIANT="ros2-ezmap-pro" ;;
+   base-image) IMAGE_VARIANT="ros2-base-image" ;;
+   *)          IMAGE_VARIANT="ros2-${GIT_BRANCH}" ;;
+esac
+
+# Export variables so they are picked up by the IGconf environment loop
+export IGconf_repo_branch="${GIT_BRANCH}"
+export IGconf_repo_commit="${GIT_COMMIT}"
+export IGconf_build_date="${BUILD_DATE}"
+export IGconf_image_variant="${IMAGE_VARIANT}"
+# ------------------------------------------
 
 # Defaults
 EXT_DIR=

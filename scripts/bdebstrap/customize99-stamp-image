@@ -1,0 +1,34 @@
+#!/bin/bash
+set -eu
+
+ROOTFS_DIR="$1"
+INFO_FILE="${ROOTFS_DIR}/etc/ubiquity-image-info"
+
+# Build Metadata (defaults if not exported)
+IMAGE_VARIANT="${IGconf_image_variant:-"ros2-generic"}"
+BUILD_DATE="${IGconf_build_date:-$(date --utc +'%Y-%m-%d %H:%M:%S UTC')}"
+REPO_BRANCH="${IGconf_repo_branch:-"unknown"}"
+REPO_COMMIT="${IGconf_repo_commit:-"unknown"}"
+
+echo "Creating image stamp at ${INFO_FILE}..."
+
+cat << EOF > "${INFO_FILE}"
+# Ubiquity Robotics Image Metadata
+IMAGE_VARIANT="${IMAGE_VARIANT}"
+BUILD_DATE="${BUILD_DATE}"
+REPO_BRANCH="${REPO_BRANCH}"
+REPO_COMMIT="${REPO_COMMIT}"
+EOF
+
+# Update /etc/issue and /etc/issue.net for console login
+ISSUE_TEXT="\nUbiquity Robotics ${IMAGE_VARIANT} [${REPO_BRANCH}@${REPO_COMMIT}] (${BUILD_DATE})\n"
+
+if [ -f "${ROOTFS_DIR}/etc/issue" ]; then
+    echo -e "${ISSUE_TEXT}" >> "${ROOTFS_DIR}/etc/issue"
+fi
+
+if [ -f "${ROOTFS_DIR}/etc/issue.net" ]; then
+    echo -e "${ISSUE_TEXT}" >> "${ROOTFS_DIR}/etc/issue.net"
+fi
+
+echo "Image successfully stamped."
