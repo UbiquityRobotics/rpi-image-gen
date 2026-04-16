@@ -9,12 +9,28 @@ mmdebstrap:
     - |
       chroot "$1" bash -c '
         echo "Installing Zellij from GitHub releases..."
-        LATEST_URL=$(curl -s https://api.github.com/repos/zellij-org/zellij/releases/latest | grep "browser_download_url.*aarch64-unknown-linux-musl.tar.gz" | cut -d "\"" -f 4)
+        # Extract the download URL for the aarch64-musl binary specifically
+        # We use a more robust regex that ignores extra characters and picks the first match
+        LATEST_URL=$(curl -s https://api.github.com/repos/zellij-org/zellij/releases/latest | \
+          grep "browser_download_url" | \
+          grep "aarch64-unknown-linux-musl.tar.gz" | \
+          head -n 1 | \
+          sed -E "s/.*\"(https[^\"]+)\".*/\1/")
+
         if [ -z "$LATEST_URL" ]; then
-          echo "ERROR: Could not find Zellij download URL"
+          echo "ERROR: Could not find a valid Zellij download URL for aarch64"
           exit 1
         fi
-        curl -L "$LATEST_URL" | tar -xz -C /usr/local/bin
+        
+        echo "Downloading Zellij from: $LATEST_URL"
+        if ! curl -L -o /tmp/zellij.tar.gz "$LATEST_URL"; then
+          echo "ERROR: Failed to download Zellij binary"
+          exit 1
+        fi
+
+        tar -xzf /tmp/zellij.tar.gz -C /usr/local/bin
+        rm /tmp/zellij.tar.gz
         chmod +x /usr/local/bin/zellij
-        zellij --version
+        
+        echo "Successfully installed $(/usr/local/bin/zellij --version)"
       '
