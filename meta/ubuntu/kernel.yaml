@@ -91,30 +91,45 @@ mmdebstrap:
       # 1. Sync Kernel Image
       if [ -f "/boot/vmlinuz-$KVER" ]; then
         cp "/boot/vmlinuz-$KVER" /boot/firmware/vmlinuz
+        echo "Synced kernel image"
       fi
 
       # 2. Sync Initramfs
       if [ -f "/boot/initrd.img-$KVER" ]; then
         cp "/boot/initrd.img-$KVER" /boot/firmware/initrd.img
+        echo "Synced initramfs"
       fi
 
-      # 3. Sync Device Trees (DTBs)
-      DTB_DIR="/usr/lib/linux-image-$KVER/broadcom"
-      if [ -d "$DTB_DIR" ]; then
-        cp $DTB_DIR/*.dtb /boot/firmware/
-        echo "Copied DTBs from $DTB_DIR"
-      else
-        echo "WARNING: DTB directory $DTB_DIR not found"
-      fi
+      # 3. Exhaustive search for Device Trees (DTBs)
+      # Ubuntu 24.04 might put them in /usr/lib/linux-image-$KVER/ or /usr/lib/linux-image-$KVER/broadcom/
+      mkdir -p /boot/firmware
+      FOUND_DTB=0
+      for dtb_path in "/usr/lib/linux-image-$KVER" "/usr/lib/linux-image-$KVER/broadcom" "/usr/lib/linux-image-$KVER/dtbs" "/usr/lib/linux-image-$KVER/dtbs/broadcom"; do
+        if [ -d "$dtb_path" ] && ls $dtb_path/*.dtb >/dev/null 2>&1; then
+          cp $dtb_path/*.dtb /boot/firmware/
+          echo "Copied DTBs from $dtb_path"
+          FOUND_DTB=1
+        fi
+      done
 
-      # 4. Sync Overlays
-      OVERLAY_DIR="/usr/lib/linux-image-$KVER/overlays"
-      if [ -d "$OVERLAY_DIR" ]; then
-        mkdir -p /boot/firmware/overlays
-        cp $OVERLAY_DIR/*.dtbo /boot/firmware/overlays/
-        echo "Copied Overlays from $OVERLAY_DIR"
-      else
-        echo "WARNING: Overlay directory $OVERLAY_DIR not found"
+      # 4. Exhaustive search for Overlays
+      mkdir -p /boot/firmware/overlays
+      FOUND_OVERLAY=0
+      for overlay_path in "/usr/lib/linux-image-$KVER/overlays" "/usr/lib/linux-image-$KVER/dtbs/overlays"; do
+        if [ -d "$overlay_path" ] && ls $overlay_path/*.dtbo >/dev/null 2>&1; then
+          cp $overlay_path/*.dtbo /boot/firmware/overlays/
+          echo "Copied Overlays from $overlay_path"
+          FOUND_OVERLAY=1
+        fi
+      done
+
+      if [ $FOUND_DTB -eq 0 ]; then
+        echo "WARNING: No DTBs found in expected locations! Searching everywhere in /usr/lib/linux-image-$KVER..."
+        find "/usr/lib/linux-image-$KVER" -name "*.dtb" -exec cp {} /boot/firmware/ \;
+      fi
+      if [ $FOUND_OVERLAY -eq 0 ]; then
+        echo "WARNING: No Overlays found in expected locations! Searching everywhere in /usr/lib/linux-image-$KVER..."
+        find "/usr/lib/linux-image-$KVER" -name "*.dtbo" -exec cp {} /boot/firmware/overlays/ \;
       fi
       '
     
