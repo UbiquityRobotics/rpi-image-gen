@@ -101,10 +101,10 @@ mmdebstrap:
       fi
 
       # 3. Exhaustive search for Device Trees (DTBs)
-      # Ubuntu 24.04 might put them in /usr/lib/linux-image-$KVER/ or /usr/lib/linux-image-$KVER/broadcom/
+      # Ubuntu 24.04 might put them in /usr/lib/linux-image-$KVER/ or /usr/lib/firmware/$KVER/device-tree/
       mkdir -p /boot/firmware
       FOUND_DTB=0
-      for dtb_path in "/usr/lib/linux-image-$KVER" "/usr/lib/linux-image-$KVER/broadcom" "/usr/lib/linux-image-$KVER/dtbs" "/usr/lib/linux-image-$KVER/dtbs/broadcom"; do
+      for dtb_path in "/usr/lib/linux-image-$KVER" "/usr/lib/linux-image-$KVER/broadcom" "/usr/lib/linux-image-$KVER/dtbs" "/usr/lib/linux-image-$KVER/dtbs/broadcom" "/usr/lib/firmware/$KVER/device-tree" "/usr/lib/firmware/$KVER/device-tree/broadcom"; do
         if [ -d "$dtb_path" ] && ls $dtb_path/*.dtb >/dev/null 2>&1; then
           cp $dtb_path/*.dtb /boot/firmware/
           echo "Copied DTBs from $dtb_path"
@@ -115,7 +115,7 @@ mmdebstrap:
       # 4. Exhaustive search for Overlays
       mkdir -p /boot/firmware/overlays
       FOUND_OVERLAY=0
-      for overlay_path in "/usr/lib/linux-image-$KVER/overlays" "/usr/lib/linux-image-$KVER/dtbs/overlays"; do
+      for overlay_path in "/usr/lib/linux-image-$KVER/overlays" "/usr/lib/linux-image-$KVER/dtbs/overlays" "/usr/lib/firmware/$KVER/device-tree/overlays"; do
         if [ -d "$overlay_path" ] && ls $overlay_path/*.dtbo >/dev/null 2>&1; then
           cp $overlay_path/*.dtbo /boot/firmware/overlays/
           echo "Copied Overlays from $overlay_path"
