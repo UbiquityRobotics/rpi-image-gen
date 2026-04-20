@@ -4,6 +4,7 @@ mmdebstrap:
     - arm64
   packages:
     - linux-image-raspi  # Install standard kernel first for proper boot infrastructure
+    - raspi-firmware     # Essential boot firmware (start.elf, fixup.dat, etc.)
     - firmware-brcm80211
     - initramfs-tools
     - iw
@@ -127,9 +128,16 @@ mmdebstrap:
         echo "WARNING: No DTBs found in expected locations! Searching everywhere in /usr/lib/linux-image-$KVER..."
         find "/usr/lib/linux-image-$KVER" -name "*.dtb" -exec cp {} /boot/firmware/ \;
       fi
-      if [ $FOUND_OVERLAY -eq 0 ]; then
-        echo "WARNING: No Overlays found in expected locations! Searching everywhere in /usr/lib/linux-image-$KVER..."
-        find "/usr/lib/linux-image-$KVER" -name "*.dtbo" -exec cp {} /boot/firmware/overlays/ \;
+      # 5. Sync Essential Boot Firmware (raspi-firmware)
+      # Ubuntu stores these in /usr/lib/raspi-firmware/
+      FW_DIR="/usr/lib/raspi-firmware"
+      if [ -d "$FW_DIR" ]; then
+        cp $FW_DIR/*.elf /boot/firmware/
+        cp $FW_DIR/*.dat /boot/firmware/
+        cp $FW_DIR/*.bin /boot/firmware/
+        echo "Copied essential boot firmware from $FW_DIR"
+      else
+        echo "WARNING: Boot firmware directory $FW_DIR not found!"
       fi
       '
     
