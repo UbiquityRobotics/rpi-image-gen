@@ -30,8 +30,18 @@ mmdebstrap:
     # ===== Step 2: Install base template files for cmdline.txt and config.txt =====
     - install -m 644 $RPI_TEMPLATES/boot-firmware/cmdline.txt $1/boot/firmware/
     - install -m 644 $RPI_TEMPLATES/boot-firmware/config.txt $1/boot/firmware/
+
+    # ===== Step 3: Configure config.txt for stock Ubuntu kernel =====
+    - |
+      cat <<EOF >> "$1/boot/firmware/config.txt"
+
+      [all]
+      # Load Ubuntu stock kernel and initramfs
+      kernel=vmlinuz
+      initramfs initrd.img followkernel
+      EOF
     
-    # ===== Step 3: Ensure critical modules for BOTH Pi4 and Pi5 =====
+    # ===== Step 4: Ensure critical modules for BOTH Pi4 and Pi5 =====
     - |
       chroot $1 /bin/bash -c '
       mkdir -p /etc/initramfs-tools
