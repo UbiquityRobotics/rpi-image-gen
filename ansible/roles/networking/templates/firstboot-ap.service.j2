@@ -1,0 +1,16 @@
+[Unit]
+Description=First-boot Access Point Setup
+After=network.target NetworkManager.service setup-hostname.service
+Wants=setup-hostname.service NetworkManager.service
+ConditionPathExists=!/etc/accesspoint-configured
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/setup-ap.sh
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

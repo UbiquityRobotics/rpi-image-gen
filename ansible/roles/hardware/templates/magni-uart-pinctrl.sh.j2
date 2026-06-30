@@ -1,0 +1,9 @@
+#!/bin/bash
+# Enable UART0 RX/TX on GPIO 14 & 15 with no pull-up/pull-down
+if command -v pinctrl &> /dev/null; then
+    pinctrl set 14 a0 pn
+    pinctrl set 15 a0 pn
+elif command -v raspi-gpio &> /dev/null; then
+    raspi-gpio set 14 a0 pn
+    raspi-gpio set 15 a0 pn
+fi

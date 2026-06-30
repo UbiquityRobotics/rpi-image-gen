@@ -1,0 +1,31 @@
+---
+- name: Deploy magni_hardware.service systemd unit
+  ansible.builtin.template:
+    src: magni_hardware.service.j2
+    dest: /etc/systemd/system/magni_hardware.service
+    mode: '0644'
+
+- name: Deploy magni_navigation.service systemd unit
+  ansible.builtin.template:
+    src: magni_navigation.service.j2
+    dest: /etc/systemd/system/magni_navigation.service
+    mode: '0644'
+
+- name: Deploy magni_ui.service systemd unit
+  ansible.builtin.template:
+    src: magni_ui.service.j2
+    dest: /etc/systemd/system/magni_ui.service
+    mode: '0644'
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable Magni orchestrator services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+  loop:
+    - magni_hardware.service
+    - magni_navigation.service
+    - magni_ui.service

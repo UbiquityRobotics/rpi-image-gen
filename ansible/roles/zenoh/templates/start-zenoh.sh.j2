@@ -1,0 +1,16 @@
+{% raw %}#!/bin/bash
+pkill -9 -f "rmw_zenohd" || true
+pkill -9 -f "ros2" || true
+ros2 daemon stop || true
+
+# Detect and pick config
+if grep -iq "Raspberry Pi 5" /proc/device-tree/model; then
+  export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5
+else
+  export ZENOH_ROUTER_CONFIG_URI=/home/ubuntu/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5
+fi
+
+export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+source /opt/ros/jazzy/setup.bash
+exec ros2 run rmw_zenoh_cpp rmw_zenohd
+{% endraw %}

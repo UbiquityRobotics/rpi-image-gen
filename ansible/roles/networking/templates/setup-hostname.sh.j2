@@ -1,0 +1,12 @@
+{% raw %}#!/bin/bash
+# Get last 4 digits of wlan0 MAC address
+MAC_SUFFIX=$(cat /sys/class/net/wlan0/address | tr -d ':' | tail -c 5 | tr '[:lower:]' '[:upper:]')
+NEW_HOSTNAME="ubiquityrobot${MAC_SUFFIX}"
+
+# Set hostname if different from current
+if [ "$(hostname)" != "${NEW_HOSTNAME}" ]; then
+    echo "${NEW_HOSTNAME}" > /etc/hostname
+    sed -i "s/127.0.1.1.*/127.0.1.1\t${NEW_HOSTNAME}/" /etc/hosts
+    hostnamectl set-hostname "${NEW_HOSTNAME}"
+fi
+{% endraw %}

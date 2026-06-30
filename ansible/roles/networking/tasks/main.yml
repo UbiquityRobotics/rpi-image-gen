@@ -1,0 +1,85 @@
+---
+- name: Create NetworkManager directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /etc/NetworkManager/conf.d
+    - /etc/NetworkManager/dispatcher.d
+
+- name: Deploy NetworkManager configuration for AP optimization
+  ansible.builtin.template:
+    src: ap-optimized.conf.j2
+    dest: /etc/NetworkManager/conf.d/ap-optimized.conf
+    mode: '0644'
+
+- name: Deploy NetworkManager configuration for wifi
+  ansible.builtin.template:
+    src: wifi.conf.j2
+    dest: /etc/NetworkManager/conf.d/wifi.conf
+    mode: '0644'
+
+- name: Deploy NetworkManager dispatcher script for Zenoh restart
+  ansible.builtin.template:
+    src: 90-zenoh-restart.j2
+    dest: /etc/NetworkManager/dispatcher.d/90-zenoh-restart
+    mode: '0755'
+
+- name: Create Netplan directory
+  ansible.builtin.file:
+    path: /etc/netplan
+    state: directory
+    mode: '0755'
+
+- name: Deploy Netplan DNS configuration
+  ansible.builtin.template:
+    src: 90-dns-fix.yaml.j2
+    dest: /etc/netplan/90-dns-fix.yaml
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: Configure resolv.conf symlink
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+
+- name: Deploy setup-hostname.sh
+  ansible.builtin.template:
+    src: setup-hostname.sh.j2
+    dest: /usr/local/bin/setup-hostname.sh
+    mode: '0755'
+
+- name: Deploy setup-ap.sh
+  ansible.builtin.template:
+    src: setup-ap.sh.j2
+    dest: /usr/local/bin/setup-ap.sh
+    mode: '0755'
+
+- name: Deploy setup-hostname.service
+  ansible.builtin.template:
+    src: setup-hostname.service.j2
+    dest: /etc/systemd/system/setup-hostname.service
+    mode: '0644'
+
+- name: Deploy firstboot-ap.service
+  ansible.builtin.template:
+    src: firstboot-ap.service.j2
+    dest: /etc/systemd/system/firstboot-ap.service
+    mode: '0644'
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable systemd networking services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+  loop:
+    - systemd-resolved
+    - setup-hostname.service
+    - firstboot-ap.service

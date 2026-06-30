@@ -1,0 +1,9 @@
+# Motor Controller (UART on Pi 5 / Pi 4)
+KERNEL=="ttyAMA0", SYMLINK+="robot_serial", MODE="0666"
+KERNEL=="ttyS0", SYMLINK+="robot_serial", MODE="0666"
+
+# LiDAR (USB)
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="robot_lidar ldlidar", MODE="0666"
+
+# Picam DMA Heap
+SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"

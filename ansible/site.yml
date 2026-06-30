@@ -1,0 +1,11 @@
+---
+- name: Provision Ubiquity Magni Robot OS Image
+  hosts: robots
+  become: true
+  roles:
+    - base_system
+    - networking
+    - hardware
+    - zenoh
+    - ros2_workspace
+    - systemd_services

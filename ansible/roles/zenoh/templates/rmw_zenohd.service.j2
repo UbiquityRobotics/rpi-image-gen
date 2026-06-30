@@ -1,0 +1,14 @@
+[Unit]
+Description=Run rmw_zenohd on boot
+After=network.target
+
+[Service]
+Type=simple
+User={{ target_user }}
+Environment=HOME={{ target_user_home }}
+WorkingDirectory={{ target_user_home }}
+ExecStart=/usr/local/bin/start-zenoh.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

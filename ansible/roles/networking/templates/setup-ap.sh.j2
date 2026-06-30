@@ -1,0 +1,67 @@
+{% raw %}#!/bin/bash
+set -e
+
+# Exit if already configured
+if [ -f /etc/accesspoint-configured ]; then
+    exit 0
+fi
+
+# Wait for NetworkManager to be fully ready
+sleep 5
+
+# Wait for wlan0 interface (up to 30 seconds)
+for i in {1..30}; do
+    if [ -e /sys/class/net/wlan0/address ]; then
+        echo "wlan0 interface found"
+        break
+    fi
+    echo "Waiting for wlan0 interface... ($i/30)"
+    sleep 1
+done
+
+# Setup hostname based on MAC
+/usr/local/bin/setup-hostname.sh
+
+# Get hostname for SSID
+HOSTNAME=$(hostname)
+
+# Set regulatory domain
+iw reg set US 2>/dev/null || true
+
+# Remove any existing AP connections
+nmcli con delete ap 2>/dev/null || true
+
+# Configure access point with explicit error handling
+if nmcli con add type wifi ifname wlan0 con-name ap \
+    autoconnect yes \
+    ssid "${HOSTNAME}" \
+    802-11-wireless.mode ap \
+    802-11-wireless.channel 6 \
+    802-11-wireless.band bg \
+    ipv4.method shared \
+    ipv4.addresses 192.168.0.1/24 \
+    wifi-sec.key-mgmt wpa-psk \
+    wifi-sec.psk "robotseverywhere"; then
+    
+    echo "AP connection created successfully"
+    
+    # Enable connection with retry logic
+    for i in {1..5}; do
+        if nmcli con up ap; then
+            echo "AP activated successfully"
+            break
+        fi
+        echo "Retry $i/5: Failed to activate AP, retrying in 3 seconds..."
+        sleep 3
+    done
+else
+    echo "Failed to create AP connection"
+    exit 1
+fi
+
+# Create marker file with proper permissions
+touch /etc/accesspoint-configured
+chmod 644 /etc/accesspoint-configured
+
+echo "Access Point configured with SSID: ${HOSTNAME}"
+{% endraw %}

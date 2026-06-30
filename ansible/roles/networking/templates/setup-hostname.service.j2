@@ -1,0 +1,13 @@
+[Unit]
+Description=Setup Dynamic Hostname from MAC
+Before=network.target
+After=systemd-udev-settle.service
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/setup-hostname.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

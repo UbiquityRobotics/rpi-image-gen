@@ -1,0 +1,18 @@
+[Unit]
+Description=Magni Touchscreen UI and Web server
+After=magni_navigation.service
+Wants=magni_navigation.service
+
+[Service]
+Type=simple
+User={{ target_user }}
+Group={{ target_user }}
+WorkingDirectory={{ ros2_ws }}
+Environment=HOME={{ target_user_home }}
+Environment=RMW_IMPLEMENTATION={{ rmw_implementation }}
+ExecStart=/bin/bash -c "source /opt/ros/{{ ros_distro }}/setup.bash && source {{ ros2_ws }}/install/setup.bash && ros2 launch robot_bringup ui_application.launch.py"
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

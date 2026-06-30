@@ -1,0 +1,12 @@
+[Unit]
+Description=Configure Magni UART Pin Multiplexing
+Before=magni_hardware.service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/magni-uart-pinctrl.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

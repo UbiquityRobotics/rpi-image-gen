@@ -1,0 +1,18 @@
+---
+# Global variables for Magni robot provisioning
+
+ansible_user: ubuntu
+target_user: ubuntu
+target_user_home: "/home/{{ target_user }}"
+ros2_ws: "{{ target_user_home }}/ros2_ws"
+rmw_implementation: rmw_zenoh_cpp
+ros_distro: jazzy
+
+# Robot hardware configuration defaults (for robot.yaml)
+robot_generation: "gen6"
+robot_lidar_installed: "ld19"
+robot_lidar_position: "top_plate_center"
+robot_raspicam_markertype: "marker_stag_18"
+robot_sonars_installed: false
+robot_shell_installed: true
+robot_tower_installed: false

@@ -1,0 +1,21 @@
+{% raw %}#!/bin/bash
+INTERFACE=$1
+ACTION=$2
+
+if [ "$INTERFACE" = "wlan0" ]; then
+    case "$ACTION" in
+        up)
+            # Check if zenoh is already running. If not, start it.
+            if ! systemctl is-active --quiet rmw_zenohd.service; then
+                logger "NetworkManager dispatcher: Restarting rmw_zenohd.service (first wlan0 up)"
+                systemctl restart rmw_zenohd.service
+            else
+                logger "NetworkManager dispatcher: wlan0 up event ignored (already handled)"
+            fi
+            ;;
+        down)
+            logger "NetworkManager dispatcher: wlan0 went down, reset state"
+            ;;
+    esac
+fi
+{% endraw %}

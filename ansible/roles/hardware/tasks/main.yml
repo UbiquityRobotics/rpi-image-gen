@@ -1,0 +1,39 @@
+---
+- name: Create ubiquity config directory
+  ansible.builtin.file:
+    path: /etc/ubiquity
+    state: directory
+    mode: '0755'
+
+- name: Deploy robot.yaml configuration
+  ansible.builtin.template:
+    src: robot.yaml.j2
+    dest: /etc/ubiquity/robot.yaml
+    mode: '0644'
+
+- name: Deploy udev rules for robot devices
+  ansible.builtin.template:
+    src: 99-ubiquity.rules.j2
+    dest: /etc/udev/rules.d/99-ubiquity.rules
+    mode: '0644'
+
+- name: Deploy UART pin control script
+  ansible.builtin.template:
+    src: magni-uart-pinctrl.sh.j2
+    dest: /usr/local/bin/magni-uart-pinctrl.sh
+    mode: '0755'
+
+- name: Deploy UART pin control service
+  ansible.builtin.template:
+    src: magni-uart-pinctrl.service.j2
+    dest: /etc/systemd/system/magni-uart-pinctrl.service
+    mode: '0644'
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable UART pin control service
+  ansible.builtin.systemd:
+    name: magni-uart-pinctrl.service
+    enabled: true

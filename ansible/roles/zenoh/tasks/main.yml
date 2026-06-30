@@ -1,0 +1,37 @@
+---
+- name: Deploy Zenoh Pi 4 Router configuration
+  ansible.builtin.template:
+    src: DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5.j2
+    dest: "{{ target_user_home }}/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi4.json5"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+
+- name: Deploy Zenoh Pi 5 Router configuration
+  ansible.builtin.template:
+    src: DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5.j2
+    dest: "{{ target_user_home }}/DEFAULT_RMW_ZENOH_ROUTER_CONFIG_pi5.json5"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+
+- name: Deploy Zenoh startup wrapper script
+  ansible.builtin.template:
+    src: start-zenoh.sh.j2
+    dest: /usr/local/bin/start-zenoh.sh
+    mode: '0755'
+
+- name: Deploy Zenoh router systemd service
+  ansible.builtin.template:
+    src: rmw_zenohd.service.j2
+    dest: /etc/systemd/system/rmw_zenohd.service
+    mode: '0644'
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Enable Zenoh router service
+  ansible.builtin.systemd:
+    name: rmw_zenohd.service
+    enabled: true

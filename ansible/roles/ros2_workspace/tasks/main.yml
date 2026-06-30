@@ -1,0 +1,74 @@
+---
+- name: Ensure workspace src directory exists with correct ownership
+  ansible.builtin.file:
+    path: "{{ ros2_ws }}/src"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+
+- name: Clone git repositories
+  become_user: "{{ target_user }}"
+  ansible.builtin.git:
+    repo: "https://github.com/UbiquityRobotics/{{ item.name }}.git"
+    dest: "{{ ros2_ws }}/src/{{ item.name }}"
+    version: "{{ item.version }}"
+    recursive: "{{ item.recursive | default(false) }}"
+    accept_hostkey: true
+  loop:
+    - { name: 'robot_bringup', version: 'master' }
+    - { name: 'magni_robot', version: 'fix-tf-remappings' }
+    - { name: 'ubiquity_core_utils', version: 'master' }
+    - { name: 'iris_ur_lama', version: 'jazzy-devel' }
+    - { name: 'iris_ur_lama_ros', version: 'jazzy-devel' }
+    - { name: 'ubiquity_motor_ros2', version: 'jazzy-devel' }
+    - { name: 'fiducials', version: 'jazzy-devel' }
+    - { name: 'lidar_ros2', version: 'jazzy-devel' }
+    - { name: 'move_smooth', version: 'jazzy-devel' }
+    - { name: 'ubiquity_route_manager', version: 'nav2-refactor' }
+    - { name: 'ubiquity_route_msgs', version: 'master' }
+    - { name: 'ezpkg_grid_driving_ros2', version: 'jazzy-devel' }
+    - { name: 'ezmap', version: 'refactor/modular-arch', recursive: true }
+
+- name: Build route_select_ui touchscreen web app
+  become_user: "{{ target_user }}"
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+    chdir: "{{ ros2_ws }}/src/ezmap/route_select_ui/route_select_ui/web_app"
+  loop:
+    - npm install
+    - npm run build
+
+- name: Check if rosdep has been initialized
+  ansible.builtin.stat:
+    path: /etc/ros/rosdep/sources.list.d/20-default.list
+  register: rosdep_init_stat
+
+- name: Initialize rosdep
+  ansible.builtin.command:
+    cmd: rosdep init
+  when: not rosdep_init_stat.stat.exists
+
+- name: Update rosdep
+  become_user: "{{ target_user }}"
+  ansible.builtin.command:
+    cmd: rosdep update --include-eol-distros
+
+- name: Install ROS workspace system dependencies via rosdep
+  ansible.builtin.command:
+    cmd: "rosdep install --from-paths {{ ros2_ws }}/src --ignore-src -y -r --rosdistro {{ ros_distro }} --skip-keys='libcamera dynamic_reconfigure catkin tf roscpp'"
+
+- name: Compile ROS 2 workspace with colcon
+  become_user: "{{ target_user }}"
+  ansible.builtin.command:
+    cmd: "/bin/bash -c 'source /opt/ros/{{ ros_distro }}/setup.bash && colcon build --symlink-install'"
+    chdir: "{{ ros2_ws }}"
+
+- name: Ensure ROS 2 workspace is sourced in target user bashrc
+  become_user: "{{ target_user }}"
+  ansible.builtin.lineinfile:
+    path: "{{ target_user_home }}/.bashrc"
+    line: "source {{ ros2_ws }}/install/setup.bash"
+    state: present
+    create: true
+    mode: '0644'

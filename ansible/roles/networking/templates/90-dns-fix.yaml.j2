@@ -1,0 +1,12 @@
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eth0:
+      dhcp4: true
+  wifis:
+    wlan0:
+      dhcp4: true
+      access-points:
+        "{{ wifi_ssid | default('SSID_PLACEHOLDER') }}":
+          password: "{{ wifi_password | default('PASSWORD_PLACEHOLDER') }}"
