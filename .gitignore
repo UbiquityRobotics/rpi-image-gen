@@ -5,3 +5,8 @@ SKIP
 SKIP_IMAGES
 .pc
 *-pc
+
+# Local Agent Artifacts
+.agents/
+ORIGINAL_REQUEST.md
+ansible_refactor_audit_report.md

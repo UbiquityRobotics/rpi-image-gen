@@ -40,6 +40,14 @@
     owner: root
     group: root
 
+- name: Deploy Netplan Ethernet configuration (Static IP)
+  ansible.builtin.template:
+    src: 01-netcfg.yaml.j2
+    dest: /etc/netplan/01-netcfg.yaml
+    mode: '0600'
+    owner: root
+    group: root
+
 - name: Configure resolv.conf symlink
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf

@@ -12,5 +12,10 @@ fi
 
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 source /opt/ros/jazzy/setup.bash
+export RUST_LOG=zenoh=debug
+
+echo "Starting Zenoh Router with config: $ZENOH_ROUTER_CONFIG_URI"
+echo "RUST_LOG level: $RUST_LOG"
+
 exec ros2 run rmw_zenoh_cpp rmw_zenohd
 {% endraw %}

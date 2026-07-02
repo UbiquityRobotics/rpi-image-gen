@@ -2,6 +2,12 @@ generation: "{{ robot_generation }}"
 lidar_installed: "{{ robot_lidar_installed }}"
 lidar_position: "{{ robot_lidar_position }}"
 raspicam_markertype: "{{ robot_raspicam_markertype }}"
+raspicam_position: "upward"
 sonars_installed: {{ robot_sonars_installed | lower }}
 shell_installed: {{ robot_shell_installed | lower }}
 tower_installed: {{ robot_tower_installed | lower }}
+force_time_sync: true
+gps_installed: "none"
+gps_position: "top_plate"
+oled_display:
+  controller: "SH1106"

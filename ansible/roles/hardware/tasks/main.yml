@@ -37,3 +37,45 @@
   ansible.builtin.systemd:
     name: magni-uart-pinctrl.service
     enabled: true
+
+- name: Ensure .ros/camera_info directory exists
+  ansible.builtin.file:
+    path: "{{ target_user_home }}/.ros/camera_info"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+
+- name: Copy camera calibration helper files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ target_user_home }}/.ros/camera_info/{{ item }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  loop:
+    - imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml
+    - imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480.yaml
+
+- name: Append UART and Bluetooth overlays to config.txt
+  ansible.builtin.blockinfile:
+    path: /boot/firmware/config.txt
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      [pi4]
+      enable_uart=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1,pin_tx=32,pin_rx=33
+      dtoverlay=uart2
+      arm_64bit=1
+
+      [pi5]
+      BOOT_UART=1
+      dtoverlay=disable-bt
+      dtoverlay=uart0
+      dtoverlay=uart1
+      dtoverlay=uart2
+      dtoverlay=uart3-pi5
+      dtoverlay=uart4
+      dtoverlay=uart5
