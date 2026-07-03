@@ -1,4 +1,5 @@
 # Motor Controller (UART on Pi 5 / Pi 4)
+KERNEL=="ttyAMA3", SYMLINK+="mcb_serial", MODE="0666"
 KERNEL=="ttyAMA0", SYMLINK+="robot_serial", MODE="0666"
 KERNEL=="ttyS0", SYMLINK+="robot_serial", MODE="0666"
 

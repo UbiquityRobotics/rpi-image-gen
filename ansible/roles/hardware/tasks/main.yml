@@ -57,6 +57,13 @@
     - imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml
     - imx708_wide__base_axi_pcie_1000120000_rp1_i2c_88000_imx708_1a_640x480.yaml
 
+- name: Disable SPI in config.txt to prevent UART3 collision on Pi 5
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/config.txt
+    regexp: '^dtparam=spi=on'
+    line: '#dtparam=spi=on (Disabled for UART3 MCB)'
+    state: present
+
 - name: Append UART and Bluetooth overlays to config.txt
   ansible.builtin.blockinfile:
     path: /boot/firmware/config.txt

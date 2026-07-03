@@ -1,7 +1,7 @@
 [Unit]
-Description=Magni Touchscreen UI and Web server
-After=navigation.service
-Wants=navigation.service
+Description=Magni UI Web Application
+After=magni-navigation.service
+Requires=magni-navigation.service
 
 [Service]
 Type=simple

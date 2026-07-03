@@ -1,7 +1,7 @@
 [Unit]
-Description=Magni SLAM and path planning navigation
-After=hardware.service
-Wants=hardware.service
+Description=Magni Navigation (SLAM, Move Smooth, Routing)
+After=magni-hardware.service
+Requires=magni-hardware.service
 
 [Service]
 Type=simple
