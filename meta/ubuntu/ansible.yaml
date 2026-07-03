@@ -12,7 +12,7 @@ mmdebstrap:
       cp -r ansible "$1/opt/ansible-provisioning"
       
       # Execute playbook using local connection inside chroot
-      chroot "$1" bash -c 'cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
+      chroot "$1" bash -c 'set -e; cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
       
       # Clean up
       rm -rf "$1/opt/ansible-provisioning"
