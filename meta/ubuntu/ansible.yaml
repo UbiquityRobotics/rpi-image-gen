@@ -8,12 +8,39 @@ mmdebstrap:
   customize-hooks:
     - |
       echo "Starting Ansible Provisioning..."
+
       # Copy ansible directory into the chroot
       cp -r ansible "$1/opt/ansible-provisioning"
-      
+
+      # Copy ros2_ws/src into the chroot so Ansible can access the older out-of-tree repos
+      if [ -d "ros2_ws/src" ]; then
+        mkdir -p "$1/opt/ros2_ws/src"
+        cp -a ros2_ws/src/. "$1/opt/ros2_ws/src/"
+      fi
+
+      # Inject GitHub token for private repo access inside the chroot
+      if [ -n "${GITHUB_TOKEN:-}" ]; then
+        chroot "$1" git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+      else
+        echo "WARNING: GITHUB_TOKEN is not set - private repos will fail to clone"
+      fi
+
       # Execute playbook using local connection inside chroot
-      chroot "$1" bash -c 'set -e; cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
-      
-      # Clean up
+      # Do NOT use set -e here: partial Ansible failures (e.g. a single repo failing)
+      # should not prevent the remaining roles (systemd_services) from executing.
+      chroot "$1" bash -c 'cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
+      ANSIBLE_RC=$?
+
+      # Clean up credentials from the chroot
+      chroot "$1" git config --global --remove-section url."https://${GITHUB_TOKEN:-}@github.com/" 2>/dev/null || true
+
+      # Clean up provisioning artifacts
       rm -rf "$1/opt/ansible-provisioning"
-      echo "Ansible Provisioning Complete!"
+      rm -rf "$1/opt/ros2_ws"
+
+      if [ $ANSIBLE_RC -ne 0 ]; then
+        echo "WARNING: Ansible Provisioning completed with errors (exit code: $ANSIBLE_RC)"
+      else
+        echo "Ansible Provisioning Complete!"
+      fi
+

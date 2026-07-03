@@ -7,7 +7,6 @@
     group: "{{ target_user }}"
     mode: '0755'
 
-
 - name: Clone git repositories
   become_user: "{{ target_user }}"
   ansible.builtin.git:
@@ -36,15 +35,17 @@
 - name: Copy older out-of-tree repositories to the workspace
   become_user: "{{ target_user }}"
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../ros2_ws/src/{{ item }}/"
+    src: "/opt/ros2_ws/src/{{ item }}/"
     dest: "{{ ros2_ws }}/src/{{ item }}/"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: preserve
+  ignore_errors: true
   loop:
     - camera_ros
     - ldlidar_stl_ros2
     - magni_bringup
+    - magni_description
     - oled_display_node
     - ros2_pigpio
     - ROS2Pi_sonar
@@ -55,6 +56,7 @@
     path: "{{ ros2_ws }}/src/ezmap/ezpkg_map_screen/public/map_manipulator.js"
     regexp: '\+ 1\.5708'
     replace: ''
+  ignore_errors: true
 
 - name: Ensure float() cast in map_web_worker_node.py
   become_user: "{{ target_user }}"
@@ -62,12 +64,14 @@
     path: "{{ ros2_ws }}/src/ezmap/ezpkg_map_screen/ezpkg_map_screen/map_web_worker_node.py"
     regexp: 'lid\.ranges\.append\(arr\[0\]\)'
     replace: 'lid.ranges.append(float(arr[0]))'
+  ignore_errors: true
 
 - name: Build route_select_ui touchscreen web app
   become_user: "{{ target_user }}"
   ansible.builtin.command:
     cmd: "{{ item }}"
     chdir: "{{ ros2_ws }}/src/ezmap/route_select_ui/route_select_ui/web_app"
+  ignore_errors: true
   loop:
     - npm install
     - npm run build
