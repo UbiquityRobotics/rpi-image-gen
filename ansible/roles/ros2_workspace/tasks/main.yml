@@ -7,6 +7,29 @@
     group: "{{ target_user }}"
     mode: '0755'
 
+- name: Copy refactored launch system local repositories to workspace
+  become_user: "{{ target_user }}"
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../../refactored_launch_system/{{ item }}/"
+    dest: "{{ ros2_ws }}/src/{{ item }}/"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: preserve
+  loop:
+    - ezmap
+    - ezpkg_grid_driving_ros2
+    - fiducials
+    - iris_ur_lama
+    - iris_ur_lama_ros
+    - lidar_ros2
+    - magni_robot
+    - move_smooth
+    - robot_bringup
+    - ubiquity_core_utils
+    - ubiquity_motor_ros2
+    - ubiquity_route_manager
+    - ubiquity_route_msgs
+
 - name: Clone git repositories
   become_user: "{{ target_user }}"
   ansible.builtin.git:
@@ -16,6 +39,7 @@
     recursive: "{{ item.recursive | default(false) }}"
     accept_hostkey: true
     force: true
+  ignore_errors: true
   loop:
     - { name: 'robot_bringup', version: 'master' }
     - { name: 'magni_robot', version: 'fix-tf-remappings' }
@@ -31,7 +55,7 @@
     - { name: 'ezpkg_grid_driving_ros2', version: 'jazzy-devel' }
     - { name: 'ezmap', version: 'refactor/modular-arch', recursive: true }
 
-- name: Copy local out-of-tree repositories to the workspace
+- name: Copy older out-of-tree repositories to the workspace
   become_user: "{{ target_user }}"
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../ros2_ws/src/{{ item }}/"
