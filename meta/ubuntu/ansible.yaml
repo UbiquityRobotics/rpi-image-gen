@@ -1,0 +1,19 @@
+---
+name: ansible
+mmdebstrap:
+  packages:
+    - ansible
+    - python3-apt
+    - git
+  customize-hooks:
+    - |
+      echo "Starting Ansible Provisioning..."
+      # Copy ansible directory into the chroot
+      cp -r ansible "$1/opt/ansible-provisioning"
+      
+      # Execute playbook using local connection inside chroot
+      chroot "$1" bash -c 'cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
+      
+      # Clean up
+      rm -rf "$1/opt/ansible-provisioning"
+      echo "Ansible Provisioning Complete!"

@@ -9,3 +9,4 @@ ubuntu/zellij
 rpi/user-credentials
 rpi/misc-skel
 ubuntu/dns
+ubuntu/ansible
