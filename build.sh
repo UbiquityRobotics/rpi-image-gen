@@ -410,6 +410,10 @@ if [ -x ${IGDEVICE}/post-build.sh ] ; then
    runh ${IGDEVICE}/post-build.sh ${IGconf_sys_target}
 fi
 
+# Run automated tests on the rootfs before creating the final image
+if [ -x "${IGTOP}/scripts/automated_tests.sh" ] ; then
+   runh "${IGTOP}/scripts/automated_tests.sh" ${IGconf_sys_target}
+fi
 
 [[ $ONLY_ROOTFS = 1 ]] && exit $?
 
