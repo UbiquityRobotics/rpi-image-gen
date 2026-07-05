@@ -32,6 +32,17 @@ for dir in src build install log; do
     fi
 done
 
+# Verify that the src directory actually contains packages
+SRC_COUNT=$(ls -1q "$WS_DIR/src" | wc -l)
+if [ "$SRC_COUNT" -eq 0 ]; then
+    echo "  - ERROR: The ros2_ws/src directory is completely empty!"
+    echo "    This means the git clones failed."
+    exit 1
+else
+    echo "  - PASS: Found $SRC_COUNT items in ros2_ws/src:"
+    ls -1 "$WS_DIR/src" | sed 's/^/      * /'
+fi
+
 # 2. Verify ROS 2 Build Success (setup.bash and nodes)
 echo "[Test 2/3] Verifying ROS 2 build outputs..."
 if [ -f "$WS_DIR/install/setup.bash" ]; then
