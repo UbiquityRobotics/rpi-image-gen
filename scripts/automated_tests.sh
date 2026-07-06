@@ -45,7 +45,6 @@ else
         "lidar_ros2"
         "magni_robot"
         "move_smooth"
-        "remote_robot"
         "robot_bringup"
         "ubiquity_core_utils"
         "ubiquity_motor_ros2"
