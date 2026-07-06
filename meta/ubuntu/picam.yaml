@@ -70,54 +70,8 @@ mmdebstrap:
     # Install ROS dev tools and common camera packages
     - chroot "$1" apt install -y ros-dev-tools ros-jazzy-camera-info-manager ros-jazzy-image-pipeline ros-jazzy-ament-cmake
 
-    # rosdep setup
-    - chroot "$1" rosdep init || true
-    - |
-      chroot "$1" runuser -u ubuntu -- bash -c '
-        success=0
-        for i in {1..5}; do
-          if rosdep update; then
-            success=1
-            break
-          fi
-          echo "WARNING: rosdep update failed (attempt $i/5), retrying in 5 seconds..."
-          sleep 5
-        done
-        if [ $success -ne 1 ]; then
-          echo "ERROR: rosdep update failed after 5 attempts."
-          exit 1
-        fi
-      '
-    - chroot "$1" rosdep install -y --from-paths /home/ubuntu/ros2_ws/src --ignore-src --rosdistro jazzy --skip-keys="libcamera dynamic_reconfigure catkin tf roscpp"
-    
-    # Build workspace
-    - chroot "$1" sudo -u ubuntu bash -c "source /opt/ros/jazzy/setup.bash && cd /home/ubuntu/ros2_ws && colcon build --base-paths src/camera_ros/"
-
-    # Force execute permission
-    - chroot "$1" sudo -u ubuntu chmod +x /home/ubuntu/ros2_ws/install/camera_ros/lib/camera_ros/camera_node || true
-
-    # Copy additional sources if they exist (as ubuntu user)
-    - |
-      if [ -d "ros2_ws/src" ]; then
-        chroot "$1" sudo -u ubuntu cp -a /tmp/additional_src/. /home/ubuntu/ros2_ws/src/ 2>/dev/null || true
-      fi
-
-    # Final ownership fix - ensure everything is owned by ubuntu
+    # Final ownership fix for the cloned repositories
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/ros2_ws
-    - chroot "$1" find /home/ubuntu/ros2_ws -type d -exec chmod 755 {} \;
-    - chroot "$1" find /home/ubuntu/ros2_ws -type f -exec chmod 644 {} \;
-    - chroot "$1" find /home/ubuntu/ros2_ws -name "*.py" -exec chmod 755 {} \;
-
-    # Ensure ROS2 workspace is sourced on user login
-    - |
-      echo 'source /home/ubuntu/ros2_ws/install/setup.bash' >> "$1/home/ubuntu/.bashrc"
-
-    # Copy additional workspace sources (preserving ownership)
-    - |
-      if [ -d "ros2_ws/src" ]; then
-        cp -a ros2_ws/src/. "$1/home/ubuntu/ros2_ws/src/"
-        chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/ros2_ws/src
-      fi
 
     # Add script to run camera calibration
     - |
