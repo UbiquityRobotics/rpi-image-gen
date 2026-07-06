@@ -76,8 +76,8 @@ else
         exit 1
     fi
 
-    # Count compiled packages by looking for package.xml in the install/share directory
-    NODE_COUNT=$(find "$WS_DIR/install/share" -mindepth 2 -maxdepth 2 -name "package.xml" | wc -l)
+    # Count compiled packages by looking for package.xml in the install directory (handles both isolated and merged layouts)
+    NODE_COUNT=$(find "$WS_DIR/install" -mindepth 3 -maxdepth 4 -name "package.xml" | wc -l)
     if [ "$NODE_COUNT" -gt 5 ]; then
         echo "  - PASS: Found $NODE_COUNT successfully compiled ROS 2 packages in install dir."
     else
