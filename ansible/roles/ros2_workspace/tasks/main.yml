@@ -88,6 +88,10 @@
   become_user: "{{ target_user }}"
   ansible.builtin.command:
     cmd: rosdep update --include-eol-distros
+  register: rosdep_update_res
+  until: rosdep_update_res.rc == 0
+  retries: 5
+  delay: 5
 
 - name: Install ROS workspace system dependencies via rosdep
   ansible.builtin.command:

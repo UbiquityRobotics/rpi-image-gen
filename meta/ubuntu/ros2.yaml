@@ -67,7 +67,22 @@ mmdebstrap:
     # Create user and configure environment
     - chroot "$1" useradd --create-home --shell /bin/bash ubuntu
     - chroot "$1" passwd -d ubuntu
-    - chroot "$1" rosdep init
-    - chroot "$1" runuser -u ubuntu -- rosdep update --include-eol-distros
+    - chroot "$1" rosdep init || true
+    - |
+      chroot "$1" runuser -u ubuntu -- bash -c '
+        success=0
+        for i in {1..5}; do
+          if rosdep update --include-eol-distros; then
+            success=1
+            break
+          fi
+          echo "WARNING: rosdep update failed (attempt $i/5), retrying in 5 seconds..."
+          sleep 5
+        done
+        if [ $success -ne 1 ]; then
+          echo "ERROR: rosdep update failed after 5 attempts."
+          exit 1
+        fi
+      '
     - echo "source /opt/ros/jazzy/setup.bash" >> "$1/home/ubuntu/.bashrc"
 

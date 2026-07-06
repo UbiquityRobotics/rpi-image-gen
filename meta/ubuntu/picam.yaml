@@ -72,7 +72,22 @@ mmdebstrap:
 
     # rosdep setup
     - chroot "$1" rosdep init || true
-    - chroot "$1" rosdep update
+    - |
+      chroot "$1" runuser -u ubuntu -- bash -c '
+        success=0
+        for i in {1..5}; do
+          if rosdep update; then
+            success=1
+            break
+          fi
+          echo "WARNING: rosdep update failed (attempt $i/5), retrying in 5 seconds..."
+          sleep 5
+        done
+        if [ $success -ne 1 ]; then
+          echo "ERROR: rosdep update failed after 5 attempts."
+          exit 1
+        fi
+      '
     - chroot "$1" rosdep install -y --from-paths /home/ubuntu/ros2_ws/src --ignore-src --rosdistro jazzy --skip-keys="libcamera dynamic_reconfigure catkin tf roscpp"
     
     # Build workspace
