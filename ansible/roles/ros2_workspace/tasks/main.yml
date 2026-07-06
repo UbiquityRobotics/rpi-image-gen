@@ -85,7 +85,6 @@
   when: not rosdep_init_stat.stat.exists
 
 - name: Update rosdep
-  become_user: "{{ target_user }}"
   ansible.builtin.command:
     cmd: rosdep update --include-eol-distros
   register: rosdep_update_res
