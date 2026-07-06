@@ -51,6 +51,9 @@ else
         "ubiquity_motor_ros2"
         "ubiquity_route_manager"
         "ubiquity_route_msgs"
+        "camera_ros"
+        "libcamera"
+        "libpisp"
     )
 
     echo "  - Checking for specifically required nodes in ros2_ws/src..."
