@@ -26,7 +26,7 @@
     - { name: 'fiducials', version: 'jazzy-devel' }
     - { name: 'lidar_ros2', version: 'jazzy-devel' }
     - { name: 'move_smooth', version: 'jazzy-devel' }
-    - { name: 'ubiquity_route_manager', version: 'nav2-refactor' }
+    - { name: 'ubiquity_route_manager', version: 'master' }
     - { name: 'ubiquity_route_msgs', version: 'master' }
     - { name: 'ezpkg_grid_driving_ros2', version: 'jazzy-devel' }
     - { name: 'ezmap', version: 'refactor/modular-arch', recursive: true }
