@@ -18,9 +18,10 @@ mmdebstrap:
         cp -a ros2_ws/src/. "$1/opt/ros2_ws/src/"
       fi
 
-      # Inject GitHub token for private repo access inside the chroot
+      # Inject GitHub token for private repo access inside the chroot for both root and ubuntu user
       if [ -n "${GITHUB_TOKEN:-}" ]; then
         chroot "$1" git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+        chroot "$1" sudo -u ubuntu git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
       else
         echo "WARNING: GITHUB_TOKEN is not set - private repos will fail to clone"
       fi
@@ -33,6 +34,7 @@ mmdebstrap:
 
       # Clean up credentials from the chroot
       chroot "$1" git config --global --remove-section url."https://${GITHUB_TOKEN:-}@github.com/" 2>/dev/null || true
+      chroot "$1" sudo -u ubuntu git config --global --remove-section url."https://${GITHUB_TOKEN:-}@github.com/" 2>/dev/null || true
 
       # Clean up provisioning artifacts
       rm -rf "$1/opt/ansible-provisioning"
