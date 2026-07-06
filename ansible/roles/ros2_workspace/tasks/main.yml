@@ -93,6 +93,19 @@
   ansible.builtin.command:
     cmd: "rosdep install --from-paths {{ ros2_ws }}/src --ignore-src -y -r --rosdistro {{ ros_distro }} --skip-keys='libcamera dynamic_reconfigure catkin tf roscpp'"
 
+- name: Create COLCON_IGNORE in non-ROS packages to prevent colcon compilation
+  become_user: "{{ target_user }}"
+  ansible.builtin.file:
+    path: "{{ ros2_ws }}/src/{{ item }}/COLCON_IGNORE"
+    state: touch
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  ignore_errors: true
+  loop:
+    - libcamera
+    - libpisp
+
 - name: Compile ROS 2 workspace with colcon
   become_user: "{{ target_user }}"
   ansible.builtin.command:
