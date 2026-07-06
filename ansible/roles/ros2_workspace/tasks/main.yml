@@ -100,6 +100,21 @@
     cmd: "/bin/bash -c 'source /opt/ros/{{ ros_distro }}/setup.bash && colcon build --symlink-install'"
     chdir: "{{ ros2_ws }}"
 
+- name: Ensure robot_bringup config directory exists in install space
+  ansible.builtin.file:
+    path: "{{ ros2_ws }}/install/robot_bringup/share/robot_bringup/config"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+
+- name: Symlink IMX219 camera calibration to robot_bringup config
+  ansible.builtin.file:
+    src: "{{ target_user_home }}/.ros/camera_info/imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml"
+    dest: "{{ ros2_ws }}/install/robot_bringup/share/robot_bringup/config/camera_info.yaml"
+    state: link
+    force: true
+
 - name: Ensure ROS 2 workspace is sourced in target user bashrc
   become_user: "{{ target_user }}"
   ansible.builtin.lineinfile:
