@@ -10,7 +10,7 @@
 - name: Clone git repositories
   become_user: "{{ target_user }}"
   ansible.builtin.git:
-    repo: "https://{{ lookup('env', 'GITHUB_TOKEN') }}@github.com/UbiquityRobotics/{{ item.name }}.git"
+    repo: "https://github.com/UbiquityRobotics/{{ item.name }}.git"
     dest: "{{ ros2_ws }}/src/{{ item.name }}"
     version: "{{ item.version }}"
     recursive: "{{ item.recursive | default(false) }}"
