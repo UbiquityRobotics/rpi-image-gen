@@ -44,7 +44,6 @@
     - camera_ros
     - ldlidar_stl_ros2
     - magni_bringup
-    - magni_description
     - oled_display_node
     - ros2_pigpio
     - ROS2Pi_sonar
