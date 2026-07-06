@@ -76,11 +76,12 @@ else
         exit 1
     fi
 
-    NODE_COUNT=$(find "$WS_DIR/install" -type f -executable | wc -l)
-    if [ "$NODE_COUNT" -gt 0 ]; then
-        echo "  - PASS: Found $NODE_COUNT compiled ROS 2 executables/nodes in install dir."
+    # Count compiled packages by looking for package.xml in the install/share directory
+    NODE_COUNT=$(find "$WS_DIR/install/share" -mindepth 2 -maxdepth 2 -name "package.xml" | wc -l)
+    if [ "$NODE_COUNT" -gt 5 ]; then
+        echo "  - PASS: Found $NODE_COUNT successfully compiled ROS 2 packages in install dir."
     else
-        echo "  - ERROR: No compiled executables found in the install directory. Nodes failed to build."
+        echo "  - ERROR: Only $NODE_COUNT compiled packages found. colcon build likely failed silently!"
         exit 1
     fi
 fi
