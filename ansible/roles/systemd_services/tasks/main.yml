@@ -1,4 +1,20 @@
 ---
+- name: Create global ROS 2 execution wrapper for systemd services
+  ansible.builtin.copy:
+    dest: /usr/local/bin/magni-ros2-run.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      # Set up the ROS 2 environment securely
+      source /opt/ros/{{ ros_distro }}/setup.bash
+      source {{ ros2_ws }}/install/setup.bash
+
+      # Global variables applied to every tier
+      export RMW_IMPLEMENTATION={{ rmw_implementation }}
+
+      # CRITICAL: 'exec' replaces the bash process with ros2 launch
+      exec ros2 launch "$@"
+
 - name: Deploy hardware.service systemd unit
   ansible.builtin.template:
     src: hardware.service.j2

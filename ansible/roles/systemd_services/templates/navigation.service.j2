@@ -1,7 +1,7 @@
 [Unit]
 Description=Magni Navigation (SLAM, Move Smooth, Routing)
 After=magni-hardware.service
-Requires=magni-hardware.service
+BindsTo=magni-hardware.service
 
 [Service]
 Type=simple
@@ -9,10 +9,10 @@ User={{ target_user }}
 Group={{ target_user }}
 WorkingDirectory={{ ros2_ws }}
 Environment=HOME={{ target_user_home }}
-Environment=RMW_IMPLEMENTATION={{ rmw_implementation }}
-ExecStart=/bin/bash -c "source /opt/ros/{{ ros_distro }}/setup.bash && source {{ ros2_ws }}/install/setup.bash && ros2 launch robot_bringup navigation.launch.py"
+ExecStart=/usr/local/bin/magni-ros2-run.sh robot_bringup navigation.launch.py
 Restart=on-failure
-RestartSec=5
+RestartSec=2
+TimeoutStopSec=10
 
 [Install]
 WantedBy=multi-user.target
