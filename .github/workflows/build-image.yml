@@ -1,0 +1,120 @@
+name: Build Raspberry Pi Robot Disk Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      config_file:
+        description: 'Image configuration profile'
+        required: true
+        default: 'config/ubuntu24-ros2-pi5.cfg'
+      options_file:
+        description: 'Image credentials/options file'
+        required: true
+        default: 'credentials24'
+      upload_spaces:
+        description: 'Upload finished image to DigitalOcean Spaces'
+        type: boolean
+        default: true
+  schedule:
+    # Run weekly production build every Sunday at midnight UTC
+    - cron: '0 0 * * 0'
+
+permissions:
+  id-token: write   # Required for AWS OIDC authentication
+  contents: read    # Required to checkout code
+  packages: read
+
+jobs:
+  launch-runner:
+    name: Provision Ephemeral AWS Graviton Runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
+
+      - name: Start Ephemeral AWS ARM64 Worker
+        id: start-ec2
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          ec2-image-id: ${{ secrets.PACKER_GOLDEN_AMI_ID || 'ami-0ba451768384e095b' }}
+          ec2-instance-type: t4g.xlarge
+          subnet-id: ${{ secrets.AWS_SUBNET_ID }}
+          security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
+          aws-resource-tags: >
+            [
+              {"Key": "Name", "Value": "github-actions-rpi-builder"},
+              {"Key": "Project", "Value": "UbiquityRobotics"}
+            ]
+
+  build-image:
+    name: Synthesize Robot OS Image inside Sandbox
+    needs: launch-runner
+    runs-on: ${{ needs.launch-runner.outputs.label }}
+    steps:
+      - name: Checkout rpi-image-gen
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build RootFS and SD Card Image
+        run: |
+          podman --cgroup-manager=cgroupfs unshare ./build.sh \
+            -c "${{ inputs.config_file || 'config/ubuntu24-ros2-pi5.cfg' }}" \
+            -o "${{ inputs.options_file || 'credentials24' }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Compress and Upload to Storage
+        if: ${{ inputs.upload_spaces != false }}
+        run: ./digital-ocean.sh
+        env:
+          S3_ACCESS_KEY: ${{ secrets.SPACES_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.SPACES_SECRET_KEY }}
+
+      - name: Publish Step Summary with Download Link
+        if: always()
+        run: |
+          DEPLOY_DIR="work/ros2/deploy"
+          if [ -d "$DEPLOY_DIR" ]; then
+            IMAGE_FILE=$(find "$DEPLOY_DIR" -name "*.img.xz" -o -name "*.img.zst" -o -name "*.img" | head -n 1)
+            if [ -n "$IMAGE_FILE" ]; then
+              FILENAME=$(basename "$IMAGE_FILE")
+              SHA256=$(sha256sum "$IMAGE_FILE" | awk '{print $1}')
+              
+              echo "## 🚀 Raspberry Pi Image Build Report" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+              echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+              echo "| **Artifact Name** | \`$FILENAME\` |" >> $GITHUB_STEP_SUMMARY
+              echo "| **SHA256 Checksum** | \`$SHA256\` |" >> $GITHUB_STEP_SUMMARY
+              echo "| **Download URL** | [Download from DigitalOcean Spaces](https://ubiquity-pi-image.sfo2.digitaloceanspaces.com/$FILENAME) |" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+  terminate-runner:
+    name: Terminate Ephemeral AWS Graviton Runner
+    needs: [launch-runner, build-image]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
+
+      - name: Terminate Ephemeral EC2 Instance
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          label: ${{ needs.launch-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.launch-runner.outputs.ec2-instance-id }}
