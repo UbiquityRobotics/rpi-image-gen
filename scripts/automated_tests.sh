@@ -86,21 +86,37 @@ else
     fi
 fi
 
-# 3. Verify Systemd Services
-echo "[Test 3/3] Verifying critical services..."
+# 3. Verify Systemd Services & 5-Tier Execution Architecture
+echo "[Test 3/3] Verifying 5-tier launch architecture & systemd services..."
 SERVICE_DIR="$ROOTFS/etc/systemd/system"
 if [ ! -d "$SERVICE_DIR" ]; then
     echo "  - ERROR: systemd services directory is missing!"
     exit 1
 fi
 
-# Check for custom/ubiquity services installed
-CUSTOM_SERVICES=$(find "$SERVICE_DIR" -name "*.service" -type f)
-if [ -n "$CUSTOM_SERVICES" ]; then
-    echo "  - PASS: Systemd services found."
+# Check global execution wrapper
+if [ -f "$ROOTFS/usr/local/bin/magni-ros2-run.sh" ]; then
+    echo "  - PASS: /usr/local/bin/magni-ros2-run.sh wrapper script found."
 else
-    echo "  - WARNING: No custom systemd services found in /etc/systemd/system."
+    echo "  - WARNING: /usr/local/bin/magni-ros2-run.sh wrapper script not found."
 fi
+
+# Check the 5 decoupled Magni tier services
+TIER_SERVICES=(
+    "magni-hardware.service"
+    "magni-teleop.service"
+    "magni-navigation.service"
+    "magni-ui.service"
+    "magni-diagnostics.service"
+)
+
+for svc in "${TIER_SERVICES[@]}"; do
+    if [ -f "$SERVICE_DIR/$svc" ] || [ -f "$SERVICE_DIR/multi-user.target.wants/$svc" ]; then
+        echo "  - PASS: Found service unit: $svc"
+    else
+        echo "  - WARNING: Service $svc is not installed in /etc/systemd/system."
+    fi
+done
 
 echo "=========================================================="
 echo "          ALL AUTOMATED TESTS PASSED SUCCESSFULLY!        "
