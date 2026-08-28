@@ -36,7 +36,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
 
       - name: Start Ephemeral AWS ARM64 Worker
         id: start-ec2
@@ -44,7 +44,7 @@ jobs:
         with:
           mode: start
           github-token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
-          ec2-image-id: ${{ secrets.PACKER_GOLDEN_AMI_ID }}
+          ec2-image-id: ${{ secrets.PACKER_GOLDEN_AMI_ID || 'ami-0ba451768384e095b' }}
           ec2-instance-type: t4g.xlarge
           subnet-id: ${{ secrets.AWS_SUBNET_ID }}
           security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
@@ -109,7 +109,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
 
       - name: Terminate Ephemeral EC2 Instance
         uses: machulav/ec2-github-runner@v2
