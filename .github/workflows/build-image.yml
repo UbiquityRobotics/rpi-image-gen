@@ -62,8 +62,6 @@ jobs:
     steps:
       - name: Checkout rpi-image-gen
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Build RootFS and SD Card Image
         run: |
