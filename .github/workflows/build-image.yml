@@ -32,10 +32,11 @@ jobs:
       label: ${{ steps.start-ec2.outputs.label }}
       ec2-instance-id: ${{ steps.start-ec2.outputs.ec2-instance-id }}
     steps:
-      - name: Configure AWS Credentials via OIDC
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
 
       - name: Start Ephemeral AWS ARM64 Worker
@@ -105,10 +106,11 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Configure AWS Credentials via OIDC
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
 
       - name: Terminate Ephemeral EC2 Instance
