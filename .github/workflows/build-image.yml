@@ -70,7 +70,7 @@ jobs:
             modprobe loop || true
             chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
             apt-get update
-            apt-get install -y zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring || true
+            apt-get install -y zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring s3cmd xz-utils || true
             mkdir -p /usr/share/keyrings
             curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
             chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
@@ -102,7 +102,7 @@ jobs:
           sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
           sudo chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
           sudo apt-get update
-          sudo apt-get install -y ubuntu-archive-keyring || true
+          sudo apt-get install -y ubuntu-archive-keyring s3cmd xz-utils || true
           if [ ! -s /usr/share/keyrings/ubuntu-archive-keyring.gpg ]; then
             sudo curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
             sudo chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
