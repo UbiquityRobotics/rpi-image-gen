@@ -69,6 +69,8 @@ jobs:
             chmod 755 /actions-runner
             modprobe loop || true
             chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
+            apt-get update
+            apt-get install -y zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools
           aws-resource-tags: >
             [
               {"Key": "Name", "Value": "github-actions-rpi-builder"},
@@ -83,8 +85,10 @@ jobs:
       - name: Checkout rpi-image-gen
         uses: actions/checkout@v4
 
-      - name: Setup Compatibility Symlinks and Permissions
+      - name: Setup Compatibility Symlinks and Install Dependencies
         run: |
+          sudo apt-get update
+          sudo ./install_deps.sh
           mkdir -p /home/admin
           ln -sfn "$GITHUB_WORKSPACE" /home/admin/rpi-image-gen
           sudo modprobe loop || true
