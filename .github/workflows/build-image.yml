@@ -71,9 +71,12 @@ jobs:
             chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
             apt-get update
             apt-get install -y zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring || true
+            mkdir -p /usr/share/keyrings
+            curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+            chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
             if [ ! -s /usr/share/keyrings/ubuntu-archive-keyring.gpg ]; then
-              mkdir -p /usr/share/keyrings
               curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
+              chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
             fi
           aws-resource-tags: >
             [
@@ -95,11 +98,14 @@ jobs:
           sudo sh -c 'echo "admin:100000:65536" > /etc/subgid'
           podman system migrate || true
           podman unshare id
+          sudo mkdir -p /usr/share/keyrings
+          sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+          sudo chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
           sudo apt-get update
           sudo apt-get install -y ubuntu-archive-keyring || true
           if [ ! -s /usr/share/keyrings/ubuntu-archive-keyring.gpg ]; then
-            sudo mkdir -p /usr/share/keyrings
             sudo curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
+            sudo chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
           fi
           sudo ./install_deps.sh
           mkdir -p /home/admin
