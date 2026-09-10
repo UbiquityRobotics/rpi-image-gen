@@ -54,8 +54,8 @@ jobs:
             echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/99-admin
             chmod 0440 /etc/sudoers.d/99-admin
             usermod -aG disk admin || true
-            grep -q "admin:100000:65536" /etc/subuid || echo "admin:100000:65536" >> /etc/subuid
-            grep -q "admin:100000:65536" /etc/subgid || echo "admin:100000:65536" >> /etc/subgid
+            echo "admin:100000:65536" > /etc/subuid
+            echo "admin:100000:65536" > /etc/subgid
             mkdir -p /etc/containers
             cat << 'CPCEOF' > /etc/containers/containers.conf
             [engine]
@@ -87,6 +87,10 @@ jobs:
 
       - name: Setup Compatibility Symlinks and Install Dependencies
         run: |
+          sudo sh -c 'echo "admin:100000:65536" > /etc/subuid'
+          sudo sh -c 'echo "admin:100000:65536" > /etc/subgid'
+          podman system migrate || true
+          podman unshare id
           sudo apt-get update
           sudo ./install_deps.sh
           mkdir -p /home/admin
