@@ -43,7 +43,7 @@ build {
   provisioner "shell" {
     inline = [
       "sudo apt-get update && sudo apt-get upgrade -y",
-      "sudo apt-get install -y podman bdebstrap mmdebstrap qemu-user-static zstd s3cmd git curl jq udev libarchive-tools",
+      "sudo apt-get install -y podman bdebstrap mmdebstrap qemu-user-static zstd s3cmd git curl jq udev libarchive-tools python3-boto3 xz-utils dosfstools genimage",
       "sudo systemctl enable podman",
       # Setup User Namespaces for podman unshare
       "echo 'admin:100000:65536' | sudo tee -a /etc/subuid",

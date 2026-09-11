@@ -70,7 +70,7 @@ jobs:
             modprobe loop || true
             chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
             apt-get update
-            apt-get install -y zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring s3cmd xz-utils || true
+            apt-get install -y zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring s3cmd xz-utils python3-boto3 || true
             mkdir -p /usr/share/keyrings
             curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
             chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
@@ -92,7 +92,7 @@ jobs:
       - name: Checkout rpi-image-gen
         uses: actions/checkout@v4
 
-      - name: Setup Compatibility Symlinks and Install Dependencies
+      - name: Worker Environment & Compatibility Setup
         run: |
           sudo sh -c 'echo "admin:100000:65536" > /etc/subuid'
           sudo sh -c 'echo "admin:100000:65536" > /etc/subgid'
@@ -102,7 +102,7 @@ jobs:
           sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
           sudo chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
           sudo apt-get update
-          sudo apt-get install -y ubuntu-archive-keyring s3cmd xz-utils || true
+          sudo apt-get install -y ubuntu-archive-keyring s3cmd xz-utils python3-boto3 || true
           if [ ! -s /usr/share/keyrings/ubuntu-archive-keyring.gpg ]; then
             sudo curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
             sudo chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
@@ -113,23 +113,56 @@ jobs:
           sudo modprobe loop || true
           sudo chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
 
-      - name: Build RootFS and SD Card Image
+      - name: Synthesize RootFS and Provision ROS 2 Stack (Ansible & Colcon)
         run: |
           export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
-          ./build.sh \
+          SKIP_AUTOMATED_TESTS=1 ./build.sh -r \
             -c "${{ inputs.config_file || 'config/ubuntu24-ros2-pi5.cfg' }}" \
             -o "${{ inputs.options_file || 'credentials24' }}"
         env:
           GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: Compress and Upload to Storage
+      - name: Execute Automated RootFS Verification Test Suite
+        run: |
+          ./scripts/automated_tests.sh work/ros2/rootfs
+
+      - name: Synthesize Bootable SD Card Disk Image (genimage)
+        run: |
+          export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
+          ./build.sh -i \
+            -c "${{ inputs.config_file || 'config/ubuntu24-ros2-pi5.cfg' }}" \
+            -o "${{ inputs.options_file || 'credentials24' }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Multithreaded SD Card Image Compression (xz -T0)
+        run: |
+          DEPLOY_DIR="work/ros2/deploy"
+          RAW_IMAGE="${DEPLOY_DIR}/ros2.img"
+          if [ ! -f "$RAW_IMAGE" ]; then
+            RAW_IMAGE=$(find "$DEPLOY_DIR" -maxdepth 1 -name "*.img" | head -n 1)
+          fi
+          if [ -z "$RAW_IMAGE" ] || [ ! -f "$RAW_IMAGE" ]; then
+            echo "Error: No raw .img found in $DEPLOY_DIR"
+            exit 1
+          fi
+          BASE_NAME="ros2-ezmap-pro"
+          CURRENT_DATE=$(date +%Y%m%d)
+          RANDOM_NUMBER=$(shuf -i 1000-9999 -n 1)
+          TARGET_XZ="${DEPLOY_DIR}/${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.img.xz"
+          echo "[INFO] Compressing $RAW_IMAGE to $TARGET_XZ using multithreaded xz (all cores)..."
+          xz -T0 -v -z "$RAW_IMAGE"
+          mv "${RAW_IMAGE}.xz" "$TARGET_XZ"
+          ls -lh "$TARGET_XZ"
+
+      - name: High-Speed Parallel Upload to DigitalOcean Spaces
         if: ${{ inputs.upload_spaces != false }}
         run: ./digital-ocean.sh
         env:
           S3_ACCESS_KEY: ${{ secrets.SPACES_ACCESS_KEY }}
           S3_SECRET_KEY: ${{ secrets.SPACES_SECRET_KEY }}
 
-      - name: Publish Step Summary with Download Link
+      - name: Publish Step Summary with Download Link and Checksum
         if: always()
         run: |
           DEPLOY_DIR="work/ros2/deploy"
@@ -137,6 +170,7 @@ jobs:
             IMAGE_FILE=$(find "$DEPLOY_DIR" -name "*.img.xz" -o -name "*.img.zst" -o -name "*.img" | head -n 1)
             if [ -n "$IMAGE_FILE" ]; then
               FILENAME=$(basename "$IMAGE_FILE")
+              FILESIZE=$(du -h "$IMAGE_FILE" | cut -f1)
               SHA256=$(sha256sum "$IMAGE_FILE" | awk '{print $1}')
               
               echo "## 🚀 Raspberry Pi Image Build Report" >> $GITHUB_STEP_SUMMARY
@@ -144,6 +178,7 @@ jobs:
               echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
               echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
               echo "| **Artifact Name** | \`$FILENAME\` |" >> $GITHUB_STEP_SUMMARY
+              echo "| **Artifact Size** | \`$FILESIZE\` |" >> $GITHUB_STEP_SUMMARY
               echo "| **SHA256 Checksum** | \`$SHA256\` |" >> $GITHUB_STEP_SUMMARY
               echo "| **Download URL** | [Download from DigitalOcean Spaces](https://ubiquity-pi-image.sfo2.digitaloceanspaces.com/$FILENAME) |" >> $GITHUB_STEP_SUMMARY
             fi

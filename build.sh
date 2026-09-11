@@ -393,29 +393,33 @@ fi
 [[ -f "$IGconf_sys_target" ]] && { msg "Exiting as non-directory target complete" ; exit 0 ; }
 
 
-# post-build: apply rootfs overlays - image layout then device
-if [ -d ${IGIMAGE}/device/rootfs-overlay ] ; then
-   run rsync -a ${IGIMAGE}/device/rootfs-overlay/ ${IGconf_sys_target}
-fi
-if [ -d ${IGDEVICE}/device/rootfs-overlay ] ; then
-   run rsync -a ${IGDEVICE}/device/rootfs-overlay/ ${IGconf_sys_target}
-fi
+if [[ $ONLY_IMAGE -eq 0 ]] ; then
+   # post-build: apply rootfs overlays - image layout then device
+   if [ -d ${IGIMAGE}/device/rootfs-overlay ] ; then
+      run rsync -a ${IGIMAGE}/device/rootfs-overlay/ ${IGconf_sys_target}
+   fi
+   if [ -d ${IGDEVICE}/device/rootfs-overlay ] ; then
+      run rsync -a ${IGDEVICE}/device/rootfs-overlay/ ${IGconf_sys_target}
+   fi
 
 
-# post-build: hooks - image layout then device
-if [ -x ${IGIMAGE}/post-build.sh ] ; then
-   runh ${IGIMAGE}/post-build.sh ${IGconf_sys_target}
-fi
-if [ -x ${IGDEVICE}/post-build.sh ] ; then
-   runh ${IGDEVICE}/post-build.sh ${IGconf_sys_target}
-fi
+   # post-build: hooks - image layout then device
+   if [ -x ${IGIMAGE}/post-build.sh ] ; then
+      runh ${IGIMAGE}/post-build.sh ${IGconf_sys_target}
+   fi
+   if [ -x ${IGDEVICE}/post-build.sh ] ; then
+      runh ${IGDEVICE}/post-build.sh ${IGconf_sys_target}
+   fi
 
-# Run automated tests on the rootfs before creating the final image
-if [ -x "${IGTOP}/scripts/automated_tests.sh" ] ; then
-   run podman unshare env "${ENV_POST_BUILD[@]}" "${IGTOP}/scripts/automated_tests.sh" ${IGconf_sys_target}
+   # Run automated tests on the rootfs before creating the final image
+   if [ -x "${IGTOP}/scripts/automated_tests.sh" ] && [[ "${SKIP_AUTOMATED_TESTS:-0}" != "1" ]] ; then
+      run podman unshare env "${ENV_POST_BUILD[@]}" "${IGTOP}/scripts/automated_tests.sh" ${IGconf_sys_target}
+   fi
 fi
 
 [[ $ONLY_ROOTFS = 1 ]] && exit $?
+
+mkdir -p "$IGconf_sys_outputdir"
 
 
 # pre-image: hooks - device has priority over image layout
