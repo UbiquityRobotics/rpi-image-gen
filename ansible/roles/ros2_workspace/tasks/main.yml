@@ -1,4 +1,12 @@
 ---
+- name: Ensure target user home directory exists with 0755 permissions
+  ansible.builtin.file:
+    path: "{{ target_user_home }}"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+
 - name: Ensure workspace src directory exists with correct ownership
   ansible.builtin.file:
     path: "{{ ros2_ws }}/src"

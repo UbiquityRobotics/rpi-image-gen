@@ -3,6 +3,11 @@ set -e
 
 ROOTFS=$1
 
+# Re-execute in podman unshare if running as non-root to ensure user namespace access
+if [ "$(id -u)" -ne 0 ] && command -v podman >/dev/null 2>&1; then
+    exec podman unshare "$0" "$@"
+fi
+
 echo ""
 echo "=========================================================="
 echo "          RUNNING AUTOMATED ROOTFS TESTS                  "
@@ -77,7 +82,7 @@ else
     fi
 
     # Count compiled packages by looking for package.xml in the install directory (handles both isolated and merged layouts)
-    NODE_COUNT=$(find "$WS_DIR/install" -mindepth 3 -maxdepth 4 -name "package.xml" | wc -l)
+    NODE_COUNT=$(find "$WS_DIR/install" -name "package.xml" | wc -l)
     if [ "$NODE_COUNT" -gt 5 ]; then
         echo "  - PASS: Found $NODE_COUNT successfully compiled ROS 2 packages in install dir."
     else

@@ -67,6 +67,7 @@ mmdebstrap:
     # Create user and configure environment
     - chroot "$1" useradd --create-home --shell /bin/bash ubuntu
     - chroot "$1" passwd -d ubuntu
+    - chroot "$1" chmod 755 /home/ubuntu
     - chroot "$1" rosdep init || true
     - |
       chroot "$1" runuser -u ubuntu -- bash -c '
