@@ -100,10 +100,13 @@ if [ ! -d "$SERVICE_DIR" ]; then
 fi
 
 # Check global execution wrapper
-if [ -f "$ROOTFS/usr/local/bin/magni-ros2-run.sh" ]; then
-    echo "  - PASS: /usr/local/bin/magni-ros2-run.sh wrapper script found."
+if [ -x "$ROOTFS/usr/local/bin/magni-ros2-run.sh" ]; then
+    echo "  - PASS: /usr/local/bin/magni-ros2-run.sh wrapper script found and is executable."
+elif [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+    echo "  - INFO: Skipping magni-ros2-run.sh check on base-image."
 else
-    echo "  - WARNING: /usr/local/bin/magni-ros2-run.sh wrapper script not found."
+    echo "  - ERROR: /usr/local/bin/magni-ros2-run.sh wrapper script is missing or not executable!"
+    exit 1
 fi
 
 # Check the 5 decoupled Magni tier services
@@ -118,8 +121,11 @@ TIER_SERVICES=(
 for svc in "${TIER_SERVICES[@]}"; do
     if [ -f "$SERVICE_DIR/$svc" ] || [ -f "$SERVICE_DIR/multi-user.target.wants/$svc" ]; then
         echo "  - PASS: Found service unit: $svc"
+    elif [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+        echo "  - INFO: Skipping $svc check on base-image."
     else
-        echo "  - WARNING: Service $svc is not installed in /etc/systemd/system."
+        echo "  - ERROR: Service $svc is missing from /etc/systemd/system!"
+        exit 1
     fi
 done
 

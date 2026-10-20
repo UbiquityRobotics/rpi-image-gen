@@ -53,11 +53,10 @@ mmdebstrap:
     # Workspace setup - create as ubuntu user from the start
     - chroot "$1" sudo -u ubuntu mkdir -p /home/ubuntu/ros2_ws/src
     - chroot "$1" sudo -u ubuntu git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
-    - chroot "$1" sudo -u ubuntu git clone -b jazzy-devel https://github.com/UbiquityRobotics/fiducials /home/ubuntu/ros2_ws/src/fiducials
-    # Clone libcamera repo as ubuntu user into ros2 workspace
-    - chroot "$1" sudo -u ubuntu git clone --recursive https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
-    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera "
-    - chroot "$1" sudo -u ubuntu git clone https://github.com/raspberrypi/libpisp /home/ubuntu/ros2_ws/src/libpisp
+    - chroot "$1" sudo -u ubuntu sed -i 's/-Werror/-Wno-deprecated-declarations/g' /home/ubuntu/ros2_ws/src/camera_ros/CMakeLists.txt
+    # Clone pinned libcamera and libpisp repos as ubuntu user into ros2 workspace
+    - chroot "$1" sudo -u ubuntu git clone --recursive -b v0.7.2+rpt20261009 https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
+    - chroot "$1" sudo -u ubuntu git clone -b v1.7.0 https://github.com/raspberrypi/libpisp.git /home/ubuntu/ros2_ws/src/libpisp
 
     # Build and install libcamera from source
     - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && meson setup build --buildtype=release -Dpipelines=rpi/vc4,rpi/pisp -Dipas=rpi/vc4,rpi/pisp -Dv4l2=true -Dgstreamer=enabled -Dtest=false -Dlc-compliance=disabled -Dcam=disabled -Dqcam=disabled -Ddocumentation=disabled -Dpycamera=enabled"

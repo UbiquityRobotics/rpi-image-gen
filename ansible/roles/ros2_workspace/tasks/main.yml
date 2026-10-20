@@ -49,12 +49,15 @@
     mode: preserve
   ignore_errors: true
   loop:
-    - camera_ros
-    - ldlidar_stl_ros2
     - magni_bringup
-    - oled_display_node
-    - ros2_pigpio
-    - ROS2Pi_sonar
+
+- name: Disable -Werror in camera_ros CMakeLists.txt for libcamera::Span deprecation compatibility
+  become_user: "{{ target_user }}"
+  ansible.builtin.replace:
+    path: "{{ ros2_ws }}/src/camera_ros/CMakeLists.txt"
+    regexp: '-Werror\b'
+    replace: '-Wno-deprecated-declarations'
+  ignore_errors: true
 
 - name: Remove 1.5708 rotation offset from map_manipulator.js
   become_user: "{{ target_user }}"

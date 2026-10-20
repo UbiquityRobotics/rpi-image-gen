@@ -113,6 +113,21 @@ jobs:
           sudo modprobe loop || true
           sudo chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
 
+      - name: Pre-Flight Token & Configuration Validation
+        run: |
+          if [ -z "${GITHUB_TOKEN:-}" ]; then
+            echo "::error::GITHUB_TOKEN is empty! Private UbiquityRobotics repositories cannot be cloned."
+            exit 1
+          fi
+          echo "[INFO] Verifying GITHUB_TOKEN access to private UbiquityRobotics repositories..."
+          if ! GIT_TERMINAL_PROMPT=0 git ls-remote "https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/robot_bringup.git" HEAD >/dev/null 2>&1; then
+            echo "::error::GITHUB_TOKEN failed authentication against UbiquityRobotics/robot_bringup.git! Please check or rotate UBIQUITY_BOT_GITHUB_TOKEN."
+            exit 1
+          fi
+          echo "[PASS] GITHUB_TOKEN verified successfully."
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
       - name: Synthesize RootFS and Provision ROS 2 Stack (Ansible & Colcon)
         run: |
           export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"

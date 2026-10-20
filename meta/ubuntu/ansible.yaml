@@ -27,8 +27,7 @@ mmdebstrap:
       fi
 
       # Execute playbook using local connection inside chroot
-      # Do NOT use set -e here: partial Ansible failures (e.g. a single repo failing)
-      # should not prevent the remaining roles (systemd_services) from executing.
+      # Capture exit code so credentials and temp directories are always cleaned up before exiting
       chroot "$1" bash -c 'cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
       ANSIBLE_RC=$?
 
@@ -41,7 +40,8 @@ mmdebstrap:
       rm -rf "$1/opt/ros2_ws"
 
       if [ $ANSIBLE_RC -ne 0 ]; then
-        echo "WARNING: Ansible Provisioning completed with errors (exit code: $ANSIBLE_RC)"
+        echo "ERROR: Ansible Provisioning failed (exit code: $ANSIBLE_RC)"
+        exit $ANSIBLE_RC
       else
         echo "Ansible Provisioning Complete!"
       fi
