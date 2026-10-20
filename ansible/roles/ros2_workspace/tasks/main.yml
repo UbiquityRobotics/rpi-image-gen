@@ -59,6 +59,14 @@
     replace: '-Wno-deprecated-declarations'
   ignore_errors: true
 
+- name: Patch camera_ros ParameterHandler.cpp for libcamera dynamic_extent compatibility
+  become_user: "{{ target_user }}"
+  ansible.builtin.replace:
+    path: "{{ ros2_ws }}/src/camera_ros/src/ParameterHandler.cpp"
+    regexp: 'libcamera::dynamic_extent'
+    replace: 'std::dynamic_extent'
+  ignore_errors: true
+
 - name: Remove 1.5708 rotation offset from map_manipulator.js
   become_user: "{{ target_user }}"
   ansible.builtin.replace:
