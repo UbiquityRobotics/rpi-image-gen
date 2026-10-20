@@ -91,6 +91,8 @@ jobs:
     steps:
       - name: Checkout rpi-image-gen
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Worker Environment & Compatibility Setup
         run: |
@@ -120,7 +122,7 @@ jobs:
             exit 1
           fi
           echo "[INFO] Verifying GITHUB_TOKEN access to private UbiquityRobotics repositories..."
-          if ! GIT_TERMINAL_PROMPT=0 git ls-remote "https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/robot_bringup.git" HEAD >/dev/null 2>&1; then
+          if ! (cd /tmp && GIT_TERMINAL_PROMPT=0 git -c http.https://github.com/.extraheader= ls-remote "https://${GITHUB_TOKEN}@github.com/UbiquityRobotics/robot_bringup.git" HEAD >/dev/null 2>&1); then
             echo "::error::GITHUB_TOKEN failed authentication against UbiquityRobotics/robot_bringup.git! Please check or rotate UBIQUITY_BOT_GITHUB_TOKEN."
             exit 1
           fi
