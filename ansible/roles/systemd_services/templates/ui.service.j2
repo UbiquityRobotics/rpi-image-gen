@@ -1,5 +1,5 @@
 [Unit]
-Description=Magni UI Web Application
+Description=Magni EZ-Map Application & Foxglove Bridge
 After=magni-navigation.service
 Requires=magni-navigation.service
 
@@ -9,9 +9,9 @@ User={{ target_user }}
 Group={{ target_user }}
 WorkingDirectory={{ ros2_ws }}
 Environment=HOME={{ target_user_home }}
-ExecStart=/usr/local/bin/magni-ros2-run.sh robot_bringup ui_application.launch.py
+ExecStart=/usr/local/bin/magni-ros2-run.sh ezmap_backend ezmap.launch.py
 Restart=on-failure
-RestartSec=2
+RestartSec=3
 TimeoutStopSec=10
 
 [Install]

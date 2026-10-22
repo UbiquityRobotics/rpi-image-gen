@@ -59,3 +59,4 @@
     - magni-navigation.service
     - magni-diagnostics.service
     - magni-ui.service
+    - nginx
