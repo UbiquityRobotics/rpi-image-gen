@@ -37,6 +37,7 @@
     - { name: 'ubiquity_route_manager', version: 'master' }
     - { name: 'ubiquity_route_msgs', version: 'master' }
     - { name: 'ezpkg_grid_driving_ros2', version: 'jazzy-devel' }
+    - { name: 'ezmap_core', version: 'jazzy-devel' }
     - { name: 'ezmap', version: 'feature-2026-foxglove_bridge_refactor', recursive: true }
 
 - name: Copy older out-of-tree repositories to the workspace
@@ -146,6 +147,7 @@
   loop:
     - libcamera
     - libpisp
+    - ezmap_core/ezmap_autoloader_web
 
 - name: Compile ROS 2 workspace with colcon
   become_user: "{{ target_user }}"
