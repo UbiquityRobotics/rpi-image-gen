@@ -1,4 +1,13 @@
 ---
+- name: Add NodeSource Node.js 22.x LTS repository (Ubuntu Noble apt only ships Node 18; Vite 8 / Svelte 5 need >= 20)
+  ansible.builtin.shell: |
+    set -e
+    apt-get update
+    apt-get install -y ca-certificates curl gnupg
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.sources
+
 - name: Install system package dependencies
   ansible.builtin.apt:
     name:
@@ -16,9 +25,9 @@
       - build-essential
       - python3-pip
       - python3-setuptools
-      - nodejs
-      - npm
+      - nodejs  # from NodeSource 22.x (bundles npm; do not add Ubuntu's npm package)
       - nginx
+      - sysstat
       - python3-yaml
       - python3-colcon-common-extensions
       - python3-vcstool

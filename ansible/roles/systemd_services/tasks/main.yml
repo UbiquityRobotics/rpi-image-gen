@@ -60,3 +60,12 @@
     - magni-diagnostics.service
     - magni-ui.service
     - nginx
+
+- name: Allow non-interactive reboot/poweroff for EZ-Map services worker
+  ansible.builtin.copy:
+    content: "{{ target_user }} ALL=(ALL) NOPASSWD: /usr/bin/systemctl reboot, /usr/bin/systemctl poweroff\n"
+    dest: /etc/sudoers.d/99-ezmap-systemctl
+    owner: root
+    group: root
+    mode: '0440'
+    validate: /usr/sbin/visudo -cf %s
