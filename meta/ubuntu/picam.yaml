@@ -50,15 +50,15 @@ mmdebstrap:
       chroot "$1" udevadm control --reload-rules
       chroot "$1" udevadm trigger
 
-    # Workspace setup - create as ubuntu user from the start
-    - chroot "$1" sudo -u ubuntu mkdir -p /home/ubuntu/ros2_ws/src
-    - chroot "$1" sudo -u ubuntu git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
-    - chroot "$1" sudo -u ubuntu git -C /home/ubuntu/ros2_ws/src/camera_ros checkout 73bc59749f453cd2ddc5dc25f49a1dedf4415f13
-    - chroot "$1" sudo -u ubuntu sed -i 's/-Werror/-Wno-deprecated-declarations/g' /home/ubuntu/ros2_ws/src/camera_ros/CMakeLists.txt
-    - chroot "$1" sudo -u ubuntu sed -i 's/libcamera::dynamic_extent/std::dynamic_extent/g' /home/ubuntu/ros2_ws/src/camera_ros/src/ParameterHandler.cpp
+    # Workspace setup - create as ubuntu user from the start via uchroot
+    - bin/uchroot "$1" mkdir -p /home/ubuntu/ros2_ws/src
+    - bin/uchroot "$1" git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
+    - bin/uchroot "$1" git -C /home/ubuntu/ros2_ws/src/camera_ros checkout 73bc59749f453cd2ddc5dc25f49a1dedf4415f13
+    - bin/uchroot "$1" sed -i 's/-Werror/-Wno-deprecated-declarations/g' /home/ubuntu/ros2_ws/src/camera_ros/CMakeLists.txt
+    - bin/uchroot "$1" sed -i 's/libcamera::dynamic_extent/std::dynamic_extent/g' /home/ubuntu/ros2_ws/src/camera_ros/src/ParameterHandler.cpp
     # Clone pinned libcamera and libpisp repos as ubuntu user into ros2 workspace
-    - chroot "$1" sudo -u ubuntu git clone --recursive -b v0.7.2+rpt20260817 https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
-    - chroot "$1" sudo -u ubuntu git clone -b v1.7.0 https://github.com/raspberrypi/libpisp.git /home/ubuntu/ros2_ws/src/libpisp
+    - bin/uchroot "$1" git clone --recursive -b v0.7.2+rpt20260817 https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
+    - bin/uchroot "$1" git clone -b v1.7.0 https://github.com/raspberrypi/libpisp.git /home/ubuntu/ros2_ws/src/libpisp
 
     # Build and install libcamera from source
     - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && meson setup build --buildtype=release -Dpipelines=rpi/vc4,rpi/pisp -Dipas=rpi/vc4,rpi/pisp -Dv4l2=true -Dgstreamer=enabled -Dtest=false -Dlc-compliance=disabled -Dcam=disabled -Dqcam=disabled -Ddocumentation=disabled -Dpycamera=enabled"

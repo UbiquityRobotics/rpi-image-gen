@@ -1,0 +1,16 @@
+#!/bin/bash
+# Safely unmount persistent host APT archive cache before genimage packaging.
+# Backported from official raspberrypi/rpi-image-gen (cleanup50-apt-cache hook).
+set -eu
+
+ROOTFS="$1"
+
+# Clean package metadata indexes and locks
+rm -f "$ROOTFS"/var/cache/apt/*.bin 2>/dev/null || true
+rm -f "$ROOTFS"/var/lib/apt/lists/lock "$ROOTFS"/var/cache/apt/archives/lock 2>/dev/null || true
+
+# Unmount the persistent host cache so .deb files do not inflate the final SD card image
+if mountpoint -q "$ROOTFS/var/cache/apt/archives" 2>/dev/null; then
+    umount "$ROOTFS/var/cache/apt/archives" || umount -l "$ROOTFS/var/cache/apt/archives" || true
+    echo "[INFO] Persistent host APT cache cleanly unmounted from rootfs."
+fi
