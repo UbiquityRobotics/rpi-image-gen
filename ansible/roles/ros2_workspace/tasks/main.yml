@@ -76,23 +76,18 @@
     group: www-data
     mode: '0755'
 
-- name: Build EZ-Map Svelte 5 frontend web application
-  become_user: "{{ target_user }}"
-  ansible.builtin.command:
-    cmd: "{{ item }}"
-    chdir: "{{ ros2_ws }}/src/ezmap/web"
-  loop:
-    - npm ci
-    - npm run build
-
-- name: Deploy EZ-Map web frontend artifacts to /var/www/ezmap
-  ansible.builtin.copy:
-    src: "{{ ros2_ws }}/src/ezmap/web/dist/"
+- name: Extract prebuilt EZ-Map Svelte 5 web frontend bundle to /var/www/ezmap
+  ansible.builtin.unarchive:
+    src: ezmap-web-dist.tar.gz
     dest: /var/www/ezmap/
-    remote_src: true
     owner: www-data
     group: www-data
-    mode: '0644'
+
+- name: Set standard directory and file permissions for /var/www/ezmap
+  ansible.builtin.shell: |
+    find /var/www/ezmap -type d -exec chmod 755 {} +
+    find /var/www/ezmap -type f -exec chmod 644 {} +
+  changed_when: false
 
 - name: Deploy EZ-Map Nginx site configuration
   ansible.builtin.copy:
