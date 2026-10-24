@@ -10,3 +10,4 @@ SKIP_IMAGES
 .agents/
 ORIGINAL_REQUEST.md
 ansible_refactor_audit_report.md
+.maestro.md

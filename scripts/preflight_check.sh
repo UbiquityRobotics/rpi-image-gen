@@ -16,7 +16,7 @@ echo "          RUNNING FAST PRE-FLIGHT VALIDATION GATES        "
 echo "=========================================================="
 
 # 1. Check required tools
-echo "[Check 1/5] Checking required host binaries..."
+echo "[Check 1/6] Checking required host binaries..."
 REQUIRED_TOOLS=("python3" "git" "ansible-playbook")
 for tool in "${REQUIRED_TOOLS[@]}"; do
     if ! command -v "$tool" >/dev/null 2>&1; then
@@ -27,7 +27,7 @@ for tool in "${REQUIRED_TOOLS[@]}"; do
 done
 
 # 2. Syntax-check Ansible Playbooks and Roles
-echo "[Check 2/5] Validating Ansible syntax across all roles..."
+echo "[Check 2/6] Validating Ansible syntax across all roles..."
 if ! bash "${REPO_ROOT}/ansible/validate.sh"; then
     echo "  - ERROR: Ansible playbook validation failed!" >&2
     exit 1
@@ -35,7 +35,7 @@ fi
 echo "  - PASS: Ansible playbooks and roles syntax verified."
 
 # 3. Validate YAML syntax in meta/ and config/
-echo "[Check 3/5] Validating YAML configuration files..."
+echo "[Check 3/6] Validating YAML configuration files..."
 python3 - <<'EOF'
 import sys, glob, yaml
 
@@ -55,7 +55,7 @@ print(f"  - PASS: Successfully validated {len(yaml_files)} YAML configuration fi
 EOF
 
 # 4. Check Git Authentication & Repository Branch Reachability
-echo "[Check 4/5] Checking workspace repository branches on GitHub..."
+echo "[Check 4/6] Checking workspace repository branches on GitHub..."
 python3 - <<'EOF'
 import sys, os, yaml, subprocess
 
@@ -99,7 +99,7 @@ if failures > 0:
 EOF
 
 # 5. Check executable permissions on bin/ and scripts/
-echo "[Check 5/5] Checking script execution permissions..."
+echo "[Check 5/6] Checking script execution permissions..."
 SCRIPTS_TO_CHECK=(
     "bin/uchroot"
     "bin/runner"
@@ -115,6 +115,20 @@ for s in "${SCRIPTS_TO_CHECK[@]}"; do
     fi
     echo "  - PASS: $s is executable"
 done
+
+# 6. Check prebuilt assets integrity
+echo "[Check 6/6] Checking prebuilt frontend web distribution bundle..."
+BUNDLE_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web-dist.tar.gz"
+if [ -f "$BUNDLE_PATH" ]; then
+    if tar -tzf "$BUNDLE_PATH" | grep -q "index.html"; then
+        echo "  - PASS: ezmap-web-dist.tar.gz is a valid tarball containing index.html."
+    else
+        echo "  - ERROR: ezmap-web-dist.tar.gz is corrupt or does not contain index.html!" >&2
+        exit 1
+    fi
+else
+    echo "  - WARNING: ezmap-web-dist.tar.gz not found locally. It must be fetched from GitHub release during build."
+fi
 
 echo ""
 echo "=========================================================="

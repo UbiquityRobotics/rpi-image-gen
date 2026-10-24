@@ -92,7 +92,7 @@ else
 fi
 
 # 3. Verify Systemd Services & 5-Tier Execution Architecture
-echo "[Test 3/3] Verifying 5-tier launch architecture & systemd services..."
+echo "[Test 3/4] Verifying 5-tier launch architecture & systemd services..."
 SERVICE_DIR="$ROOTFS/etc/systemd/system"
 if [ ! -d "$SERVICE_DIR" ]; then
     echo "  - ERROR: systemd services directory is missing!"
@@ -128,6 +128,26 @@ for svc in "${TIER_SERVICES[@]}"; do
         exit 1
     fi
 done
+
+# 4. Verify EZ-Map Web Application & Nginx Deployment
+echo "[Test 4/4] Verifying EZ-Map web frontend and Nginx deployment..."
+if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+    echo "  - INFO: Skipping web frontend check on base-image."
+else
+    if [ -f "$ROOTFS/var/www/ezmap/index.html" ] && [ -s "$ROOTFS/var/www/ezmap/index.html" ]; then
+        echo "  - PASS: /var/www/ezmap/index.html static web application is deployed."
+    else
+        echo "  - ERROR: /var/www/ezmap/index.html is missing or empty! Web deployment failed."
+        exit 1
+    fi
+
+    if [ -L "$ROOTFS/etc/nginx/sites-enabled/ezmap" ]; then
+        echo "  - PASS: Nginx ezmap site configuration is enabled."
+    else
+        echo "  - ERROR: Nginx ezmap site symlink missing in /etc/nginx/sites-enabled!"
+        exit 1
+    fi
+fi
 
 echo "=========================================================="
 echo "          ALL AUTOMATED TESTS PASSED SUCCESSFULLY!        "

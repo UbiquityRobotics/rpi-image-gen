@@ -125,6 +125,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
+      - name: Fetch Prebuilt EZ-Map Web Application Release Bundle
+        run: |
+          mkdir -p ansible/roles/ros2_workspace/files
+          echo "[INFO] Attempting to fetch latest ezmap-web-dist.tar.gz from UbiquityRobotics/ezmap releases..."
+          if gh release download -R UbiquityRobotics/ezmap -p "ezmap-web-dist.tar.gz" -D ansible/roles/ros2_workspace/files/ --clobber 2>/dev/null; then
+            echo "[PASS] Downloaded latest ezmap-web-dist.tar.gz from GitHub Releases."
+          elif [ -f "ansible/roles/ros2_workspace/files/ezmap-web-dist.tar.gz" ]; then
+            echo "[INFO] Using repository bundled ezmap-web-dist.tar.gz fallback."
+          else
+            echo "::error::No ezmap-web-dist.tar.gz found in releases or repo!"
+            exit 1
+          fi
+          ls -lh ansible/roles/ros2_workspace/files/ezmap-web-dist.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
       - name: Synthesize RootFS and Provision ROS 2 Stack (Ansible & Colcon)
         run: |
           export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
