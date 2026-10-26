@@ -92,7 +92,7 @@ else
 fi
 
 # 3. Verify Systemd Services & 5-Tier Execution Architecture
-echo "[Test 3/4] Verifying 5-tier launch architecture & systemd services..."
+echo "[Test 3/5] Verifying 5-tier launch architecture & systemd services..."
 SERVICE_DIR="$ROOTFS/etc/systemd/system"
 if [ ! -d "$SERVICE_DIR" ]; then
     echo "  - ERROR: systemd services directory is missing!"
@@ -130,7 +130,7 @@ for svc in "${TIER_SERVICES[@]}"; do
 done
 
 # 4. Verify EZ-Map Web Application & Nginx Deployment
-echo "[Test 4/4] Verifying EZ-Map web frontend and Nginx deployment..."
+echo "[Test 4/5] Verifying EZ-Map web frontend and Nginx deployment..."
 if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
     echo "  - INFO: Skipping web frontend check on base-image."
 else
@@ -145,6 +145,19 @@ else
         echo "  - PASS: Nginx ezmap site configuration is enabled."
     else
         echo "  - ERROR: Nginx ezmap site symlink missing in /etc/nginx/sites-enabled!"
+        exit 1
+    fi
+fi
+
+# 5. Verify Image Provenance Metadata
+echo "[Test 5/5] Verifying image build provenance metadata..."
+if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+    echo "  - INFO: Skipping provenance check on base-image."
+else
+    if [ -f "$ROOTFS/etc/ubiquity-image-release" ]; then
+        echo "  - PASS: Found /etc/ubiquity-image-release."
+    else
+        echo "  - ERROR: Missing /etc/ubiquity-image-release metadata!"
         exit 1
     fi
 fi

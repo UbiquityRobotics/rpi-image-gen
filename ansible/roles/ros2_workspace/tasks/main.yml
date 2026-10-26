@@ -26,7 +26,7 @@
     force: true
   loop:
     - { name: 'robot_bringup', version: 'master' }
-    - { name: 'magni_robot', version: 'fix-tf-remappings' }
+    - { name: 'magni_robot', version: 'jazzy-devel' }
     - { name: 'ubiquity_core_utils', version: 'master' }
     - { name: 'iris_ur_lama', version: 'jazzy-devel' }
     - { name: 'iris_ur_lama_ros', version: 'jazzy-devel' }
@@ -38,7 +38,7 @@
     - { name: 'ubiquity_route_msgs', version: 'master' }
     - { name: 'ezpkg_grid_driving_ros2', version: 'jazzy-devel' }
     - { name: 'ezmap_core', version: 'jazzy-devel' }
-    - { name: 'ezmap', version: 'feature-2026-foxglove_bridge_refactor', recursive: true }
+    - { name: 'ezmap', version: 'feat/native-worker-robot-client', recursive: true }
 
 - name: Copy older out-of-tree repositories to the workspace
   become_user: "{{ target_user }}"
