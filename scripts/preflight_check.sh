@@ -117,9 +117,17 @@ for s in "${SCRIPTS_TO_CHECK[@]}"; do
 done
 
 # 6. Check prebuilt assets integrity
-echo "[Check 6/6] Checking prebuilt frontend web distribution bundle..."
+echo "[Check 6/6] Checking prebuilt frontend web distribution package (.deb)..."
+DEB_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web_all.deb"
 BUNDLE_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web-dist.tar.gz"
-if [ -f "$BUNDLE_PATH" ]; then
+if [ -f "$DEB_PATH" ]; then
+    if dpkg-deb -c "$DEB_PATH" | grep -q "index.html"; then
+        echo "  - PASS: ezmap-web_all.deb is a valid Debian package containing index.html."
+    else
+        echo "  - ERROR: ezmap-web_all.deb is corrupt or does not contain index.html!" >&2
+        exit 1
+    fi
+elif [ -f "$BUNDLE_PATH" ]; then
     if tar -tzf "$BUNDLE_PATH" | grep -q "index.html"; then
         echo "  - PASS: ezmap-web-dist.tar.gz is a valid tarball containing index.html."
     else
@@ -127,7 +135,7 @@ if [ -f "$BUNDLE_PATH" ]; then
         exit 1
     fi
 else
-    echo "  - WARNING: ezmap-web-dist.tar.gz not found locally. It must be fetched from GitHub release during build."
+    echo "  - WARNING: Neither ezmap-web_all.deb nor ezmap-web-dist.tar.gz found locally. It must be fetched from GitHub release during build."
 fi
 
 echo ""
