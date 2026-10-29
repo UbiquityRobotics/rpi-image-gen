@@ -20,8 +20,14 @@ echo "[Check 1/6] Checking required host binaries..."
 REQUIRED_TOOLS=("python3" "git" "ansible-playbook")
 for tool in "${REQUIRED_TOOLS[@]}"; do
     if ! command -v "$tool" >/dev/null 2>&1; then
-        echo "  - ERROR: Required tool '$tool' is not installed on host!" >&2
-        exit 1
+        if [ "$tool" = "ansible-playbook" ] && command -v apt-get >/dev/null 2>&1 && [ "$(id -u)" -eq 0 ]; then
+            echo "  - INFO: Attempting auto-installation of ansible on host..."
+            apt-get update -qq && apt-get install -y -qq ansible || true
+        fi
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            echo "  - ERROR: Required tool '$tool' is not installed on host! (Install via: sudo apt-get install -y ansible)" >&2
+            exit 1
+        fi
     fi
     echo "  - PASS: Found $tool"
 done
