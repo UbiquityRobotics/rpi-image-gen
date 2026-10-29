@@ -43,11 +43,15 @@ build {
   provisioner "shell" {
     inline = [
       "sudo apt-get update && sudo apt-get upgrade -y",
-      "sudo apt-get install -y podman bdebstrap mmdebstrap qemu-user-static zstd s3cmd git curl jq udev libarchive-tools python3-boto3 xz-utils dosfstools genimage",
+      "sudo apt-get install -y ansible podman bdebstrap mmdebstrap qemu-user-static zstd s3cmd git curl jq udev libarchive-tools python3-boto3 xz-utils dosfstools genimage mtools crudini pv btrfs-progs dctrl-tools",
       "sudo systemctl enable podman",
       # Setup User Namespaces for podman unshare
       "echo 'admin:100000:65536' | sudo tee -a /etc/subuid",
       "echo 'admin:100000:65536' | sudo tee -a /etc/subgid",
+      # Pre-bake ROS 2 keyring
+      "sudo mkdir -p /usr/share/keyrings",
+      "sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg",
+      "sudo chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg",
       # Pre-configure loopback module for image formatting
       "sudo modprobe loop"
     ]
