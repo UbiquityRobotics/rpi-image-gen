@@ -20,6 +20,9 @@ REPO_BRANCH="${REPO_BRANCH}"
 REPO_COMMIT="${REPO_COMMIT}"
 EOF
 
+# Symlink /etc/image_info.txt for backward compatibility (Issue #3)
+ln -sf ubiquity-image-info "${ROOTFS_DIR}/etc/image_info.txt"
+
 # Update /etc/issue and /etc/issue.net for console login
 ISSUE_TEXT="\nUbiquity Robotics ${IMAGE_VARIANT} [${REPO_BRANCH}@${REPO_COMMIT}] (${BUILD_DATE})\n"
 
