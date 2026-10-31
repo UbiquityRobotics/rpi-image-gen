@@ -7,7 +7,9 @@
       #!/bin/bash
       # Set up the ROS 2 environment securely
       source /opt/ros/{{ ros_distro }}/setup.bash
-      source {{ ros2_ws }}/install/setup.bash
+      if [ -f "{{ ros2_ws }}/install/setup.bash" ]; then
+        source {{ ros2_ws }}/install/setup.bash
+      fi
 
       # Global variables applied to every tier
       export RMW_IMPLEMENTATION={{ rmw_implementation }}

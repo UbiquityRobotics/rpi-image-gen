@@ -90,6 +90,11 @@
       - ros-jazzy-xacro
       - ros-jazzy-ros2-control
       - ros-jazzy-ros2-controllers
+      - ros-jazzy-camera-ros
+      - ros-jazzy-twist-mux
+      - ros-jazzy-diagnostic-aggregator
+      - ros-jazzy-diagnostic-updater
+      - ros-jazzy-angles
     state: present
     update_cache: true
 

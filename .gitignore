@@ -11,3 +11,10 @@ SKIP_IMAGES
 ORIGINAL_REQUEST.md
 ansible_refactor_audit_report.md
 .maestro.md
+
+# Prebuilt binary Debian assets fetched during build
+ansible/roles/ros2_workspace/files/debs/
+ansible/roles/ros2_workspace/files/*.deb
+ansible/roles/ros2_workspace/files/*.deb.sha256
+ansible/roles/ros2_workspace/files/*.tar.gz
+
