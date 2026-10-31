@@ -33,12 +33,22 @@
     - "{{ playbook_dir }}/roles/ros2_workspace/files/debs/*.deb"
     - "{{ playbook_dir }}/roles/ros2_workspace/files/*.deb"
 
+- name: Configure dpkg to allow overwriting shared build layout metadata
+  ansible.builtin.copy:
+    content: "force-overwrite\n"
+    dest: /etc/dpkg/dpkg.cfg.d/force-overwrite
+    mode: '0644'
+
 - name: Install all Ubiquity Core Appliance debian packages into /opt/ros underlay
-  ansible.builtin.apt:
-    deb: "{{ item }}"
-    state: present
-  with_fileglob:
-    - "/tmp/ubiquity_debs/*.deb"
+  ansible.builtin.command:
+    cmd: /bin/bash -c "apt-get update && apt-get install -y --allow-downgrades -o Dpkg::Options::=--force-overwrite /tmp/ubiquity_debs/*.deb"
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: Remove temporary dpkg force-overwrite configuration
+  ansible.builtin.file:
+    path: /etc/dpkg/dpkg.cfg.d/force-overwrite
+    state: absent
 
 - name: Clean up temporary debian staging directory
   ansible.builtin.file:
