@@ -124,13 +124,31 @@ if [ "$RESTORED" = false ]; then
 fi
 
 # 4. Fallback: Full bootstrap
+FALLBACK_BOOTSTRAP=false
 if [ "$RESTORED" = false ]; then
   echo "[WARN] No Golden Base found on NVMe or GHCR! Falling back to full bdebstrap..."
   ./build.sh -r -c "$CONFIG" -o "$OPTIONS"
   RESTORED=true
+  FALLBACK_BOOTSTRAP=true
 fi
 
 echo "[PASS] Golden Base RootFS restored in $(($(date +%s) - START_TIME)) seconds."
+
+# If we had to bootstrap from scratch, automatically cache the base rootfs to DO Spaces for future runs
+if [ "$FALLBACK_BOOTSTRAP" = true ] && [ -n "${S3_ACCESS_KEY:-}" ] && [ -n "${S3_SECRET_KEY:-}" ]; then
+  echo "[INFO] Caching synthesized base rootfs to DigitalOcean Spaces for future instant runs..."
+  CACHE_DIR="work/ros2/deploy"
+  mkdir -p "$CACHE_DIR"
+  CACHE_TARBALL="${CACHE_DIR}/magni-base-noble-jazzy.tar.zst"
+  podman unshare tar --numeric-owner -I 'zstd -T0 -1' -cf "$CACHE_TARBALL" -C "$ROOTFS" .
+  s3cmd --access_key="$S3_ACCESS_KEY" \
+        --secret_key="$S3_SECRET_KEY" \
+        --host="sfo2.digitaloceanspaces.com" \
+        --host-bucket="%(bucket)s.sfo2.digitaloceanspaces.com" \
+        --acl-public \
+        put "$CACHE_TARBALL" s3://ubiquity-pi-image/cache/ || true
+  echo "[PASS] Successfully uploaded base rootfs to Spaces CDN cache!"
+fi
 
 # ------------------------------------------------------------------------------
 # STEP 2: Layer Ubiquity Core Appliance Debian Packages
