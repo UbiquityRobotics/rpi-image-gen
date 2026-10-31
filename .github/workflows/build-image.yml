@@ -70,7 +70,7 @@ jobs:
             modprobe loop || true
             chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
             apt-get update
-            apt-get install -y ansible zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring s3cmd xz-utils python3-boto3 || true
+            apt-get install -y ansible zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring s3cmd xz-utils python3-boto3 gh || true
             mkdir -p /usr/share/keyrings
             curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
             chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
@@ -104,7 +104,15 @@ jobs:
           sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
           sudo chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
           sudo apt-get update
-          sudo apt-get install -y ansible ubuntu-archive-keyring s3cmd xz-utils python3-boto3 || true
+          sudo apt-get install -y ansible ubuntu-archive-keyring s3cmd xz-utils python3-boto3 gh || true
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "[INFO] Installing official GitHub CLI binary for arm64..."
+            curl -sSL https://github.com/cli/cli/releases/download/v2.62.0/gh_2.62.0_linux_arm64.tar.gz -o /tmp/gh.tar.gz
+            sudo tar -xzf /tmp/gh.tar.gz -C /usr/local/bin --strip-components=2 gh_2.62.0_linux_arm64/bin/gh
+            sudo chmod +x /usr/local/bin/gh
+            rm -f /tmp/gh.tar.gz
+          fi
+          gh --version
           if [ ! -s /usr/share/keyrings/ubuntu-archive-keyring.gpg ]; then
             sudo curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
             sudo chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
@@ -117,6 +125,14 @@ jobs:
 
       - name: Fetch All Ubiquity Core Appliance Debian Packages
         run: |
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "[INFO] gh not found in PATH, installing standalone binary for arm64..."
+            curl -sSL https://github.com/cli/cli/releases/download/v2.62.0/gh_2.62.0_linux_arm64.tar.gz -o /tmp/gh.tar.gz
+            sudo tar -xzf /tmp/gh.tar.gz -C /usr/local/bin --strip-components=2 gh_2.62.0_linux_arm64/bin/gh
+            sudo chmod +x /usr/local/bin/gh
+            rm -f /tmp/gh.tar.gz
+          fi
+
           DEBS_DIR="ansible/roles/ros2_workspace/files/debs"
           mkdir -p "$DEBS_DIR"
           
