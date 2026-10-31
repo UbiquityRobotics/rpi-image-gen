@@ -27,8 +27,8 @@ mmdebstrap:
       fi
 
       # Execute playbook using local connection inside chroot
-      # Capture exit code so credentials and temp directories are always cleaned up before exiting
-      chroot "$1" bash -c 'cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml'
+      # Supports optional ANSIBLE_EXTRA_VARS (e.g. -e build_tier=base) for Tier 1 base image builds
+      chroot "$1" bash -c "cd /opt/ansible-provisioning && ansible-playbook -i inventory.ini site.yml ${ANSIBLE_EXTRA_VARS:-}"
       ANSIBLE_RC=$?
 
       # Clean up credentials from the chroot

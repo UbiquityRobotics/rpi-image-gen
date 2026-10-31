@@ -15,6 +15,12 @@ on:
         description: 'Upload finished image to DigitalOcean Spaces'
         type: boolean
         default: true
+      fast_appliance_mode:
+        description: 'Use Two-Tier Fast Appliance Pipeline (~4m) instead of full bdebstrap (~45m)'
+        type: boolean
+        default: true
+  repository_dispatch:
+    types: [appliance-package-released]
   schedule:
     # Run weekly production build every Sunday at midnight UTC
     - cron: '0 0 * * 0'
@@ -189,7 +195,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: Synthesize RootFS and Provision ROS 2 Stack (Ansible Debian Appliance)
+      - name: Synthesize Appliance Disk Image (Two-Tier Fast Mode)
+        if: ${{ inputs.fast_appliance_mode != false }}
+        run: |
+          export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
+          ./scripts/synthesize_fast_appliance.sh \
+            -c "${{ inputs.config_file || 'config/ubuntu24-ros2-pi5.cfg' }}" \
+            -o "${{ inputs.options_file || 'credentials24' }}" \
+            --debs-dir ansible/roles/ros2_workspace/files/debs
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          APT_CACHE_DIR: /actions-runner/_work/apt-cache/archives
+
+      - name: Synthesize RootFS via Full Bootstrap (Monolithic Fallback Mode)
+        if: ${{ inputs.fast_appliance_mode == false }}
         run: |
           export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
           mkdir -p /actions-runner/_work/apt-cache/archives/partial
@@ -200,11 +219,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           APT_CACHE_DIR: /actions-runner/_work/apt-cache/archives
 
-      - name: Execute Automated RootFS Verification Test Suite
+      - name: Execute Automated RootFS Verification Test Suite (Monolithic Mode)
+        if: ${{ inputs.fast_appliance_mode == false }}
         run: |
           ./scripts/automated_tests.sh work/ros2/rootfs
 
-      - name: Synthesize Bootable SD Card Disk Image (genimage)
+      - name: Synthesize Bootable SD Card Disk Image (genimage) (Monolithic Mode)
+        if: ${{ inputs.fast_appliance_mode == false }}
         run: |
           export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
           ./build.sh -i \
