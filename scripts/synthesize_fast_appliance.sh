@@ -94,10 +94,16 @@ TARBALL_CANDIDATES=(
 
 for tb in "${TARBALL_CANDIDATES[@]}"; do
   if [ -n "$tb" ] && [ -f "$tb" ]; then
-    echo "[INFO] Found local base rootfs archive: $tb. Unpacking via zstd..."
-    podman unshare tar --numeric-owner -I 'zstd -T0' -xf "$tb" -C "$ROOTFS"
-    RESTORED=true
-    break
+    echo "[INFO] Found candidate base rootfs archive: $tb. Testing archive integrity..."
+    if zstd -t "$tb" >/dev/null 2>&1; then
+      echo "[PASS] Valid zstd base rootfs verified: $tb. Unpacking via zstd..."
+      podman unshare tar --numeric-owner -I 'zstd -T0' -xf "$tb" -C "$ROOTFS"
+      RESTORED=true
+      break
+    else
+      echo "[WARN] Candidate $tb is invalid or not a valid zstd archive (e.g. 404 XML response). Pruning..."
+      podman unshare rm -f "$tb" || rm -f "$tb" || true
+    fi
   fi
 done
 
