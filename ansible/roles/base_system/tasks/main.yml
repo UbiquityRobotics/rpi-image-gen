@@ -1,4 +1,10 @@
 ---
+- name: Enable force-unsafe-io in dpkg for maximum unpack and disk write throughput
+  ansible.builtin.copy:
+    content: "force-unsafe-io\n"
+    dest: /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+    mode: '0644'
+
 - name: Install system package dependencies
   ansible.builtin.apt:
     name:
@@ -42,10 +48,6 @@
       - nginx
       - sysstat
       - python3-colcon-common-extensions
-      - python3-vcstool
-      - ros-dev-tools
-      - python3-ply
-      - gh
       # Camera ROS dependencies
       - libjpeg-dev
       - libavcodec-dev
@@ -62,12 +64,7 @@
       - libgstreamer1.0-dev
       - libgstreamer-plugins-base1.0-dev
       - libglib2.0-dev
-      - python3-colcon-meson
-      - meson
-      - ninja-build
-      # ROS 2 Jazzy packages
-      - ros-jazzy-ros-base
-      - ros-jazzy-desktop
+      # ROS 2 Jazzy peripheral packages
       - ros-jazzy-rmw-zenoh-cpp
       - ros-jazzy-foxglove-bridge
       - ros-jazzy-ament-cmake
@@ -96,7 +93,12 @@
       - ros-jazzy-diagnostic-updater
       - ros-jazzy-angles
     state: present
-    update_cache: true
+    update_cache: false
+
+- name: Remove temporary dpkg force-unsafe-io configuration
+  ansible.builtin.file:
+    path: /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+    state: absent
 
 - name: Configure limits.conf for real-time priority of target user
   ansible.builtin.lineinfile:
