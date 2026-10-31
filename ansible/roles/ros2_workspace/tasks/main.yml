@@ -25,7 +25,7 @@
     accept_hostkey: true
     force: true
   loop:
-    - { name: 'robot_bringup', version: 'master' }
+    - { name: 'robot_bringup', version: 'jazzy-devel' }
     - { name: 'magni_robot', version: 'jazzy-devel' }
     - { name: 'ubiquity_core_utils', version: 'master' }
     - { name: 'iris_ur_lama', version: 'jazzy-devel' }
