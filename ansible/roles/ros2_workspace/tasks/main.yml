@@ -23,6 +23,7 @@
     path: /tmp/ubiquity_debs
     state: directory
     mode: '0755'
+  when: build_tier | default('appliance') != 'base'
 
 - name: Copy fetched Ubiquity Core debian packages into staging directory
   ansible.builtin.copy:
@@ -32,34 +33,40 @@
   with_fileglob:
     - "{{ playbook_dir }}/roles/ros2_workspace/files/debs/*.deb"
     - "{{ playbook_dir }}/roles/ros2_workspace/files/*.deb"
+  when: build_tier | default('appliance') != 'base'
 
 - name: Configure dpkg to allow overwriting shared build layout metadata
   ansible.builtin.copy:
     content: "force-overwrite\n"
     dest: /etc/dpkg/dpkg.cfg.d/force-overwrite
     mode: '0644'
+  when: build_tier | default('appliance') != 'base'
 
 - name: Install all Ubiquity Core Appliance debian packages into /opt/ros underlay
   ansible.builtin.command:
     cmd: /bin/bash -c "apt-get update && apt-get install -y --allow-downgrades -o Dpkg::Options::=--force-overwrite /tmp/ubiquity_debs/*.deb"
   environment:
     DEBIAN_FRONTEND: noninteractive
+  when: build_tier | default('appliance') != 'base'
 
 - name: Remove temporary dpkg force-overwrite configuration
   ansible.builtin.file:
     path: /etc/dpkg/dpkg.cfg.d/force-overwrite
     state: absent
+  when: build_tier | default('appliance') != 'base'
 
 - name: Clean up temporary debian staging directory
   ansible.builtin.file:
     path: /tmp/ubiquity_debs
     state: absent
+  when: build_tier | default('appliance') != 'base'
 
 - name: Ensure robot_bringup config directory exists in /opt/ros underlay
   ansible.builtin.file:
     path: "/opt/ros/{{ ros_distro }}/share/robot_bringup/config"
     state: directory
     mode: '0755'
+  when: build_tier | default('appliance') != 'base'
 
 - name: Symlink IMX219 camera calibration to robot_bringup underlay config
   ansible.builtin.file:
@@ -68,6 +75,7 @@
     state: link
     force: true
   ignore_errors: true
+  when: build_tier | default('appliance') != 'base'
 
 - name: Configure target user bashrc for ROS 2 underlay and optional overlay workspace
   become_user: "{{ target_user }}"

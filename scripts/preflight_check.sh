@@ -105,6 +105,8 @@ SCRIPTS_TO_CHECK=(
     "bin/runner"
     "build.sh"
     "scripts/automated_tests.sh"
+    "scripts/build_golden_base.sh"
+    "scripts/synthesize_fast_appliance.sh"
     "scripts/bdebstrap/setup01-apt-cache"
     "scripts/bdebstrap/cleanup99-apt-cache"
 )

@@ -68,7 +68,11 @@ build {
       "printf '[engine]\\ncgroup_manager = \"cgroupfs\"\\nevents_logger = \"file\"\\n' | sudo tee /etc/containers/containers.conf",
       # Pre-configure loopback module for image formatting
       "sudo modprobe loop",
-      "echo 'loop' | sudo tee -a /etc/modules"
+      "echo 'loop' | sudo tee -a /etc/modules",
+      # Pre-stage directory for Tier 1 Golden Base RootFS NVMe cache
+      "sudo mkdir -p /opt/ubiquity/base-rootfs",
+      "sudo chown -R admin:admin /opt/ubiquity",
+      "curl -sSL https://ubiquity-pi-image.sfo2.digitaloceanspaces.com/cache/magni-base-noble-jazzy.tar.zst -o /opt/ubiquity/base-rootfs/magni-base-noble-jazzy.tar.zst || true"
     ]
   }
 }

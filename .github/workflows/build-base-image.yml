@@ -1,0 +1,188 @@
+name: Build Tier 1 Golden Base RootFS
+
+on:
+  workflow_dispatch:
+    inputs:
+      config_file:
+        description: 'Image configuration profile'
+        required: true
+        default: 'config/ubuntu24-ros2-pi5.cfg'
+      options_file:
+        description: 'Image credentials/options file'
+        required: true
+        default: 'credentials24'
+      push_ghcr:
+        description: 'Push OCI Container to GitHub Container Registry'
+        type: boolean
+        default: true
+      upload_spaces:
+        description: 'Upload finished rootfs tarball to DigitalOcean Spaces cache'
+        type: boolean
+        default: true
+  schedule:
+    # Run weekly base image build every Sunday at 02:00 UTC
+    - cron: '0 2 * * 0'
+
+permissions:
+  id-token: write   # Required for AWS OIDC authentication
+  contents: read    # Required to checkout code
+  packages: write   # Required to push to GitHub Container Registry (ghcr.io)
+
+jobs:
+  launch-runner:
+    name: Provision Ephemeral AWS Graviton Runner
+    runs-on: ubuntu-latest
+    outputs:
+      label: ${{ steps.start-ec2.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2.outputs.ec2-instance-id }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
+
+      - name: Start Ephemeral AWS ARM64 Worker
+        id: start-ec2
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          ec2-image-id: ${{ secrets.PACKER_GOLDEN_AMI_ID || 'ami-02e43b20eda5028b3' }}
+          ec2-instance-type: t4g.xlarge
+          subnet-id: ${{ secrets.AWS_SUBNET_ID }}
+          security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
+          run-runner-as-user: admin
+          pre-runner-script: |
+            echo "admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/99-admin
+            chmod 0440 /etc/sudoers.d/99-admin
+            usermod -aG disk admin || true
+            echo "admin:100000:65536" > /etc/subuid
+            echo "admin:100000:65536" > /etc/subgid
+            mkdir -p /etc/containers
+            cat << 'CPCEOF' > /etc/containers/containers.conf
+            [engine]
+            cgroup_manager = "cgroupfs"
+            events_logger = "file"
+            CPCEOF
+            mkdir -p /home/admin
+            chown -R admin:admin /home/admin
+            mkdir -p /actions-runner
+            chown -R admin:admin /actions-runner
+            chmod 755 /actions-runner
+            modprobe loop || true
+            chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
+            apt-get update
+            apt-get install -y ansible zip dosfstools rsync genimage mtools crudini pv python-is-python3 btrfs-progs dctrl-tools ubuntu-archive-keyring s3cmd xz-utils python3-boto3 gh zstd || true
+            mkdir -p /usr/share/keyrings
+            curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+            chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
+            if [ ! -s /usr/share/keyrings/ubuntu-archive-keyring.gpg ]; then
+              curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
+              chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
+            fi
+          aws-resource-tags: >
+            [
+              {"Key": "Name", "Value": "github-actions-rpi-base-builder"},
+              {"Key": "Project", "Value": "UbiquityRobotics"}
+            ]
+
+  build-base-rootfs:
+    name: Synthesize Golden Base RootFS (Tier 1)
+    needs: launch-runner
+    runs-on: ${{ needs.launch-runner.outputs.label }}
+    steps:
+      - name: Checkout rpi-image-gen
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Worker Environment & Compatibility Setup
+        run: |
+          sudo sh -c 'echo "admin:100000:65536" > /etc/subuid'
+          sudo sh -c 'echo "admin:100000:65536" > /etc/subgid'
+          podman system migrate || true
+          podman unshare id
+          sudo mkdir -p /usr/share/keyrings
+          sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+          sudo chmod 644 /usr/share/keyrings/ros-archive-keyring.gpg
+          sudo apt-get update
+          sudo apt-get install -y ansible ubuntu-archive-keyring s3cmd xz-utils python3-boto3 gh zstd || true
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        if: ${{ inputs.push_ghcr != false }}
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Synthesize Tier 1 Golden Base RootFS
+        run: |
+          export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
+          mkdir -p /actions-runner/_work/apt-cache/archives/partial
+          
+          PUSH_ARG=""
+          if [ "${{ inputs.push_ghcr }}" != "false" ]; then
+            PUSH_ARG="--push-ghcr"
+          fi
+          
+          ./scripts/build_golden_base.sh \
+            -c "${{ inputs.config_file || 'config/ubuntu24-ros2-pi5.cfg' }}" \
+            -o "${{ inputs.options_file || 'credentials24' }}" \
+            $PUSH_ARG
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          APT_CACHE_DIR: /actions-runner/_work/apt-cache/archives
+
+      - name: Upload Base RootFS Tarball to DigitalOcean Spaces Cache
+        if: ${{ inputs.upload_spaces != false }}
+        run: |
+          TARBALL="work/ros2/deploy/magni-base-noble-jazzy.tar.zst"
+          if [ -f "$TARBALL" ]; then
+            echo "[INFO] Uploading Golden Base RootFS tarball to DigitalOcean Spaces..."
+            s3cmd --access_key="${{ secrets.SPACES_ACCESS_KEY }}" \
+                  --secret_key="${{ secrets.SPACES_SECRET_KEY }}" \
+                  --host="sfo2.digitaloceanspaces.com" \
+                  --host-bucket="%(bucket)s.sfo2.digitaloceanspaces.com" \
+                  --acl-public \
+                  put "$TARBALL" "${TARBALL}.sha256" s3://ubiquity-pi-image/cache/
+          fi
+
+      - name: Publish Step Summary with Golden Base Artifacts
+        if: always()
+        run: |
+          TARBALL="work/ros2/deploy/magni-base-noble-jazzy.tar.zst"
+          if [ -f "$TARBALL" ]; then
+            FILESIZE=$(du -h "$TARBALL" | cut -f1)
+            SHA256=$(cat "${TARBALL}.sha256")
+            
+            echo "## 🏆 Tier 1 Golden Base RootFS Build Report" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+            echo "| **OCI Image Tag** | \`ghcr.io/ubiquityrobotics/magni-base-rootfs:noble-jazzy\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Tarball File** | \`magni-base-noble-jazzy.tar.zst\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Tarball Size** | \`$FILESIZE\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| **SHA256** | \`$SHA256\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Cache Download URL** | [Download from Spaces Cache](https://ubiquity-pi-image.sfo2.digitaloceanspaces.com/cache/magni-base-noble-jazzy.tar.zst) |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  terminate-runner:
+    name: Terminate Ephemeral AWS Graviton Runner
+    needs: [launch-runner, build-base-rootfs]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-2' }}
+
+      - name: Terminate Ephemeral EC2 Instance
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          label: ${{ needs.launch-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.launch-runner.outputs.ec2-instance-id }}
