@@ -14,11 +14,33 @@
       - parted
       - plocate
       - build-essential
+      - clang
+      - lld
+      - clang-format
+      - clang-tidy
+      - cmake
+      - ninja-build
+      - ccache
+      - gdb
+      - lldb
+      - libeigen3-dev
+      - nlohmann-json3-dev
+      - libboost-all-dev
       - python3-pip
       - python3-setuptools
+      - python3-wheel
+      - python3-serial
+      - python3-yaml
+      - python3-cairosvg
+      - python3-joblib
+      - python3-networkx
+      - python3-shapely
+      - python3-skimage
+      - python3-numpy
+      - python3-scipy
+      - python3-pytest
       - nginx
       - sysstat
-      - python3-yaml
       - python3-colcon-common-extensions
       - python3-vcstool
       - ros-dev-tools
