@@ -1,0 +1,16 @@
+#!/bin/bash
+# Bind-mount persistent host APT package archive cache into chroot.
+# Backported from official raspberrypi/rpi-image-gen (v2.7+ dlcache mechanism).
+# This prevents downloading hundreds of megabytes of .deb packages on every build.
+set -eu
+
+ROOTFS="$1"
+CACHE_DIR="${APT_CACHE_DIR:-${IGconf_sys_workdir:-work/ros2}/cache/apt/archives}"
+
+mkdir -p "$CACHE_DIR/partial"
+mkdir -p "$ROOTFS/var/cache/apt/archives/partial"
+
+if ! mountpoint -q "$ROOTFS/var/cache/apt/archives" 2>/dev/null; then
+    mount --bind "$CACHE_DIR" "$ROOTFS/var/cache/apt/archives"
+    echo "[INFO] Persistent host APT cache bind-mounted: $CACHE_DIR -> $ROOTFS/var/cache/apt/archives"
+fi

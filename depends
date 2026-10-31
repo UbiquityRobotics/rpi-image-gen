@@ -21,3 +21,4 @@ dctrl-tools
 uuidgen:uuid-runtime
 fdisk
 jq
+ansible-playbook:ansible

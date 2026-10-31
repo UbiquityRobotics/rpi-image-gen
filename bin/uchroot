@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# Safe userspec chroot wrapper as a local user with shell command execution.
+# Backported from official raspberrypi/rpi-image-gen (commit cfface5).
+# The user defaults to IGconf_device_user1 (or ubuntu), or is chosen with -u.
+# UID/GID are read from the chroot's own /etc/passwd and passed to chroot
+# --userspec as numeric +UID:+GID to eliminate NSS name lookup and PAM hostname
+# resolution warnings (e.g., 'sudo: unable to resolve host').
+set -u
+
+usage() {
+   >&2 echo "Usage: uchroot [-u <user>] <chroot_path> [command...]"
+}
+
+user="${IGconf_device_user1:-ubuntu}"
+while getopts u: opt; do
+   case $opt in
+      u) user="$OPTARG" ;;
+      *) usage; exit 1 ;;
+   esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -eq 0 ]; then
+   usage
+   exit 1
+fi
+
+if [ -z "$user" ]; then
+   >&2 echo "uchroot: no user given and IGconf_device_user1 not set"
+   exit 1
+fi
+
+if [ ! -d "$1" ]; then
+   >&2 echo "uchroot: dir '$1' is invalid"
+   exit 1
+fi
+
+dir="$1"
+shift
+
+if [ -r "${dir}/etc/passwd" ]; then
+   spec=$(grep "^${user}:" "${dir}/etc/passwd" 2>/dev/null || true)
+   if [ -n "$spec" ]; then
+      # home is 6th field
+      home_dir=$(echo "$spec" | cut -d: -f6)
+      if [ -d "${dir}${home_dir}" ]; then
+         # UID/GID are 3rd/4th field
+         user_uid=$(echo "$spec" | cut -d: -f3)
+         user_gid=$(echo "$spec" | cut -d: -f4)
+         userspec="+${user_uid}:+${user_gid}"
+
+         USER="$user" \
+         LOGNAME="$user" \
+         HOME="$home_dir" \
+         chroot --userspec "$userspec" "$dir" /bin/bash -c "$*"
+         exit $?
+      fi
+   fi
+fi
+
+>&2 echo "uchroot: User '$user' does not exist in ${dir}/etc/passwd"
+exit 1

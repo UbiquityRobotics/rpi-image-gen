@@ -1,4 +1,7 @@
 ---
+# ==============================================================================
+# Debian Appliance Underlay Provisioning & Clean User Workspace
+# ==============================================================================
 - name: Ensure target user home directory exists with 0755 permissions
   ansible.builtin.file:
     path: "{{ target_user_home }}"
@@ -7,7 +10,7 @@
     group: "{{ target_user }}"
     mode: '0755'
 
-- name: Ensure workspace src directory exists with correct ownership
+- name: Ensure customer ROS 2 workspace src directory exists and is clean
   ansible.builtin.file:
     path: "{{ ros2_ws }}/src"
     state: directory
@@ -15,166 +18,66 @@
     group: "{{ target_user }}"
     mode: '0755'
 
-- name: Clone git repositories
-  become_user: "{{ target_user }}"
-  ansible.builtin.git:
-    repo: "https://github.com/UbiquityRobotics/{{ item.name }}.git"
-    dest: "{{ ros2_ws }}/src/{{ item.name }}"
-    version: "{{ item.version }}"
-    recursive: "{{ item.recursive | default(false) }}"
-    accept_hostkey: true
-    force: true
-  loop:
-    - { name: 'robot_bringup', version: 'master' }
-    - { name: 'magni_robot', version: 'fix-tf-remappings' }
-    - { name: 'ubiquity_core_utils', version: 'master' }
-    - { name: 'iris_ur_lama', version: 'jazzy-devel' }
-    - { name: 'iris_ur_lama_ros', version: 'jazzy-devel' }
-    - { name: 'ubiquity_motor_ros2', version: 'jazzy-devel' }
-    - { name: 'fiducials', version: 'jazzy-devel' }
-    - { name: 'lidar_ros2', version: 'jazzy-devel' }
-    - { name: 'move_smooth', version: 'jazzy-devel' }
-    - { name: 'ubiquity_route_manager', version: 'master' }
-    - { name: 'ubiquity_route_msgs', version: 'master' }
-    - { name: 'ezpkg_grid_driving_ros2', version: 'jazzy-devel' }
-    - { name: 'ezmap_core', version: 'jazzy-devel' }
-    - { name: 'ezmap', version: 'feature-2026-foxglove_bridge_refactor', recursive: true }
-
-- name: Copy older out-of-tree repositories to the workspace
-  become_user: "{{ target_user }}"
-  ansible.builtin.copy:
-    src: "/opt/ros2_ws/src/{{ item }}/"
-    dest: "{{ ros2_ws }}/src/{{ item }}/"
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: preserve
-  ignore_errors: true
-  loop:
-    - magni_bringup
-
-- name: Disable -Werror in camera_ros CMakeLists.txt for libcamera::Span deprecation compatibility
-  become_user: "{{ target_user }}"
-  ansible.builtin.replace:
-    path: "{{ ros2_ws }}/src/camera_ros/CMakeLists.txt"
-    regexp: '-Werror\b'
-    replace: '-Wno-deprecated-declarations'
-  ignore_errors: true
-
-- name: Patch camera_ros ParameterHandler.cpp for libcamera dynamic_extent compatibility
-  become_user: "{{ target_user }}"
-  ansible.builtin.replace:
-    path: "{{ ros2_ws }}/src/camera_ros/src/ParameterHandler.cpp"
-    regexp: 'libcamera::dynamic_extent'
-    replace: 'std::dynamic_extent'
-  ignore_errors: true
-
-- name: Ensure /var/www/ezmap directory exists
+- name: Create temporary debian staging directory inside rootfs
   ansible.builtin.file:
-    path: /var/www/ezmap
+    path: /tmp/ubiquity_debs
     state: directory
-    owner: www-data
-    group: www-data
     mode: '0755'
 
-- name: Build EZ-Map Svelte 5 frontend web application
-  become_user: "{{ target_user }}"
+- name: Copy fetched Ubiquity Core debian packages into staging directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /tmp/ubiquity_debs/
+    mode: '0644'
+  with_fileglob:
+    - "{{ playbook_dir }}/roles/ros2_workspace/files/debs/*.deb"
+    - "{{ playbook_dir }}/roles/ros2_workspace/files/*.deb"
+
+- name: Configure dpkg to allow overwriting shared build layout metadata
+  ansible.builtin.copy:
+    content: "force-overwrite\n"
+    dest: /etc/dpkg/dpkg.cfg.d/force-overwrite
+    mode: '0644'
+
+- name: Install all Ubiquity Core Appliance debian packages into /opt/ros underlay
   ansible.builtin.command:
-    cmd: "{{ item }}"
-    chdir: "{{ ros2_ws }}/src/ezmap/web"
-  loop:
-    - npm ci
-    - npm run build
+    cmd: /bin/bash -c "apt-get update && apt-get install -y --allow-downgrades -o Dpkg::Options::=--force-overwrite /tmp/ubiquity_debs/*.deb"
+  environment:
+    DEBIAN_FRONTEND: noninteractive
 
-- name: Deploy EZ-Map web frontend artifacts to /var/www/ezmap
-  ansible.builtin.copy:
-    src: "{{ ros2_ws }}/src/ezmap/web/dist/"
-    dest: /var/www/ezmap/
-    remote_src: true
-    owner: www-data
-    group: www-data
-    mode: '0644'
-
-- name: Deploy EZ-Map Nginx site configuration
-  ansible.builtin.copy:
-    src: "{{ ros2_ws }}/src/ezmap/deploy/nginx/ezmap.nginx.conf"
-    dest: /etc/nginx/sites-available/ezmap
-    remote_src: true
-    mode: '0644'
-
-- name: Enable EZ-Map Nginx site
+- name: Remove temporary dpkg force-overwrite configuration
   ansible.builtin.file:
-    src: /etc/nginx/sites-available/ezmap
-    dest: /etc/nginx/sites-enabled/ezmap
-    state: link
-    force: true
-
-- name: Disable Nginx default site
-  ansible.builtin.file:
-    path: /etc/nginx/sites-enabled/default
+    path: /etc/dpkg/dpkg.cfg.d/force-overwrite
     state: absent
 
-- name: Check if rosdep has been initialized
-  ansible.builtin.stat:
-    path: /etc/ros/rosdep/sources.list.d/20-default.list
-  register: rosdep_init_stat
-
-- name: Initialize rosdep
-  ansible.builtin.command:
-    cmd: rosdep init
-  when: not rosdep_init_stat.stat.exists
-
-- name: Update rosdep
-  ansible.builtin.command:
-    cmd: rosdep update --include-eol-distros
-  register: rosdep_update_res
-  until: rosdep_update_res.rc == 0
-  retries: 5
-  delay: 5
-
-- name: Install ROS workspace system dependencies via rosdep
-  ansible.builtin.command:
-    cmd: "rosdep install --from-paths {{ ros2_ws }}/src --ignore-src -y -r --rosdistro {{ ros_distro }} --skip-keys='libcamera dynamic_reconfigure catkin tf roscpp'"
-
-- name: Create COLCON_IGNORE in non-ROS packages to prevent colcon compilation
-  become_user: "{{ target_user }}"
+- name: Clean up temporary debian staging directory
   ansible.builtin.file:
-    path: "{{ ros2_ws }}/src/{{ item }}/COLCON_IGNORE"
-    state: touch
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: '0644'
-  ignore_errors: true
-  loop:
-    - libcamera
-    - libpisp
-    - ezmap_core/ezmap_autoloader_web
+    path: /tmp/ubiquity_debs
+    state: absent
 
-- name: Compile ROS 2 workspace with colcon
-  become_user: "{{ target_user }}"
-  ansible.builtin.command:
-    cmd: "/bin/bash -c 'source /opt/ros/{{ ros_distro }}/setup.bash && colcon build --symlink-install'"
-    chdir: "{{ ros2_ws }}"
-
-- name: Ensure robot_bringup config directory exists in install space
+- name: Ensure robot_bringup config directory exists in /opt/ros underlay
   ansible.builtin.file:
-    path: "{{ ros2_ws }}/install/robot_bringup/share/robot_bringup/config"
+    path: "/opt/ros/{{ ros_distro }}/share/robot_bringup/config"
     state: directory
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
     mode: '0755'
 
-- name: Symlink IMX219 camera calibration to robot_bringup config
+- name: Symlink IMX219 camera calibration to robot_bringup underlay config
   ansible.builtin.file:
     src: "{{ target_user_home }}/.ros/camera_info/imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml"
-    dest: "{{ ros2_ws }}/install/robot_bringup/share/robot_bringup/config/camera_info.yaml"
+    dest: "/opt/ros/{{ ros_distro }}/share/robot_bringup/config/camera_info.yaml"
     state: link
     force: true
+  ignore_errors: true
 
-- name: Ensure ROS 2 workspace is sourced in target user bashrc
+- name: Configure target user bashrc for ROS 2 underlay and optional overlay workspace
   become_user: "{{ target_user }}"
-  ansible.builtin.lineinfile:
+  ansible.builtin.blockinfile:
     path: "{{ target_user_home }}/.bashrc"
-    line: "source {{ ros2_ws }}/install/setup.bash"
-    state: present
+    block: |
+      source /opt/ros/{{ ros_distro }}/setup.bash
+      if [ -f "{{ ros2_ws }}/install/setup.bash" ]; then
+        source {{ ros2_ws }}/install/setup.bash
+      fi
+    marker: "# {mark} ANSIBLE MANAGED ROS2 ENVIRONMENT"
     create: true
     mode: '0644'

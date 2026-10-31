@@ -18,81 +18,68 @@ if [ -z "$ROOTFS" ] || [ ! -d "$ROOTFS" ]; then
     exit 1
 fi
 
-# 1. Verify ros2_ws Workspace Structure (Only if this is a ROS 2 robot image)
+# 1. Verify ROS 2 Jazzy Underlay & Appliance Packages (Only if this is a ROS 2 robot image)
 if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
-    echo "  - INFO: Building base-image. Skipping ROS 2 workspace tests."
+    echo "  - INFO: Building base-image. Skipping ROS 2 appliance tests."
 else
-    echo "[Test 1/3] Verifying ros2_ws structure..."
-    WS_DIR="$ROOTFS/home/ubuntu/ros2_ws"
+    echo "[Test 1/5] Verifying ROS 2 Jazzy Underlay & Debian Appliance packages..."
+    UNDERLAY_DIR="$ROOTFS/opt/ros/jazzy"
 
-    if [ ! -d "$WS_DIR" ]; then
-        echo "ERROR: ros2_ws directory does not exist at $WS_DIR!"
+    if [ ! -d "$UNDERLAY_DIR" ]; then
+        echo "ERROR: ROS 2 Jazzy underlay does not exist at $UNDERLAY_DIR!"
         exit 1
     fi
 
-    for dir in src build install log; do
-        if [ -d "$WS_DIR/$dir" ]; then
-            echo "  - PASS: $dir directory found."
-        else
-            echo "  - ERROR: Missing $dir directory in ros2_ws!"
-            echo "    This indicates the build failed or colcon did not run properly."
-            exit 1
-        fi
-    done
+    if [ -f "$UNDERLAY_DIR/setup.bash" ]; then
+        echo "  - PASS: setup.bash found in /opt/ros/jazzy."
+    else
+        echo "  - ERROR: setup.bash missing from /opt/ros/jazzy!"
+        exit 1
+    fi
 
-    # Verify that the src directory contains the specifically required nodes
-    REQUIRED_NODES=(
-        "ezmap"
-        "ezpkg_grid_driving_ros2"
-        "fiducials"
-        "iris_ur_lama"
-        "iris_ur_lama_ros"
-        "lidar_ros2"
-        "magni_robot"
-        "move_smooth"
+    REQUIRED_APPLIANCE_PACKAGES=(
         "robot_bringup"
-        "ubiquity_core_utils"
+        "magni_description"
         "ubiquity_motor_ros2"
+        "move_smooth"
         "ubiquity_route_manager"
-        "ubiquity_route_msgs"
+        "ubiquity_core_utils"
+        "ld19_lidar"
+        "iris_lama"
+        "aruco_detect"
         "camera_ros"
-        "libcamera"
-        "libpisp"
     )
 
-    echo "  - Checking for specifically required nodes in ros2_ws/src..."
-    for node in "${REQUIRED_NODES[@]}"; do
-        if ! find "$WS_DIR/src" -maxdepth 2 -type d -name "$node" | grep -q .; then
-            echo "  - ERROR: Required node '$node' is missing from ros2_ws/src!"
-            echo "    Please verify your .yaml meta files are cloning this repository."
+    echo "  - Checking for Ubiquity Core Appliance packages in /opt/ros/jazzy/share..."
+    for pkg in "${REQUIRED_APPLIANCE_PACKAGES[@]}"; do
+        if [ -d "$UNDERLAY_DIR/share/$pkg" ]; then
+            echo "  - PASS: Found underlay package '$pkg'"
+        else
+            echo "  - ERROR: Required underlay package '$pkg' missing from /opt/ros/jazzy/share!"
             exit 1
         fi
     done
 
-    SRC_COUNT=$(ls -1q "$WS_DIR/src" | wc -l)
-    echo "  - PASS: All strictly required nodes found. Total $SRC_COUNT top-level items in src."
+    # 2. Verify Clean Customer Workspace & Appliance Isolation
+    echo "[Test 2/5] Verifying clean customer workspace structure..."
+    WS_DIR="$ROOTFS/home/ubuntu/ros2_ws"
 
-    # 2. Verify ROS 2 Build Success (setup.bash and nodes)
-    echo "[Test 2/3] Verifying ROS 2 build outputs..."
-    if [ -f "$WS_DIR/install/setup.bash" ]; then
-        echo "  - PASS: setup.bash found in install directory."
-    else
-        echo "  - ERROR: setup.bash missing! The workspace didn't compile successfully."
+    if [ ! -d "$WS_DIR/src" ]; then
+        echo "ERROR: ros2_ws/src directory does not exist at $WS_DIR/src!"
         exit 1
     fi
 
-    # Count compiled packages by looking for package.xml in the install directory (handles both isolated and merged layouts)
-    NODE_COUNT=$(find "$WS_DIR/install" -name "package.xml" | wc -l)
-    if [ "$NODE_COUNT" -gt 5 ]; then
-        echo "  - PASS: Found $NODE_COUNT successfully compiled ROS 2 packages in install dir."
+    # Ensure customer workspace is pristine and contains no clutter
+    SRC_COUNT=$(find "$WS_DIR/src" -mindepth 1 -maxdepth 1 | wc -l)
+    if [ "$SRC_COUNT" -eq 0 ]; then
+        echo "  - PASS: Customer workspace src is pristine and empty (pure appliance model)."
     else
-        echo "  - ERROR: Only $NODE_COUNT compiled packages found. colcon build likely failed silently!"
-        exit 1
+        echo "  - WARNING: Customer workspace contains $SRC_COUNT items in src."
     fi
 fi
 
 # 3. Verify Systemd Services & 5-Tier Execution Architecture
-echo "[Test 3/3] Verifying 5-tier launch architecture & systemd services..."
+echo "[Test 3/5] Verifying 5-tier launch architecture & systemd services..."
 SERVICE_DIR="$ROOTFS/etc/systemd/system"
 if [ ! -d "$SERVICE_DIR" ]; then
     echo "  - ERROR: systemd services directory is missing!"
@@ -128,6 +115,39 @@ for svc in "${TIER_SERVICES[@]}"; do
         exit 1
     fi
 done
+
+# 4. Verify EZ-Map Web Application & Nginx Deployment
+echo "[Test 4/5] Verifying EZ-Map web frontend and Nginx deployment..."
+if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+    echo "  - INFO: Skipping web frontend check on base-image."
+else
+    if [ -f "$ROOTFS/var/www/ezmap/index.html" ] && [ -s "$ROOTFS/var/www/ezmap/index.html" ]; then
+        echo "  - PASS: /var/www/ezmap/index.html static web application is deployed."
+    else
+        echo "  - ERROR: /var/www/ezmap/index.html is missing or empty! Web deployment failed."
+        exit 1
+    fi
+
+    if [ -L "$ROOTFS/etc/nginx/sites-enabled/ezmap" ]; then
+        echo "  - PASS: Nginx ezmap site configuration is enabled."
+    else
+        echo "  - ERROR: Nginx ezmap site symlink missing in /etc/nginx/sites-enabled!"
+        exit 1
+    fi
+fi
+
+# 5. Verify Image Provenance Metadata
+echo "[Test 5/5] Verifying image build provenance metadata..."
+if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+    echo "  - INFO: Skipping provenance check on base-image."
+else
+    if [ -f "$ROOTFS/etc/ubiquity-image-release" ]; then
+        echo "  - PASS: Found /etc/ubiquity-image-release."
+    else
+        echo "  - ERROR: Missing /etc/ubiquity-image-release metadata!"
+        exit 1
+    fi
+fi
 
 echo "=========================================================="
 echo "          ALL AUTOMATED TESTS PASSED SUCCESSFULLY!        "

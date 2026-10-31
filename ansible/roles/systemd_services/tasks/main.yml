@@ -7,7 +7,9 @@
       #!/bin/bash
       # Set up the ROS 2 environment securely
       source /opt/ros/{{ ros_distro }}/setup.bash
-      source {{ ros2_ws }}/install/setup.bash
+      if [ -f "{{ ros2_ws }}/install/setup.bash" ]; then
+        source {{ ros2_ws }}/install/setup.bash
+      fi
 
       # Global variables applied to every tier
       export RMW_IMPLEMENTATION={{ rmw_implementation }}
@@ -69,3 +71,32 @@
     group: root
     mode: '0440'
     validate: /usr/sbin/visudo -cf %s
+
+- name: Stamp official Ubiquity image build provenance metadata
+  ansible.builtin.copy:
+    dest: /etc/ubiquity-image-release
+    mode: '0644'
+    content: |
+      IMAGE_NAME="ros2-ezmap-pro"
+      BUILD_DATE="{{ ansible_date_time.iso8601 | default('2026-10-26T00:00:00Z') }}"
+      ROS_DISTRO="{{ ros_distro }}"
+      RMW_IMPLEMENTATION="{{ rmw_implementation }}"
+      TARGET_USER="{{ target_user }}"
+      TIER_ARCH="5-tier-decoupled"
+      EZMAP_FRONTEND="svelte-5-fastcdr-worker"
+
+- name: Write ROS 2 workspace provenance json
+  ansible.builtin.copy:
+    dest: "{{ ros2_ws }}/.image_provenance.json"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+    content: |
+      {
+        "image_name": "ros2-ezmap-pro",
+        "build_date": "{{ ansible_date_time.iso8601 | default('2026-10-26T00:00:00Z') }}",
+        "ros_distro": "{{ ros_distro }}",
+        "rmw_implementation": "{{ rmw_implementation }}",
+        "tier_architecture": "5-tier-decoupled",
+        "provenance_type": "golden_image_synthesis"
+      }
