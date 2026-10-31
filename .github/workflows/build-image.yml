@@ -115,6 +115,54 @@ jobs:
           sudo modprobe loop || true
           sudo chmod 666 /dev/loop* /dev/loop-control 2>/dev/null || true
 
+      - name: Fetch All Ubiquity Core Appliance Debian Packages
+        run: |
+          DEBS_DIR="ansible/roles/ros2_workspace/files/debs"
+          mkdir -p "$DEBS_DIR"
+          
+          echo "[INFO] Fetching all 10 Ubiquity Core Appliance .deb packages from GitHub Releases..."
+          
+          # 1. robot_bringup
+          gh release download -R UbiquityRobotics/robot_bringup -p "*all.deb" -D "$DEBS_DIR" --clobber
+          
+          # 2. magni_robot (tag v0.6.1-beta.1)
+          gh release download v0.6.1-beta.1 -R UbiquityRobotics/magni_robot -p "*all.deb" -D "$DEBS_DIR" --clobber
+          
+          # 3. ubiquity_core_utils
+          gh release download -R UbiquityRobotics/ubiquity_core_utils -p "*all.deb" -D "$DEBS_DIR" --clobber
+          
+          # 4. ezmap
+          gh release download -R UbiquityRobotics/ezmap -p "ezmap-web_all.deb*" -D "$DEBS_DIR" --clobber
+          
+          # 5. move_smooth
+          gh release download -R UbiquityRobotics/move_smooth -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          # 6. ubiquity_route_manager
+          gh release download -R UbiquityRobotics/ubiquity_route_manager -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          # 7. fiducials
+          gh release download -R UbiquityRobotics/fiducials -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          # 8. ubiquity_motor_ros2
+          gh release download -R UbiquityRobotics/ubiquity_motor_ros2 -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          # 9. lidar_ros2
+          gh release download -R UbiquityRobotics/lidar_ros2 -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          # 10. iris_ur_lama_ros
+          gh release download -R UbiquityRobotics/iris_ur_lama_ros -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          echo "[PASS] Successfully fetched all appliance packages:"
+          ls -lh "$DEBS_DIR"
+          
+          COUNT=$(find "$DEBS_DIR" -name "*.deb" | wc -l)
+          if [ "$COUNT" -lt 10 ]; then
+            echo "::error::Expected at least 10 appliance .deb packages, found only $COUNT!"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
       - name: Pre-Flight Token & Configuration Validation
         run: |
           if [ -z "${GITHUB_TOKEN:-}" ]; then
@@ -125,23 +173,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: Fetch Prebuilt EZ-Map Web Application Release Bundle & Debian Package
-        run: |
-          mkdir -p ansible/roles/ros2_workspace/files
-          echo "[INFO] Attempting to fetch latest ezmap-web_all.deb from UbiquityRobotics/ezmap releases..."
-          if gh release download -R UbiquityRobotics/ezmap -p "ezmap-web_all.deb*" -D ansible/roles/ros2_workspace/files/ --clobber 2>/dev/null; then
-            echo "[PASS] Downloaded latest ezmap-web_all.deb from GitHub Releases."
-          elif [ -f "ansible/roles/ros2_workspace/files/ezmap-web_all.deb" ]; then
-            echo "[INFO] Using repository bundled ezmap-web_all.deb fallback."
-          else
-            echo "::error::No ezmap-web_all.deb found in releases or repo!"
-            exit 1
-          fi
-          ls -lh ansible/roles/ros2_workspace/files/ezmap-web_all.deb
-        env:
-          GITHUB_TOKEN: ${{ secrets.UBIQUITY_BOT_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: Synthesize RootFS and Provision ROS 2 Stack (Ansible & Colcon)
+      - name: Synthesize RootFS and Provision ROS 2 Stack (Ansible Debian Appliance)
         run: |
           export PATH="$GITHUB_WORKSPACE/bin:$GITHUB_WORKSPACE/work/ros2/host/bin:$PATH"
           mkdir -p /actions-runner/_work/apt-cache/archives/partial

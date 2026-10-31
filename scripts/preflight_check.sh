@@ -60,48 +60,42 @@ if errors > 0:
 print(f"  - PASS: Successfully validated {len(yaml_files)} YAML configuration files.")
 EOF
 
-# 4. Check Git Authentication & Repository Branch Reachability
-echo "[Check 4/6] Checking workspace repository branches on GitHub..."
+# 4. Check Ubiquity Core Debian Appliance Packages
+echo "[Check 4/6] Checking Ubiquity Core Appliance debian packages..."
 python3 - <<'EOF'
-import sys, os, yaml, subprocess
+import sys, os, glob, subprocess
 
-with open("ansible/roles/ros2_workspace/tasks/main.yml", "r") as f:
-    tasks = yaml.safe_load(f)
+debs_dir = "ansible/roles/ros2_workspace/files/debs"
+local_debs = glob.glob(os.path.join(debs_dir, "*.deb"))
 
-repos = []
-for task in tasks:
-    if task.get("name") == "Clone git repositories":
-        repos = task.get("loop", [])
-        break
+expected_packages = [
+    "ros-jazzy-robot-bringup",
+    "ros-jazzy-magni-description",
+    "ros-jazzy-ubiquity-core-utils",
+    "ezmap-web",
+    "ros-jazzy-move-smooth",
+    "ros-jazzy-ubiquity-route-manager",
+    "ros-jazzy-fiducials",
+    "ros-jazzy-ubiquity-motor-ros2",
+    "ros-jazzy-lidar-ros2",
+    "ros-jazzy-iris-lama-ros",
+]
 
-token = os.environ.get("GITHUB_TOKEN", "")
-failures = 0
-
-for r in repos:
-    name = r["name"]
-    version = r["version"]
-    url = f"https://github.com/UbiquityRobotics/{name}.git"
-    if token:
-        url = f"https://{token}@github.com/UbiquityRobotics/{name}.git"
+if local_debs:
+    print(f"  - Found {len(local_debs)} appliance debian packages staged in {debs_dir}.")
+    found_pkgs = set()
+    for deb in local_debs:
+        basename = os.path.basename(deb)
+        for exp in expected_packages:
+            if basename.startswith(exp):
+                found_pkgs.add(exp)
+                print(f"  - PASS: Found staged deb for {exp} ({basename})")
     
-    # Run a fast 1-second git ls-remote to ensure repo and branch exist
-    cmd = ["git", "ls-remote", "--exit-code", url, version, f"refs/heads/{version}", f"refs/tags/{version}"]
-    try:
-        res = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=8)
-        if res.returncode == 0:
-            print(f"  - PASS: {name} @ {version}")
-        else:
-            print(f"  - ERROR: Branch/tag '{version}' not found on {name}!", file=sys.stderr)
-            failures += 1
-    except subprocess.TimeoutExpired:
-        print(f"  - WARNING: Network timeout checking {name} (skipping)", file=sys.stderr)
-    except Exception as e:
-        print(f"  - ERROR checking {name}: {e}", file=sys.stderr)
-        failures += 1
-
-if failures > 0:
-    print(f"\nFATAL: {failures} repository branch checks failed!", file=sys.stderr)
-    sys.exit(1)
+    missing = set(expected_packages) - found_pkgs
+    if missing:
+        print(f"  - WARNING: Missing staged debs for: {missing}. These will be downloaded during CI release fetch step.", file=sys.stderr)
+else:
+    print(f"  - INFO: No local debs in {debs_dir}. They will be fetched during CI build step.")
 EOF
 
 # 5. Check executable permissions on bin/ and scripts/
@@ -124,7 +118,10 @@ done
 
 # 6. Check prebuilt assets integrity
 echo "[Check 6/6] Checking prebuilt frontend web distribution package (.deb)..."
-DEB_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web_all.deb"
+DEB_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/debs/ezmap-web_all.deb"
+if [ ! -f "$DEB_PATH" ]; then
+    DEB_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web_all.deb"
+fi
 BUNDLE_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web-dist.tar.gz"
 if [ -f "$DEB_PATH" ]; then
     if dpkg-deb -c "$DEB_PATH" | grep -q "index.html"; then
