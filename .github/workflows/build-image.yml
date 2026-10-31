@@ -84,6 +84,9 @@ jobs:
               curl -sSL -o /usr/share/keyrings/ubuntu-archive-keyring.gpg https://archive.ubuntu.com/ubuntu/project/ubuntu-archive-keyring.gpg
               chmod 644 /usr/share/keyrings/ubuntu-archive-keyring.gpg
             fi
+            # Pre-cache Golden Base RootFS tarball onto local NVMe disk during EC2 boot
+            mkdir -p /opt/ubiquity/base-rootfs
+            curl -sSL https://ubiquity-pi-image.sfo2.digitaloceanspaces.com/cache/magni-base-noble-jazzy.tar.zst -o /opt/ubiquity/base-rootfs/magni-base-noble-jazzy.tar.zst 2>/dev/null || true
           aws-resource-tags: >
             [
               {"Key": "Name", "Value": "github-actions-rpi-builder"},
