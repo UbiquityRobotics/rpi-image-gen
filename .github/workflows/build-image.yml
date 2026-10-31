@@ -228,8 +228,8 @@ jobs:
           CURRENT_DATE=$(date +%Y%m%d)
           RANDOM_NUMBER=$(shuf -i 1000-9999 -n 1)
           TARGET_XZ="${DEPLOY_DIR}/${BASE_NAME}_${CURRENT_DATE}_${RANDOM_NUMBER}.img.xz"
-          echo "[INFO] Compressing $RAW_IMAGE to $TARGET_XZ using multithreaded xz (all cores)..."
-          xz -T0 -v -z "$RAW_IMAGE"
+          echo "[INFO] Compressing $RAW_IMAGE to $TARGET_XZ using multithreaded fast xz (all cores)..."
+          xz -T0 -1 -v -z "$RAW_IMAGE"
           mv "${RAW_IMAGE}.xz" "$TARGET_XZ"
           ls -lh "$TARGET_XZ"
 
