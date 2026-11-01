@@ -161,6 +161,9 @@ fi
 # ------------------------------------------------------------------------------
 echo "==> [Phase 2/5] Staging and installing Ubiquity Appliance .deb packages..."
 
+# Purge any incompatible architectures (e.g. amd64) from staging directory
+rm -f "$DEBS_DIR"/*amd64*.deb 2>/dev/null || true
+
 DEB_COUNT=$(find "$DEBS_DIR" -name "*.deb" | wc -l)
 if [ "$DEB_COUNT" -eq 0 ]; then
   echo "[ERROR] No .deb packages found in $DEBS_DIR!" >&2
@@ -170,6 +173,7 @@ echo "[INFO] Found $DEB_COUNT appliance .deb package(s)."
 
 podman unshare mkdir -p "${ROOTFS}/tmp/ubiquity_debs"
 podman unshare cp "${DEBS_DIR}/"*.deb "${ROOTFS}/tmp/ubiquity_debs/"
+podman unshare rm -f "${ROOTFS}/tmp/ubiquity_debs"/*amd64*.deb 2>/dev/null || true
 
 # Install atomically with dpkg force-overwrite and unsafe-io inside chroot
 podman unshare chroot "$ROOTFS" /bin/bash -c '

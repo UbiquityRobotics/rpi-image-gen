@@ -66,7 +66,7 @@ python3 - <<'EOF'
 import sys, os, glob, subprocess
 
 debs_dir = "ansible/roles/ros2_workspace/files/debs"
-local_debs = glob.glob(os.path.join(debs_dir, "*.deb"))
+local_debs = [d for d in glob.glob(os.path.join(debs_dir, "*.deb")) if "amd64" not in os.path.basename(d)]
 
 expected_packages = [
     "ros-jazzy-robot-bringup",

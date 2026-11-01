@@ -50,6 +50,11 @@
     mode: '0644'
   when: build_tier | default('appliance') != 'base'
 
+- name: Purge any incompatible architecture packages from staging
+  ansible.builtin.shell:
+    cmd: rm -f /tmp/ubiquity_debs/*amd64*.deb
+  when: build_tier | default('appliance') != 'base'
+
 - name: Install all Ubiquity Core Appliance debian packages into /opt/ros underlay
   ansible.builtin.command:
     cmd: /bin/bash -c "apt-get update && apt-get install -y --allow-downgrades -o Dpkg::Options::=--force-overwrite /tmp/ubiquity_debs/*.deb"

@@ -159,7 +159,8 @@ jobs:
           gh release download -R UbiquityRobotics/ubiquity_core_utils -p "*all.deb" -D "$DEBS_DIR" --clobber
           
           # 4. ezmap (both ezmap-web frontend and ros-jazzy-ezmap backend)
-          gh release download -R UbiquityRobotics/ezmap -p "*.deb" -D "$DEBS_DIR" --clobber
+          gh release download -R UbiquityRobotics/ezmap -p "*all.deb" -D "$DEBS_DIR" --clobber
+          gh release download -R UbiquityRobotics/ezmap -p "*arm64.deb" -D "$DEBS_DIR" --clobber
           
           # 5. move_smooth
           gh release download -R UbiquityRobotics/move_smooth -p "*arm64.deb" -D "$DEBS_DIR" --clobber
@@ -178,6 +179,9 @@ jobs:
           
           # 10. iris_ur_lama_ros
           gh release download -R UbiquityRobotics/iris_ur_lama_ros -p "*arm64.deb" -D "$DEBS_DIR" --clobber
+          
+          # Safety: purge any incompatible architecture (e.g. amd64) packages from staging
+          rm -f "$DEBS_DIR"/*amd64*.deb
           
           echo "[PASS] Successfully fetched all appliance packages:"
           ls -lh "$DEBS_DIR"
