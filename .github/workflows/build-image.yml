@@ -285,7 +285,7 @@ jobs:
               FILESIZE=$(du -h "$IMAGE_FILE" | cut -f1)
               SHA256=$(sha256sum "$IMAGE_FILE" | awk '{print $1}')
               
-              echo "## 🚀 Raspberry Pi Image Build Report" >> $GITHUB_STEP_SUMMARY
+              echo "## Raspberry Pi Image Build Report" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
               echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
               echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
