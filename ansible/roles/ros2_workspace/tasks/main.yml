@@ -81,8 +81,11 @@
   become_user: "{{ target_user }}"
   ansible.builtin.blockinfile:
     path: "{{ target_user_home }}/.bashrc"
+    insertbefore: BOF
     block: |
-      source /opt/ros/{{ ros_distro }}/setup.bash
+      if [ -f "/opt/ros/{{ ros_distro }}/setup.bash" ]; then
+        source /opt/ros/{{ ros_distro }}/setup.bash
+      fi
       if [ -f "{{ ros2_ws }}/install/setup.bash" ]; then
         source {{ ros2_ws }}/install/setup.bash
       fi
