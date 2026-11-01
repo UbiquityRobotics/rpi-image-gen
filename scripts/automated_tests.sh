@@ -138,16 +138,34 @@ else
 fi
 
 # 5. Verify Image Provenance Metadata
-echo "[Test 5/5] Verifying image build provenance metadata..."
+echo "[Test 5/6] Verifying image build provenance metadata..."
 if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
     echo "  - INFO: Skipping provenance check on base-image."
 else
-    if [ -f "$ROOTFS/etc/ubiquity-image-release" ]; then
-        echo "  - PASS: Found /etc/ubiquity-image-release."
+    if [ -f "$ROOTFS/etc/ubiquity-image-release" ] || [ -f "$ROOTFS/etc/ubiquity/image-release" ]; then
+        echo "  - PASS: Found image release metadata."
     else
         echo "  - ERROR: Missing /etc/ubiquity-image-release metadata!"
         exit 1
     fi
+fi
+
+# 6. Verify ROS 2 RMW Zenoh Runtime and Dynamic Linker Configuration
+echo "[Test 6/6] Verifying ROS 2 RMW Zenoh runtime and dynamic linker configuration..."
+if [ "$IGconf_image_variant" == "ros2-base-image" ]; then
+    echo "  - INFO: Skipping RMW runtime check on base-image."
+else
+    if [ ! -f "$ROOTFS/etc/ld.so.conf.d/ros-jazzy-vendor.conf" ]; then
+        echo "  - ERROR: Missing /etc/ld.so.conf.d/ros-jazzy-vendor.conf!"
+        exit 1
+    fi
+    echo "  - PASS: Found /etc/ld.so.conf.d/ros-jazzy-vendor.conf"
+
+    if [ ! -f "$ROOTFS/opt/ros/jazzy/opt/zenoh_cpp_vendor/lib/libzenohc.so" ]; then
+        echo "  - ERROR: libzenohc.so missing from /opt/ros/jazzy/opt/zenoh_cpp_vendor/lib/!"
+        exit 1
+    fi
+    echo "  - PASS: libzenohc.so found in zenoh_cpp_vendor."
 fi
 
 echo "=========================================================="
