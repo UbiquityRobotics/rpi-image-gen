@@ -126,3 +126,22 @@
     dest: /etc/profile.d/locale.sh
     content: "export LANG=en_US.UTF-8\n"
     mode: '0644'
+
+- name: Configure dynamic linker ld.so for ROS 2 Jazzy multiarch and vendor libraries
+  ansible.builtin.copy:
+    dest: /etc/ld.so.conf.d/ros-jazzy-vendor.conf
+    content: |
+      /opt/ros/jazzy/lib
+      /opt/ros/jazzy/lib/aarch64-linux-gnu
+      /opt/ros/jazzy/opt/sdformat_vendor/lib
+      /opt/ros/jazzy/opt/zenoh_cpp_vendor/lib
+      /opt/ros/jazzy/opt/gz_tools_vendor/lib
+      /opt/ros/jazzy/opt/rviz_ogre_vendor/lib
+      /opt/ros/jazzy/opt/gz_cmake_vendor/lib
+      /opt/ros/jazzy/opt/gz_math_vendor/lib
+      /opt/ros/jazzy/opt/gz_utils_vendor/lib
+    mode: '0644'
+
+- name: Run ldconfig to refresh shared library cache
+  ansible.builtin.command:
+    cmd: ldconfig
