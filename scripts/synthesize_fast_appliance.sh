@@ -175,6 +175,15 @@ podman unshare mkdir -p "${ROOTFS}/tmp/ubiquity_debs"
 podman unshare cp "${DEBS_DIR}/"*.deb "${ROOTFS}/tmp/ubiquity_debs/"
 podman unshare rm -f "${ROOTFS}/tmp/ubiquity_debs"/*amd64*.deb 2>/dev/null || true
 
+# Temporarily provide host DNS resolution to chroot
+podman unshare cp -a "${ROOTFS}/etc/resolv.conf" "${ROOTFS}/etc/resolv.conf.orig" 2>/dev/null || true
+podman unshare rm -f "${ROOTFS}/etc/resolv.conf"
+if [ -f /etc/resolv.conf ]; then
+  podman unshare cp /etc/resolv.conf "${ROOTFS}/etc/resolv.conf"
+else
+  echo "nameserver 8.8.8.8" | podman unshare tee "${ROOTFS}/etc/resolv.conf" >/dev/null
+fi
+
 # Install atomically with dpkg force-overwrite and unsafe-io inside chroot
 podman unshare chroot "$ROOTFS" /bin/bash -c '
   set -euo pipefail
@@ -190,6 +199,14 @@ podman unshare chroot "$ROOTFS" /bin/bash -c '
   rm -f /etc/dpkg/dpkg.cfg.d/force-overwrite
   rm -rf /tmp/ubiquity_debs
 '
+
+# Restore original resolv.conf
+podman unshare rm -f "${ROOTFS}/etc/resolv.conf"
+if [ -e "${ROOTFS}/etc/resolv.conf.orig" ]; then
+  podman unshare mv "${ROOTFS}/etc/resolv.conf.orig" "${ROOTFS}/etc/resolv.conf"
+else
+  podman unshare ln -sf /run/systemd/resolve/stub-resolv.conf "${ROOTFS}/etc/resolv.conf"
+fi
 
 # Configure IMX219 camera calibration symlink if applicable
 podman unshare mkdir -p "${ROOTFS}/opt/ros/jazzy/share/robot_bringup/config"
