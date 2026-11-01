@@ -121,16 +121,16 @@ done
 
 # 6. Check prebuilt assets integrity
 echo "[Check 6/6] Checking prebuilt frontend web distribution package (.deb)..."
-DEB_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/debs/ezmap-web_all.deb"
-if [ ! -f "$DEB_PATH" ]; then
-    DEB_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web_all.deb"
+DEB_PATH=$(ls "${REPO_ROOT}/ansible/roles/ros2_workspace/files/debs/ezmap-web"*.deb 2>/dev/null | head -n 1 || true)
+if [ -z "$DEB_PATH" ] || [ ! -f "$DEB_PATH" ]; then
+    DEB_PATH=$(ls "${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web"*.deb 2>/dev/null | head -n 1 || true)
 fi
 BUNDLE_PATH="${REPO_ROOT}/ansible/roles/ros2_workspace/files/ezmap-web-dist.tar.gz"
-if [ -f "$DEB_PATH" ]; then
+if [ -n "$DEB_PATH" ] && [ -f "$DEB_PATH" ]; then
     if dpkg-deb -c "$DEB_PATH" | grep -q "index.html"; then
-        echo "  - PASS: ezmap-web_all.deb is a valid Debian package containing index.html."
+        echo "  - PASS: $(basename "$DEB_PATH") is a valid Debian package containing index.html."
     else
-        echo "  - ERROR: ezmap-web_all.deb is corrupt or does not contain index.html!" >&2
+        echo "  - ERROR: $(basename "$DEB_PATH") is corrupt or does not contain index.html!" >&2
         exit 1
     fi
 elif [ -f "$BUNDLE_PATH" ]; then

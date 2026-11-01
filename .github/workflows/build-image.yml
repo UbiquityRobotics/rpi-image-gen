@@ -152,8 +152,8 @@ jobs:
           # 1. robot_bringup
           gh release download -R UbiquityRobotics/robot_bringup -p "*all.deb" -D "$DEBS_DIR" --clobber
           
-          # 2. magni_robot (tag v0.6.1-beta.1)
-          gh release download v0.6.1-beta.1 -R UbiquityRobotics/magni_robot -p "*all.deb" -D "$DEBS_DIR" --clobber
+          # 2. magni_robot (tag v0.6.2+)
+          gh release download -R UbiquityRobotics/magni_robot -p "*all.deb" -D "$DEBS_DIR" --clobber
           
           # 3. ubiquity_core_utils
           gh release download -R UbiquityRobotics/ubiquity_core_utils -p "*all.deb" -D "$DEBS_DIR" --clobber

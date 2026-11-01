@@ -44,6 +44,7 @@ else
         "move_smooth"
         "ubiquity_route_manager"
         "ubiquity_core_utils"
+        "ezmap_backend"
         "ld19_lidar"
         "iris_lama"
         "aruco_detect"
