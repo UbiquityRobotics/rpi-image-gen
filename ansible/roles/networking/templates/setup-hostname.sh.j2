@@ -8,5 +8,6 @@ if [ "$(hostname)" != "${NEW_HOSTNAME}" ]; then
     echo "${NEW_HOSTNAME}" > /etc/hostname
     sed -i "s/127.0.1.1.*/127.0.1.1\t${NEW_HOSTNAME}/" /etc/hosts
     hostnamectl set-hostname "${NEW_HOSTNAME}"
+    systemctl restart avahi-daemon 2>/dev/null || true
 fi
 {% endraw %}
