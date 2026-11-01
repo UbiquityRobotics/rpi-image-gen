@@ -225,10 +225,14 @@ EOF
     fi
   fi
 
-  # Fix start-zenoh.sh to source ros2 environment before daemon cleanup
+  # Fix start-zenoh.sh to source ros2 environment and never kill system ROS 2 nodes
   if [ -f /usr/local/bin/start-zenoh.sh ]; then
     sed -i '\''/ros2 daemon stop/d'\'' /usr/local/bin/start-zenoh.sh
-    sed -i '\''1a source /opt/ros/jazzy/setup.bash 2>/dev/null || true\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp'\'' /usr/local/bin/start-zenoh.sh
+    sed -i '\''/pkill -9 -f "ros2"/d'\'' /usr/local/bin/start-zenoh.sh
+    sed -i '\''s|pkill -9 -f "rmw_zenohd"|pkill -9 -f "rmw_zenoh_cpp/rmw_zenohd"|g'\'' /usr/local/bin/start-zenoh.sh
+    if ! grep -q "RMW_IMPLEMENTATION=rmw_zenoh_cpp" /usr/local/bin/start-zenoh.sh; then
+      sed -i '\''1a source /opt/ros/jazzy/setup.bash 2>/dev/null || true\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp'\'' /usr/local/bin/start-zenoh.sh
+    fi
   fi
 
   rm -f /etc/dpkg/dpkg.cfg.d/force-unsafe-io
