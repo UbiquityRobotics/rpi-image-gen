@@ -86,6 +86,8 @@
       if [ -f "{{ ros2_ws }}/install/setup.bash" ]; then
         source {{ ros2_ws }}/install/setup.bash
       fi
+      export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+      export ROS_DISTRO={{ ros_distro }}
     marker: "# {mark} ANSIBLE MANAGED ROS2 ENVIRONMENT"
     create: true
     mode: '0644'
