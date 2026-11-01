@@ -191,9 +191,45 @@ podman unshare chroot "$ROOTFS" /bin/bash -c '
   echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
   echo "force-overwrite" > /etc/dpkg/dpkg.cfg.d/force-overwrite
 
+  # Configure dynamic linker for ROS 2 vendor and multiarch libraries (libzenohc.so, libsdformat, etc.)
+  cat << "EOF" > /etc/ld.so.conf.d/ros-jazzy-vendor.conf
+/opt/ros/jazzy/lib
+/opt/ros/jazzy/lib/aarch64-linux-gnu
+/opt/ros/jazzy/opt/sdformat_vendor/lib
+/opt/ros/jazzy/opt/zenoh_cpp_vendor/lib
+/opt/ros/jazzy/opt/gz_tools_vendor/lib
+/opt/ros/jazzy/opt/rviz_ogre_vendor/lib
+/opt/ros/jazzy/opt/gz_cmake_vendor/lib
+/opt/ros/jazzy/opt/gz_math_vendor/lib
+/opt/ros/jazzy/opt/gz_utils_vendor/lib
+EOF
+  ldconfig
+
   apt-get update -o Acquire::AllowReleaseInfoChange=true || true
   apt-get install -y --allow-downgrades -o Dpkg::Options::="--force-overwrite" /tmp/ubiquity_debs/*.deb
   ldconfig
+
+  # Configure ROS 2 environment at beginning of bashrc so non-interactive shells find ros2 and rmw_zenoh
+  for bashrc in /home/ubuntu/.bashrc /root/.bashrc /etc/skel/.bashrc; do
+    if [ -f "$bashrc" ]; then
+      if ! grep -q "RMW_IMPLEMENTATION=rmw_zenoh_cpp" "$bashrc"; then
+        sed -i "1i # ROS 2 Environment Setup\nexport ROS_DISTRO=jazzy\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp\nsource /opt/ros/jazzy/setup.bash 2>/dev/null || true\n" "$bashrc"
+      fi
+    fi
+  done
+
+  # Ensure setup-hostname.sh restarts avahi-daemon when dynamic MAC-based hostname is assigned
+  if [ -f /usr/local/bin/setup-hostname.sh ]; then
+    if ! grep -q "restart avahi-daemon" /usr/local/bin/setup-hostname.sh; then
+      sed -i '\''s/hostnamectl set-hostname "${NEW_HOSTNAME}"/hostnamectl set-hostname "${NEW_HOSTNAME}"\n    systemctl restart avahi-daemon || true/'\'' /usr/local/bin/setup-hostname.sh
+    fi
+  fi
+
+  # Fix start-zenoh.sh to source ros2 environment before daemon cleanup
+  if [ -f /usr/local/bin/start-zenoh.sh ]; then
+    sed -i '\''/ros2 daemon stop/d'\'' /usr/local/bin/start-zenoh.sh
+    sed -i '\''1a source /opt/ros/jazzy/setup.bash 2>/dev/null || true\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp'\'' /usr/local/bin/start-zenoh.sh
+  fi
 
   rm -f /etc/dpkg/dpkg.cfg.d/force-unsafe-io
   rm -f /etc/dpkg/dpkg.cfg.d/force-overwrite
@@ -225,6 +261,7 @@ IMAGE_GIT_COMMIT="${GIT_COMMIT}"
 BUILD_PIPELINE="two-tier-fast-appliance"
 EOF
 podman unshare ln -sf /etc/ubiquity/image-release "${ROOTFS}/etc/image_info.txt"
+podman unshare ln -sf /etc/ubiquity/image-release "${ROOTFS}/etc/ubiquity-image-release"
 
 echo "[PASS] Appliance packages installed into /opt/ros/jazzy."
 
