@@ -10,6 +10,14 @@
     group: "{{ target_user }}"
     mode: '0755'
 
+- name: Deploy README.adoc to target user home directory
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../README.adoc"
+    dest: "{{ target_user_home }}/README.adoc"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+
 - name: Ensure customer ROS 2 workspace src directory exists and is clean
   ansible.builtin.file:
     path: "{{ ros2_ws }}/src"
