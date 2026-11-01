@@ -158,8 +158,8 @@ jobs:
           # 3. ubiquity_core_utils
           gh release download -R UbiquityRobotics/ubiquity_core_utils -p "*all.deb" -D "$DEBS_DIR" --clobber
           
-          # 4. ezmap
-          gh release download -R UbiquityRobotics/ezmap -p "ezmap-web_all.deb*" -D "$DEBS_DIR" --clobber
+          # 4. ezmap (both ezmap-web frontend and ros-jazzy-ezmap backend)
+          gh release download -R UbiquityRobotics/ezmap -p "*.deb" -D "$DEBS_DIR" --clobber
           
           # 5. move_smooth
           gh release download -R UbiquityRobotics/move_smooth -p "*arm64.deb" -D "$DEBS_DIR" --clobber
@@ -183,8 +183,8 @@ jobs:
           ls -lh "$DEBS_DIR"
           
           COUNT=$(find "$DEBS_DIR" -name "*.deb" | wc -l)
-          if [ "$COUNT" -lt 10 ]; then
-            echo "::error::Expected at least 10 appliance .deb packages, found only $COUNT!"
+          if [ "$COUNT" -lt 11 ]; then
+            echo "::error::Expected at least 11 appliance .deb packages, found only $COUNT!"
             exit 1
           fi
         env:

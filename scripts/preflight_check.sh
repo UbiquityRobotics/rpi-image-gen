@@ -73,6 +73,7 @@ expected_packages = [
     "ros-jazzy-magni-description",
     "ros-jazzy-ubiquity-core-utils",
     "ezmap-web",
+    "ros-jazzy-ezmap",
     "ros-jazzy-move-smooth",
     "ros-jazzy-ubiquity-route-manager",
     "ros-jazzy-fiducials",
