@@ -79,10 +79,7 @@
 
       [pi5]
       BOOT_UART=1
-      dtoverlay=disable-bt
-      dtoverlay=uart0
-      dtoverlay=uart1
-      dtoverlay=uart2
+      dtoverlay=disable-bt-pi5
+      dtoverlay=uart0-pi5
+      dtoverlay=uart2-pi5
       dtoverlay=uart3-pi5
-      dtoverlay=uart4
-      dtoverlay=uart5

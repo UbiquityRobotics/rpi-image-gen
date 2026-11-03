@@ -1,9 +1,16 @@
 #!/bin/bash
-# Enable UART0 RX/TX on GPIO 14 & 15 with no pull-up/pull-down
-if command -v pinctrl &> /dev/null; then
-    pinctrl set 14 a0 pn
-    pinctrl set 15 a0 pn
+# Enable UARTs on Raspberry Pi
+if [ -f /proc/device-tree/model ] && grep -q "Raspberry Pi 5" /proc/device-tree/model; then
+    # UART2: GPIO 4 (TXD2), GPIO 5 (RXD2)
+    pinctrl set 4 a2 pn 2>/dev/null || true
+    pinctrl set 5 a2 pu 2>/dev/null || true
+    # UART3: GPIO 8 (TXD3), GPIO 9 (RXD3)
+    pinctrl set 8 a2 pn 2>/dev/null || true
+    pinctrl set 9 a2 pu 2>/dev/null || true
+elif command -v pinctrl &> /dev/null; then
+    pinctrl set 14 a0 pn 2>/dev/null || true
+    pinctrl set 15 a0 pn 2>/dev/null || true
 elif command -v raspi-gpio &> /dev/null; then
-    raspi-gpio set 14 a0 pn
-    raspi-gpio set 15 a0 pn
+    raspi-gpio set 14 a0 pn 2>/dev/null || true
+    raspi-gpio set 15 a0 pn 2>/dev/null || true
 fi
