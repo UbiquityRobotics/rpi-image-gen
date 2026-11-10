@@ -205,7 +205,28 @@ podman unshare chroot "$ROOTFS" /bin/bash -c '
 EOF
   ldconfig
 
+  # Configure Raspberry Pi OS Noble PPA and APT pinning for libcamera 0.7 (fixes Linux 6.8 delimiter bug)
+  echo "deb [trusted=yes] http://ppa.launchpad.net/marco-sonic/rasppios/ubuntu noble main" > /etc/apt/sources.list.d/marco-sonic-rasppios-noble.list
+  cat << "EOF" > /etc/apt/preferences.d/pin-libcamera
+# Prevent outdated ROS 2 Debian sync of libcamera from overriding updated kernel-compatible driver
+Package: ros-jazzy-libcamera
+Pin: release *
+Pin-Priority: -1
+
+# Prioritize Raspberry Pi OS official Noble port for all libcamera and ISP packages
+Package: libcamera* libpisp* rpicam*
+Pin: release o=LP-PPA-marco-sonic-rasppios
+Pin-Priority: 1000
+EOF
+
+  # Purge rogue unmanaged camera builds from /usr/local
+  rm -rf /usr/local/lib/aarch64-linux-gnu/libcamera* \
+         /usr/local/lib/aarch64-linux-gnu/libpisp* \
+         /usr/local/include/libcamera \
+         /usr/local/include/libpisp
+
   apt-get update -o Acquire::AllowReleaseInfoChange=true || true
+  apt-get install -y --allow-downgrades libcamera0.7 libcamera-ipa libpisp1 libpisp-common rpicam-apps v4l-utils || true
   apt-get install -y --allow-downgrades -o Dpkg::Options::="--force-overwrite" /tmp/ubiquity_debs/*.deb
   ldconfig
 

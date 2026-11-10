@@ -587,7 +587,7 @@
         sequence_number_resolution: "32bit",
         /// Link lease duration in milliseconds to announce to other zenoh nodes
         /// ROS setting: increase the value to avoid lease expiration at launch time with a large number of Nodes starting all together
-        lease: 60000,
+        lease: 59999,
         /// Number of keep-alive messages in a link lease duration. If no data is sent, keep alive
         /// messages will be sent at the configured time interval.
         /// NOTE: In order to consider eventual packet loss and transmission latency and jitter,
@@ -599,7 +599,7 @@
         ///       target interval.
         /// ROS setting: decrease the value since Nodes are communicating over the loopback
         ///              where keep-alive messages have less chances to be lost.
-        keep_alive: 2,
+        keep_alive: 10,
         /// Batch size in bytes is expressed as a 16bit unsigned integer.
         /// Therefore, the maximum batch size is 2^16-1 (i.e. 65535).
         /// The default batch size value is the maximum batch size: 65535.
