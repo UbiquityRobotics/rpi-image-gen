@@ -5,6 +5,42 @@
     dest: /etc/dpkg/dpkg.cfg.d/force-unsafe-io
     mode: '0644'
 
+- name: Add Raspberry Pi OS Noble PPA repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/marco-sonic-rasppios-noble.list
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      deb [trusted=yes] http://ppa.launchpad.net/marco-sonic/rasppios/ubuntu noble main
+
+- name: Configure APT pinning to block outdated ros-jazzy-libcamera
+  ansible.builtin.copy:
+    dest: /etc/apt/preferences.d/pin-libcamera
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      # Prevent outdated ROS 2 Debian sync of libcamera from overriding updated kernel-compatible driver
+      Package: ros-jazzy-libcamera
+      Pin: release *
+      Pin-Priority: -1
+
+      # Prioritize Raspberry Pi OS official Noble port for all libcamera and ISP packages
+      Package: libcamera* libpisp* rpicam*
+      Pin: release o=LP-PPA-marco-sonic-rasppios
+      Pin-Priority: 1000
+
+- name: Remove rogue unmanaged camera builds from /usr/local
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/lib/aarch64-linux-gnu/libcamera.so.0.7.2
+    - /usr/local/lib/aarch64-linux-gnu/libpisp.so.1.5.0
+    - /usr/local/include/libcamera
+    - /usr/local/include/libpisp
+
 - name: Install system package dependencies
   ansible.builtin.apt:
     name:
@@ -93,8 +129,15 @@
       - ros-jazzy-diagnostic-aggregator
       - ros-jazzy-diagnostic-updater
       - ros-jazzy-angles
+      # Raspberry Pi Camera Stack (PiSP / Libcamera 0.7)
+      - libcamera0.7
+      - libcamera-ipa
+      - libpisp1
+      - libpisp-common
+      - rpicam-apps
+      - v4l-utils
     state: present
-    update_cache: false
+    update_cache: true
 
 - name: Remove temporary dpkg force-unsafe-io configuration
   ansible.builtin.file:

@@ -168,6 +168,20 @@ else
     echo "  - PASS: libzenohc.so found in zenoh_cpp_vendor."
 fi
 
+# 7. Verify Camera Pipeline APT Pinning & Clean /usr/local
+echo "[Test 7/7] Verifying Camera Pipeline APT Pinning and clean /usr/local..."
+if [ ! -f "$ROOTFS/etc/apt/preferences.d/pin-libcamera" ]; then
+    echo "  - ERROR: Missing /etc/apt/preferences.d/pin-libcamera!"
+    exit 1
+fi
+echo "  - PASS: Found /etc/apt/preferences.d/pin-libcamera"
+
+if [ -e "$ROOTFS/usr/local/lib/aarch64-linux-gnu/libcamera.so.0.7.2" ]; then
+    echo "  - ERROR: Detected rogue unmanaged libcamera in /usr/local/lib!"
+    exit 1
+fi
+echo "  - PASS: Clean /usr/local/lib (No rogue libcamera binaries)"
+
 echo "=========================================================="
 echo "          ALL AUTOMATED TESTS PASSED SUCCESSFULLY!        "
 echo "=========================================================="
