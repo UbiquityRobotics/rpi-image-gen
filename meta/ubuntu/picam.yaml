@@ -50,28 +50,30 @@ mmdebstrap:
       chroot "$1" udevadm control --reload-rules
       chroot "$1" udevadm trigger
 
-    # Workspace setup - create as ubuntu user from the start via uchroot
+    # APT pinning to block outdated ros-jazzy-libcamera and enforce Marco Sonic PPA
+    - |
+      cat << 'EOF' > "$1/etc/apt/preferences.d/pin-libcamera"
+      # Prevent outdated ROS 2 Debian sync of libcamera from overriding updated kernel-compatible driver
+      Package: ros-jazzy-libcamera
+      Pin: release *
+      Pin-Priority: -1
+
+      # Prioritize Raspberry Pi OS official Noble port for all libcamera and ISP packages
+      Package: libcamera* libpisp* rpicam*
+      Pin: release o=LP-PPA-marco-sonic-rasppios
+      Pin-Priority: 1000
+      EOF
+
+    # Install official Raspberry Pi 5 camera stack packages via APT (zero source compilation)
+    - chroot "$1" apt-get update
+    - chroot "$1" apt-get install -y --allow-downgrades libcamera0.7 libcamera-ipa libpisp1 libpisp-common rpicam-apps v4l-utils ros-jazzy-camera-ros
+
+    # Purge any unmanaged builds in /usr/local
+    - rm -rf "$1/usr/local/lib/aarch64-linux-gnu/libcamera"* "$1/usr/local/lib/aarch64-linux-gnu/libpisp"* "$1/usr/local/include/libcamera" "$1/usr/local/include/libpisp"
+    - chroot "$1" ldconfig
+
+    # Clean customer workspace structure
     - bin/uchroot "$1" mkdir -p /home/ubuntu/ros2_ws/src
-    - bin/uchroot "$1" git clone https://github.com/christianrauch/camera_ros.git /home/ubuntu/ros2_ws/src/camera_ros
-    - bin/uchroot "$1" git -C /home/ubuntu/ros2_ws/src/camera_ros checkout 73bc59749f453cd2ddc5dc25f49a1dedf4415f13
-    - bin/uchroot "$1" sed -i 's/-Werror/-Wno-deprecated-declarations/g' /home/ubuntu/ros2_ws/src/camera_ros/CMakeLists.txt
-    - bin/uchroot "$1" sed -i 's/libcamera::dynamic_extent/std::dynamic_extent/g' /home/ubuntu/ros2_ws/src/camera_ros/src/ParameterHandler.cpp
-    # Clone pinned libcamera and libpisp repos as ubuntu user into ros2 workspace
-    - bin/uchroot "$1" git clone --recursive -b v0.7.2+rpt20260817 https://github.com/raspberrypi/libcamera.git /home/ubuntu/ros2_ws/src/libcamera
-    - bin/uchroot "$1" git clone -b v1.7.0 https://github.com/raspberrypi/libpisp.git /home/ubuntu/ros2_ws/src/libpisp
-
-    # Build and install libcamera from source
-    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && meson setup build --buildtype=release -Dpipelines=rpi/vc4,rpi/pisp -Dipas=rpi/vc4,rpi/pisp -Dv4l2=true -Dgstreamer=enabled -Dtest=false -Dlc-compliance=disabled -Dcam=disabled -Dqcam=disabled -Ddocumentation=disabled -Dpycamera=enabled"
-    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && ninja -C build"
-    - chroot "$1" bash -c "cd /home/ubuntu/ros2_ws/src/libcamera && ninja -C build install"
-
-    # Clean up build files and apt cache to reduce image size
-    - chroot "$1" rm -rf /home/ubuntu/ros2_ws/src/libcamera/build
-    - chroot "$1" apt clean
-    # Install ROS dev tools and common camera packages
-    - chroot "$1" apt install -y ros-dev-tools ros-jazzy-camera-info-manager ros-jazzy-image-pipeline ros-jazzy-ament-cmake
-
-    # Final ownership fix for the cloned repositories
     - chroot "$1" chown -R ubuntu:ubuntu /home/ubuntu/ros2_ws
 
     # Add script to run camera calibration
