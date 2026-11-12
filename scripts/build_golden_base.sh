@@ -100,7 +100,10 @@ echo "[INFO] Generating SHA256 checksum for base rootfs tarball..."
 sha256sum "$TARBALL" | awk '{print $1}' > "${TARBALL}.sha256"
 
 echo "[INFO] Packaging OCI container image: $IMAGE_TAG ..."
-podman import "$ROOTFS" "$IMAGE_TAG"
+if ! podman import "$TARBALL" "$IMAGE_TAG"; then
+  echo "[WARN] Direct podman import failed; attempting import via decompressed tar stream..."
+  zstd -dc "$TARBALL" | podman import - "$IMAGE_TAG"
+fi
 
 if [ "$PUSH_GHCR" = true ]; then
   echo "[INFO] Pushing OCI container image to GHCR ($IMAGE_TAG)..."
