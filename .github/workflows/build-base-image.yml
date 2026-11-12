@@ -155,7 +155,7 @@ jobs:
             FILESIZE=$(du -h "$TARBALL" | cut -f1)
             SHA256=$(cat "${TARBALL}.sha256")
             
-            echo "## 🏆 Tier 1 Golden Base RootFS Build Report" >> $GITHUB_STEP_SUMMARY
+            echo "## RootFS Build Report" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
             echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
