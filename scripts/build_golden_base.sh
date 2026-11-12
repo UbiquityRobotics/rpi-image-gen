@@ -107,7 +107,9 @@ fi
 
 if [ "$PUSH_GHCR" = true ]; then
   echo "[INFO] Pushing OCI container image to GHCR ($IMAGE_TAG)..."
-  podman push "$IMAGE_TAG"
+  if ! podman push "$IMAGE_TAG"; then
+    echo "[WARN] podman push to GHCR failed or GHCR package access denied. DigitalOcean Spaces will serve as the primary CDN cache."
+  fi
 fi
 
 echo "=========================================================="

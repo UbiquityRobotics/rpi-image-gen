@@ -107,7 +107,28 @@ for tb in "${TARBALL_CANDIDATES[@]}"; do
   fi
 done
 
-# 2. Check local Podman container image
+# 2. Check DigitalOcean Spaces CDN Cache if not found locally on NVMe
+if [ "$RESTORED" = false ]; then
+  SPACES_CACHE_URL="https://ubiquity-pi-image.sfo2.digitaloceanspaces.com/cache/magni-base-noble-jazzy.tar.zst"
+  LOCAL_DOWNLOAD="work/ros2/deploy/magni-base-noble-jazzy.tar.zst"
+  mkdir -p "work/ros2/deploy"
+  echo "[INFO] Checking DigitalOcean Spaces Golden Base cache: $SPACES_CACHE_URL ..."
+  if curl -sSLf -o "$LOCAL_DOWNLOAD" "$SPACES_CACHE_URL" 2>/dev/null; then
+    echo "[INFO] Testing integrity of downloaded base rootfs archive..."
+    if zstd -t "$LOCAL_DOWNLOAD" >/dev/null 2>&1; then
+      echo "[PASS] Valid zstd base rootfs verified from DigitalOcean Spaces CDN. Unpacking..."
+      podman unshare tar --numeric-owner -I 'zstd -T0' -xf "$LOCAL_DOWNLOAD" -C "$ROOTFS"
+      RESTORED=true
+    else
+      echo "[WARN] Downloaded file from Spaces is not a valid zstd archive. Pruning..."
+      rm -f "$LOCAL_DOWNLOAD"
+    fi
+  else
+    echo "[INFO] Base rootfs not found in DigitalOcean Spaces cache or network unavailable."
+  fi
+fi
+
+# 3. Check local Podman container image
 if [ "$RESTORED" = false ]; then
   if podman image exists "$BASE_IMAGE" 2>/dev/null; then
     echo "[INFO] Found local Podman image '$BASE_IMAGE'. Exporting to rootfs..."
@@ -118,7 +139,7 @@ if [ "$RESTORED" = false ]; then
   fi
 fi
 
-# 3. Pull from GitHub Container Registry
+# 4. Pull from GitHub Container Registry
 if [ "$RESTORED" = false ]; then
   echo "[INFO] Attempting to pull base rootfs from GHCR ($BASE_IMAGE)..."
   if podman pull "$BASE_IMAGE" 2>/dev/null; then
@@ -129,7 +150,7 @@ if [ "$RESTORED" = false ]; then
   fi
 fi
 
-# 4. Fallback: Full bootstrap
+# 5. Fallback: Full bootstrap
 FALLBACK_BOOTSTRAP=false
 if [ "$RESTORED" = false ]; then
   echo "[WARN] No Golden Base found on NVMe or GHCR! Falling back to full bdebstrap..."
