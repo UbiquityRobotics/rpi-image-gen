@@ -11,6 +11,8 @@ mmdebstrap:
 
       # Copy ansible directory into the chroot
       cp -r ansible "$1/opt/ansible-provisioning"
+      cp README.adoc "$1/opt/ansible-provisioning/" 2>/dev/null || true
+      cp README.adoc "$1/opt/README.adoc" 2>/dev/null || true
 
       # Copy ros2_ws/src into the chroot so Ansible can access the older out-of-tree repos
       if [ -d "ros2_ws/src" ]; then
@@ -38,6 +40,7 @@ mmdebstrap:
       # Clean up provisioning artifacts
       rm -rf "$1/opt/ansible-provisioning"
       rm -rf "$1/opt/ros2_ws"
+      rm -f "$1/opt/README.adoc"
 
       if [ $ANSIBLE_RC -ne 0 ]; then
         echo "ERROR: Ansible Provisioning failed (exit code: $ANSIBLE_RC)"

@@ -275,6 +275,13 @@ podman unshare ln -sf \
   "/home/ubuntu/.ros/camera_info/imx219__base_axi_pcie_1000120000_rp1_i2c_88000_imx219_10_640x480.yaml" \
   "${ROOTFS}/opt/ros/jazzy/share/robot_bringup/config/camera_info.yaml" || true
 
+# Ensure documentation is deployed to target user home
+if [ -f "${REPO_ROOT}/README.adoc" ]; then
+  podman unshare cp "${REPO_ROOT}/README.adoc" "${ROOTFS}/home/ubuntu/README.adoc"
+  podman unshare chown 1000:1000 "${ROOTFS}/home/ubuntu/README.adoc" 2>/dev/null || true
+  podman unshare chmod 644 "${ROOTFS}/home/ubuntu/README.adoc" 2>/dev/null || true
+fi
+
 # Stamp build metadata
 podman unshare mkdir -p "${ROOTFS}/etc/ubiquity"
 BUILD_DATE=$(date --utc +'%Y-%m-%d %H:%M:%S UTC')

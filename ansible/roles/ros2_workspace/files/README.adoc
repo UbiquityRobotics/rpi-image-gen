@@ -1,0 +1,165 @@
+================================================================================
+Ubiquity Robotics Appliance Image with ROS 2 Jazzy
+================================================================================
+
+OVERVIEW
+--------
+This is the official Ubiquity Robotics production appliance image built on
+Ubuntu 24.04 LTS (Noble Numbat) with ROS 2 Jazzy Jalisco.
+
+Key Pre-Installed Features:
+- ROS 2 Jazzy Jalisco Underlay (/opt/ros/jazzy)
+- rmw_zenoh_cpp (Ultra-low latency, robust distributed communications)
+- Automatic First-Boot Wi-Fi Hotspot / Access Point
+- NetworkManager with dynamic MAC-based hostname provisioning
+- Ubiquity Robotics Robot Bringup, Teleop, Navigation, and Hardware Drivers
+- EZ-Map Web Application and Foxglove WebSocket Telemetry Bridge (Port 80 / 8765)
+- Iris LAMA 2D SLAM and STag / ArUco Fiducial Vision
+
+
+DEFAULT SYSTEM CREDENTIALS
+--------------------------
+Username: ubuntu
+Password: ubuntu
+(You will be prompted to change or retain your password on first login).
+
+
+FIRST BOOT & NETWORK CONNECTIVITY
+---------------------------------
+When the robot boots for the first time:
+
+1. Dynamic Hostname:
+   The system automatically inspects the wireless MAC address (wlan0) and
+   assigns a unique hostname: ubiquityrobotXXXX
+   (where XXXX are the last 4 characters of the MAC address in uppercase).
+
+2. Wi-Fi Access Point (Hotspot):
+   If the robot has not been configured with a local Wi-Fi connection, it
+   broadcasts a standalone Wi-Fi Access Point:
+     SSID:     ubiquityrobotXXXX  (matches your robot's hostname)
+     Password: robotseverywhere
+     Robot IP: 192.168.0.1
+
+3. Wired Ethernet (end0):
+   For direct cable connection to a laptop or workstation without Wi-Fi:
+     Static IP: 192.168.42.125/24
+   To connect directly via Ethernet, configure your computer's wired interface to:
+     IP: 192.168.42.100, Netmask: 255.255.255.0
+
+
+STEP-BY-STEP GETTING STARTED
+----------------------------
+
+Step 1: Connect to the Robot's Wi-Fi Access Point
+  - Scan for Wi-Fi networks on your computer or phone.
+  - Connect to the network: ubiquityrobotXXXX
+  - Enter the security password: robotseverywhere
+  - Your client computer will receive a DHCP address in the 192.168.0.0/24 subnet.
+
+Step 2: SSH into the Robot
+  Open a terminal on your computer and run:
+
+    ssh ubuntu@192.168.0.1
+
+  When prompted for the password, enter: ubuntu
+
+Step 3: Access the Web Console (EZ-Map & Telemetry)
+  While connected to the Access Point, open any web browser and navigate to:
+
+    http://192.168.0.1/
+
+  The web console provides robot mapping, route scheduling, virtual joystick
+  driving, and live diagnostics streaming over the Foxglove bridge.
+
+Step 4: Configure the Robot to Connect to your Local Wi-Fi Network
+  Once connected over SSH, you can link the robot to your home or office Wi-Fi
+  using NetworkManager CLI (nmcli):
+
+  1. Scan for nearby Wi-Fi networks:
+       sudo nmcli dev wifi list
+
+  2. Connect to your Wi-Fi network:
+       sudo nmcli dev wifi connect "YourNetworkSSID" password "YourPassword"
+
+  Note: Once connected to your local network, the Access Point will shut down,
+  and your active SSH session to 192.168.0.1 will terminate. The robot will
+  receive a new IP address from your local router's DHCP server.
+
+Step 5: Reconnect over your Local Wi-Fi Network
+  Connect your computer to the same Wi-Fi network as the robot.
+  Find the robot's newly assigned IP on your router, or connect using mDNS:
+
+    ssh ubuntu@ubiquityrobotXXXX.local
+    or
+    ssh ubuntu@<Robot_Local_IP>
+
+  You can also navigate to the web console on your local network:
+
+    http://ubiquityrobotXXXX.local/
+    or
+    http://<Robot_Local_IP>/
+
+
+VERIFYING ROS 2 SYSTEM SERVICES
+-------------------------------
+The robot runs all core system services automatically via systemd. You can
+inspect service statuses at any time:
+
+  systemctl list-units 'magni*' 'rmw*' --no-pager
+
+Key Services:
+  rmw_zenohd.service         - Zenoh communication router daemon
+  magni-hardware.service     - Hardware drivers, encoders, and motor controllers
+  magni-teleop.service       - Twist multiplexer and gamepad/joystick controls
+  magni-navigation.service   - Iris LAMA SLAM, Move Smooth velocity controller
+  magni-ui.service           - EZ-Map backend and Foxglove WebSocket bridge
+  magni-diagnostics.service  - Top-level hardware diagnostics aggregator
+
+To check all running ROS 2 nodes:
+
+    ros2 node list
+
+Expected Nodes:
+  /actions_node
+  /diagnostics_agg
+  /ezmap_node
+  /foxglove_bridge
+  /iris_lama_ros
+  /move_smooth
+  /odom_tf_broadcaster
+  /robot_state_publisher
+  /route_executor_node
+  /route_setup_node
+  /stag_detect
+  /triggers_node
+  /twist_mux
+
+To monitor primary robot topics:
+
+    ros2 topic list
+    ros2 topic echo /battery_state
+    ros2 topic echo /odom
+
+
+TROUBLESHOOTING & COMMON COMMANDS
+---------------------------------
+1. If Wi-Fi Access Point does not appear:
+   Inspect hostapd and NetworkManager status:
+     sudo systemctl status NetworkManager
+     sudo nmcli connection show
+
+2. To switch back to Access Point mode manually:
+     sudo /usr/local/bin/setup-ap.sh
+
+3. To view systemd service logs:
+     journalctl -u magni-hardware.service -n 50 --no-pager
+     journalctl -u magni-navigation.service -n 50 --no-pager
+     journalctl -u magni-ui.service -n 50 --no-pager
+
+4. Managing User Overlay Workspace:
+   The user workspace is located at /home/ubuntu/ros2_ws.
+   To build custom packages:
+     cd /home/ubuntu/ros2_ws
+     colcon build --symlink-install
+     source install/setup.bash
+================================================================================

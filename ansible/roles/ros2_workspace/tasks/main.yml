@@ -12,7 +12,7 @@
 
 - name: Deploy README.adoc to target user home directory
   ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../README.adoc"
+    src: README.adoc
     dest: "{{ target_user_home }}/README.adoc"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
