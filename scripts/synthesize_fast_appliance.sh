@@ -205,15 +205,33 @@ else
   echo "nameserver 8.8.8.8" | podman unshare tee "${ROOTFS}/etc/resolv.conf" >/dev/null
 fi
 
-# Install atomically with dpkg force-overwrite and unsafe-io inside chroot
-podman unshare chroot "$ROOTFS" /bin/bash -c '
+# Bind-mount essential /dev device nodes inside the same podman unshare mount namespace
+# so apt-key/gpgv can write to /dev/null and install missing transitive dependencies.
+podman unshare /bin/bash -s "$ROOTFS" << 'CHROOT_WRAPPER'
   set -euo pipefail
-  export DEBIAN_FRONTEND=noninteractive
-  echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
-  echo "force-overwrite" > /etc/dpkg/dpkg.cfg.d/force-overwrite
+  ROOTFS="$1"
 
-  # Configure dynamic linker for ROS 2 vendor and multiarch libraries (libzenohc.so, libsdformat, etc.)
-  cat << "EOF" > /etc/ld.so.conf.d/ros-jazzy-vendor.conf
+  cleanup_mounts() {
+    for devnode in null zero random urandom; do
+      umount -l "${ROOTFS}/dev/${devnode}" 2>/dev/null || true
+    done
+  }
+  trap cleanup_mounts EXIT
+
+  mkdir -p "${ROOTFS}/dev"
+  for devnode in null zero random urandom; do
+    touch "${ROOTFS}/dev/${devnode}"
+    mount --bind "/dev/${devnode}" "${ROOTFS}/dev/${devnode}" || chmod 666 "${ROOTFS}/dev/${devnode}" || true
+  done
+
+  chroot "$ROOTFS" /bin/bash -s << 'IN_CHROOT'
+    set -euo pipefail
+    export DEBIAN_FRONTEND=noninteractive
+    echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+    echo "force-overwrite" > /etc/dpkg/dpkg.cfg.d/force-overwrite
+
+    # Configure dynamic linker for ROS 2 vendor and multiarch libraries (libzenohc.so, libsdformat, etc.)
+    cat << "EOF" > /etc/ld.so.conf.d/ros-jazzy-vendor.conf
 /opt/ros/jazzy/lib
 /opt/ros/jazzy/lib/aarch64-linux-gnu
 /opt/ros/jazzy/opt/sdformat_vendor/lib
@@ -224,11 +242,11 @@ podman unshare chroot "$ROOTFS" /bin/bash -c '
 /opt/ros/jazzy/opt/gz_math_vendor/lib
 /opt/ros/jazzy/opt/gz_utils_vendor/lib
 EOF
-  ldconfig
+    ldconfig
 
-  # Configure Raspberry Pi OS Noble PPA and APT pinning for libcamera 0.7 (fixes Linux 6.8 delimiter bug)
-  echo "deb [trusted=yes] http://ppa.launchpad.net/marco-sonic/rasppios/ubuntu noble main" > /etc/apt/sources.list.d/marco-sonic-rasppios-noble.list
-  cat << "EOF" > /etc/apt/preferences.d/pin-libcamera
+    # Configure Raspberry Pi OS Noble PPA and APT pinning for libcamera 0.7 (fixes Linux 6.8 delimiter bug)
+    echo "deb [trusted=yes] http://ppa.launchpad.net/marco-sonic/rasppios/ubuntu noble main" > /etc/apt/sources.list.d/marco-sonic-rasppios-noble.list
+    cat << "EOF" > /etc/apt/preferences.d/pin-libcamera
 # Prevent outdated ROS 2 Debian sync of libcamera from overriding updated kernel-compatible driver
 Package: ros-jazzy-libcamera
 Pin: release *
@@ -240,47 +258,49 @@ Pin: release o=LP-PPA-marco-sonic-rasppios
 Pin-Priority: 1000
 EOF
 
-  # Purge rogue unmanaged camera builds from /usr/local
-  rm -rf /usr/local/lib/aarch64-linux-gnu/libcamera* \
-         /usr/local/lib/aarch64-linux-gnu/libpisp* \
-         /usr/local/include/libcamera \
-         /usr/local/include/libpisp
+    # Purge rogue unmanaged camera builds from /usr/local
+    rm -rf /usr/local/lib/aarch64-linux-gnu/libcamera* \
+           /usr/local/lib/aarch64-linux-gnu/libpisp* \
+           /usr/local/include/libcamera \
+           /usr/local/include/libpisp
 
-  apt-get update -o Acquire::AllowReleaseInfoChange=true || true
-  apt-get install -y --allow-downgrades libcamera0.7 libcamera-ipa libpisp1 libpisp-common rpicam-apps v4l-utils || true
-  apt-get install -y --allow-downgrades -o Dpkg::Options::="--force-overwrite" /tmp/ubiquity_debs/*.deb
-  ldconfig
+    apt-get update -o Acquire::AllowReleaseInfoChange=true
+    apt-get install -y --allow-downgrades libcamera0.7 libcamera-ipa libpisp1 libpisp-common rpicam-apps v4l-utils || true
+    apt-get install -y --allow-downgrades -o Dpkg::Options::="--force-overwrite" /tmp/ubiquity_debs/*.deb
+    apt-get clean
+    ldconfig
 
-  # Configure ROS 2 environment at beginning of bashrc so non-interactive shells find ros2 and rmw_zenoh
-  for bashrc in /home/ubuntu/.bashrc /root/.bashrc /etc/skel/.bashrc; do
-    if [ -f "$bashrc" ]; then
-      if ! grep -q "RMW_IMPLEMENTATION=rmw_zenoh_cpp" "$bashrc"; then
-        sed -i "1i # ROS 2 Environment Setup\nexport ROS_DISTRO=jazzy\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp\nsource /opt/ros/jazzy/setup.bash 2>/dev/null || true\n" "$bashrc"
+    # Configure ROS 2 environment at beginning of bashrc so non-interactive shells find ros2 and rmw_zenoh
+    for bashrc in /home/ubuntu/.bashrc /root/.bashrc /etc/skel/.bashrc; do
+      if [ -f "$bashrc" ]; then
+        if ! grep -q "RMW_IMPLEMENTATION=rmw_zenoh_cpp" "$bashrc"; then
+          sed -i "1i # ROS 2 Environment Setup\nexport ROS_DISTRO=jazzy\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp\nsource /opt/ros/jazzy/setup.bash 2>/dev/null || true\n" "$bashrc"
+        fi
+      fi
+    done
+
+    # Ensure setup-hostname.sh restarts avahi-daemon when dynamic MAC-based hostname is assigned
+    if [ -f /usr/local/bin/setup-hostname.sh ]; then
+      if ! grep -q "restart avahi-daemon" /usr/local/bin/setup-hostname.sh; then
+        sed -i 's/hostnamectl set-hostname "${NEW_HOSTNAME}"/hostnamectl set-hostname "${NEW_HOSTNAME}"\n    systemctl restart avahi-daemon || true/' /usr/local/bin/setup-hostname.sh
       fi
     fi
-  done
 
-  # Ensure setup-hostname.sh restarts avahi-daemon when dynamic MAC-based hostname is assigned
-  if [ -f /usr/local/bin/setup-hostname.sh ]; then
-    if ! grep -q "restart avahi-daemon" /usr/local/bin/setup-hostname.sh; then
-      sed -i '\''s/hostnamectl set-hostname "${NEW_HOSTNAME}"/hostnamectl set-hostname "${NEW_HOSTNAME}"\n    systemctl restart avahi-daemon || true/'\'' /usr/local/bin/setup-hostname.sh
+    # Fix start-zenoh.sh to source ros2 environment and never kill system ROS 2 nodes
+    if [ -f /usr/local/bin/start-zenoh.sh ]; then
+      sed -i '/ros2 daemon stop/d' /usr/local/bin/start-zenoh.sh
+      sed -i '/pkill -9 -f "ros2"/d' /usr/local/bin/start-zenoh.sh
+      sed -i 's|pkill -9 -f "rmw_zenohd"|pkill -9 -f "rmw_zenoh_cpp/rmw_zenohd"|g' /usr/local/bin/start-zenoh.sh
+      if ! grep -q "RMW_IMPLEMENTATION=rmw_zenoh_cpp" /usr/local/bin/start-zenoh.sh; then
+        sed -i '1a source /opt/ros/jazzy/setup.bash 2>/dev/null || true\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp' /usr/local/bin/start-zenoh.sh
+      fi
     fi
-  fi
 
-  # Fix start-zenoh.sh to source ros2 environment and never kill system ROS 2 nodes
-  if [ -f /usr/local/bin/start-zenoh.sh ]; then
-    sed -i '\''/ros2 daemon stop/d'\'' /usr/local/bin/start-zenoh.sh
-    sed -i '\''/pkill -9 -f "ros2"/d'\'' /usr/local/bin/start-zenoh.sh
-    sed -i '\''s|pkill -9 -f "rmw_zenohd"|pkill -9 -f "rmw_zenoh_cpp/rmw_zenohd"|g'\'' /usr/local/bin/start-zenoh.sh
-    if ! grep -q "RMW_IMPLEMENTATION=rmw_zenoh_cpp" /usr/local/bin/start-zenoh.sh; then
-      sed -i '\''1a source /opt/ros/jazzy/setup.bash 2>/dev/null || true\nexport RMW_IMPLEMENTATION=rmw_zenoh_cpp'\'' /usr/local/bin/start-zenoh.sh
-    fi
-  fi
-
-  rm -f /etc/dpkg/dpkg.cfg.d/force-unsafe-io
-  rm -f /etc/dpkg/dpkg.cfg.d/force-overwrite
-  rm -rf /tmp/ubiquity_debs
-'
+    rm -f /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+    rm -f /etc/dpkg/dpkg.cfg.d/force-overwrite
+    rm -rf /tmp/ubiquity_debs
+IN_CHROOT
+CHROOT_WRAPPER
 
 # Restore original resolv.conf
 podman unshare rm -f "${ROOTFS}/etc/resolv.conf"

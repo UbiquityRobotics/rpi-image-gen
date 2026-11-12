@@ -108,6 +108,7 @@
       - ros-jazzy-rviz-visual-tools
       - ros-jazzy-vision-msgs
       - ros-jazzy-image-transport
+      - ros-jazzy-compressed-image-transport
       - ros-jazzy-camera-info-manager
       - ros-jazzy-image-pipeline
       - ros-jazzy-nav2-map-server
