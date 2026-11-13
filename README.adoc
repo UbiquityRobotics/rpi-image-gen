@@ -2,6 +2,19 @@
 Ubiquity Robotics Appliance Image with ROS 2 Jazzy
 ================================================================================
 
+RUNNING NEW BUILD
+-----------------
+1) Go to this URL https://github.com/UbiquityRobotics/rpi-image-gen (should be the URL you are on)
+2) Click on Actions on the top toolbar
+3) Click on "Build Raspbery Pi Robot Disk Image" on the left hand side
+4) Click the greeen "Run Workflow" button on the right to the middle
+5) In the pop up that appears you can select which branch you want to build from and other details once done click the green "Run Workflow" button in the pop up.
+6) Wait for it to build ~ 20 minutes is typical, but it depends on what packages have been updated since last time. Once done it will generate a build report. If you , that can be viewed by looking at the build activity. This can be downloaded 
+
+
+
+
+
 OVERVIEW
 --------
 This is the official Ubiquity Robotics production appliance image built on
